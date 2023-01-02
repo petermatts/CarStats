@@ -1,0 +1,11 @@
+- Modify link scraper: there are a few holes/links it is not picking up that is should
+    - modify for efficency as well?
+
+- Data scraper for each link
+    - Will most likely do this by barnd/year because everything at once is too much requests, will get errors
+    - Pick out attributes to parse out of the web scrapping, will put this in Targets.txt
+
+- Find way of displaying/comparing/filtering/sorting resulting data
+
+- Explore using matplotlib.pyplot to display specs
+    - further explore interactability so that data rows can be sorted according to desired features

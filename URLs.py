@@ -2,10 +2,10 @@ from bs4 import BeautifulSoup
 import requests
 import re
 import datetime
+import os
 
 # returns a list of all urls for each automaker
-def findAutoMakers(site: str):
-    # site = 'https://caranddriver.com'
+def findAutoMakers(site: str = 'https://caranddriver.com'):
     r = requests.get(site)
     if r.status_code != 200:
         return
@@ -41,13 +41,20 @@ def scrapeAutoMakers(automaker: str):
     for i in s.find_all("a"):
         href = i.attrs['href']
         if href.startswith("/") and "search" not in href:
-            site_n = site + href
+            # site_n = site + href
+            site_n = automaker + href # ? I think this is right?
             if site_n not in urls and re.search('-\d\d\d\d$', site_n) == None and site_n.startswith(automaker):
                 urls.append(site_n + '/specs')
                 # print(site_n)
 
-    # urls = list(filter(lambda s: s.startswith(automaker), urls))
+    urls = list(filter(lambda s: s.startswith(automaker), urls))
     urls = list(set(urls))
+
+    # Why isnt it finding this, hopefully there arent others like this that the algorithm is missing
+    if automaker == 'https://caranddriver.com/audi':
+        urls.append('https://caranddriver.com/audi/s7/specs')
+
+    urls.sort()
         
     return urls
 
@@ -71,6 +78,8 @@ def modelSpecLinks(site: str):
         links[0] = links[1].replace(y, year)
 
     # print(links)
+
+    # return links
 
     masterlist = []
 
@@ -99,48 +108,91 @@ def getAllModelLinks(site: str):
 
     a.remove(site + '/specs')
 
+    a.sort() # not necessary but would be nice for stuff to be somewhat ordered
+
     for i in a:
         brand = i.split('/')[-3:-2][0]
         model = i.split('/')[-2:-1][0]
         print(brand, model)
         urls += modelSpecLinks(i)
     
-    for i in urls:
-        print(i)
+    # for i in urls:
+    #     print(i)
 
     urls = list(set(urls))
     urls.sort()
 
     return urls
 
-def getAll():
+def brandLinkFile(site: str):
+    if not os.path.isdir('Links'):
+        os.mkdir('Links')
+
+    brand = site.split('/')[3]
+    b = brand.split('-')
+    for i in range(len(b)):
+        b[i] = b[i].capitalize()
+    brand = '-'.join(b) + '.txt'
+
+    # print(brand)
+
+    urls = getAllModelLinks(site)
+    for i in range(len(urls)):
+        urls[i] = urls[i] + '\n'
+
+    f = open("Links/"+brand, "w")
+    f.writelines(urls)
+    f.close()
+
+
+def createAutoMakersTXT():
+    if not os.path.isdir('Links'):
+        os.mkdir('Links')
+
     site = 'https://caranddriver.com'
     autoMakers = findAutoMakers(site)
+    for i in range(len(autoMakers)):
+        autoMakers[i] = autoMakers[i] + '\n'
 
-    urls = []
-
-
-def test():
-    # r = requests.get('https://caranddriver.com/tesla/cybertruck/specs')
-    r = requests.get('https://caranddriver.com/tesla/specs')
-    print(r.status_code)
-
-# TODO create reference function that shows what index all outmakers are, make it write to a txt file?
+    autoMakersDotTXT = open("Links/AutoMakers.txt", "w")
+    autoMakersDotTXT.writelines(autoMakers)
+    autoMakersDotTXT.close()
 
 if __name__ == '__main__':
-    site = 'https://caranddriver.com'
-    autoMakers = findAutoMakers(site)
+    # site = 'https://caranddriver.com'
+    # autoMakers = findAutoMakers(site)
+    autoMakers = findAutoMakers()
     # for i in range(len(autoMakers)):
         # print(i, autoMakers[i])
 
-    # a = scrapeAutoMakers(autoMakers[3]) # Audi
-    # a = scrapeAutoMakers(autoMakers[20]) # Honda
-    # a = scrapeAutoMakers(autoMakers[52]) # Tesla
-    # for i in a:
-        # l = modelSpecLinks(i)
-        # for j in l:
-            # print(j)
+    # u = getAllModelLinks(autoMakers[3])
+    # u = scrapeAutoMakers(autoMakers[3])
+    # for i in u:
+    #     print(i)
 
-    for i in getAllModelLinks(autoMakers[52]):
-        # print(i)
-        pass
+    # for i in autoMakers:
+    #     brandLinkFile(i)
+
+    # createAutoMakersTXT()
+
+    # NOTE do this one at a time from 0 - 56
+    # TODO rerun after new years?
+    # Could iterate but its possible the site could fail to respond after a bajillion requests
+    """
+        NOTE:
+            6  (Bollinger)
+            7  (Bugatti)
+            9  (Byton)
+            16 (Fisker)
+            25 (Karma)
+            27 (Koenigsegg)
+            32 (Lordstown)
+            34 (Lucid-Motors)
+            40 (Mercedes-Maybach)
+            43 (Nikola)
+            48 (Rimac)
+            49 (Rivian)
+            54 (Vinfast)
+        are empty (no specs links)
+    """
+    # brandLinkFile(autoMakers[56])
