@@ -1,11 +1,14 @@
-- Modify link scraper: there are a few holes/links it is not picking up that is should
-    - modify for efficency as well?
+- Modify link scraper: 
+    - modify URLs.py to read in SUMMARY.txt and check each link
+    - enumerate each link by year, then variants
+        - ? write all links to /Links/{Brand}/{Brand}.txt 
+    - write resulting data to csv files in /Links/{Brand}/{Year}/{Model}.csv
+        - descide how to write scraped data to file
 
 - Data scraper for each link
     - Will most likely do this by barnd/year because everything at once is too much requests, will get errors
     - Pick out attributes to parse out of the web scrapping, will put this in Targets.txt
 
 - Find way of displaying/comparing/filtering/sorting resulting data
-
-- Explore using matplotlib.pyplot to display specs
-    - further explore interactability so that data rows can be sorted according to desired features
+    - Explore using matplotlib.pyplot to display specs
+        - further explore interactability so that data rows can be sorted according to desired features

@@ -4,30 +4,42 @@ import re
 import datetime
 import os
 
-# returns a list of all urls for each automaker
-def findAutoMakers(site: str = 'https://caranddriver.com'):
-    r = requests.get(site)
-    if r.status_code != 200:
-        return
+def createAutoMakersTXT():
+    # returns a list of all urls for each automaker
+    def findAutoMakers(site: str = 'https://caranddriver.com'):
+        r = requests.get(site)
+        if r.status_code != 200:
+            return
 
-    s = BeautifulSoup(r.text, "html.parser")
+        s = BeautifulSoup(r.text, "html.parser")
 
-    urls = []
+        urls = []
 
-    for i in s.find_all("a"):
-        href = i.attrs['href']
-        if href.startswith("/") and "search" not in href:
-            site_n = site + href
-            if site_n not in urls:
-                urls.append(site_n)
-                # print(site_n)
+        for i in s.find_all("a"):
+            href = i.attrs['href']
+            if href.startswith("/") and "search" not in href:
+                site_n = site + href
+                if site_n not in urls:
+                    urls.append(site_n)
+                    # print(site_n)
 
-    # filter list of links down to all automakers
-    urls = list(filter(lambda s: not s.endswith('/'), urls))
-    urls = urls[0:len(urls)-2]
+        # filter list of links down to all automakers
+        urls = list(filter(lambda s: not s.endswith('/'), urls))
+        urls = urls[0:len(urls)-2]
 
-    return urls
+        return urls[:-1]
+    
+    if not os.path.isdir('Links'):
+        os.mkdir('Links')
 
+    site = 'https://caranddriver.com'
+    autoMakers = findAutoMakers(site)
+    for i in range(len(autoMakers)):
+        autoMakers[i] = autoMakers[i] + '\n'
+
+    autoMakersDotTXT = open("Links/AutoMakers.txt", "w")
+    autoMakersDotTXT.writelines(autoMakers)
+    autoMakersDotTXT.close()
 
 # returns a list of links to all model specs for the given automaker
 def scrapeAutoMakers(automaker: str):
@@ -61,12 +73,14 @@ def scrapeAutoMakers(automaker: str):
 
 def modelSpecLinks(site: str):
     base = 'https://caranddriver.com'
+    print(site)
     r = requests.get(site)
 
     s = BeautifulSoup(r.text, "html.parser")
 
     links = []
     for i in s.find_all(class_ = 'css-gchatv ef885v21'):
+        print('here')
         for j in i.children:
             links.append(base + j.get('href'))
    
@@ -124,6 +138,9 @@ def getAllModelLinks(site: str):
 
     return urls
 
+def organizedFiles(site: str):
+    pass
+
 def brandLinkFile(site: str):
     if not os.path.isdir('Links'):
         os.mkdir('Links')
@@ -134,7 +151,7 @@ def brandLinkFile(site: str):
         b[i] = b[i].capitalize()
     brand = '-'.join(b) + '.txt'
 
-    # print(brand)
+    # print(brand)python
 
     urls = getAllModelLinks(site)
     for i in range(len(urls)):
@@ -144,36 +161,29 @@ def brandLinkFile(site: str):
     f.writelines(urls)
     f.close()
 
+def capHyphenize(string: str):
+    s = string.split("-")
+    for i in range(len(s)):
+        s[i] = s[i].capitalize()
+    return '-'.join(s)
 
-def createAutoMakersTXT():
-    if not os.path.isdir('Links'):
-        os.mkdir('Links')
-
-    site = 'https://caranddriver.com'
-    autoMakers = findAutoMakers(site)
-    for i in range(len(autoMakers)):
-        autoMakers[i] = autoMakers[i] + '\n'
-
-    autoMakersDotTXT = open("Links/AutoMakers.txt", "w")
-    autoMakersDotTXT.writelines(autoMakers)
-    autoMakersDotTXT.close()
 
 if __name__ == '__main__':
-    # site = 'https://caranddriver.com'
-    # autoMakers = findAutoMakers(site)
-    autoMakers = findAutoMakers()
-    # for i in range(len(autoMakers)):
-        # print(i, autoMakers[i])
+    # createAutoMakersTXT()
 
-    # u = getAllModelLinks(autoMakers[3])
-    # u = scrapeAutoMakers(autoMakers[3])
-    # for i in u:
-    #     print(i)
+    # f = open('Links/AutoMakers.txt', 'r')
+    # autoMakers = f.readlines()
+    # for i in range(len(autoMakers)):
+    #     autoMakers[i] = autoMakers[i].strip()
+    #     print(i, autoMakers[i])
 
     # for i in autoMakers:
     #     brandLinkFile(i)
 
-    # createAutoMakersTXT()
+    # a = scrapeAutoMakers('https://caranddriver.com/tesla')
+    a = getAllModelLinks('https://caranddriver.com/tesla')
+    for i in a:
+        print(i)
 
     # NOTE do this one at a time from 0 - 56
     # TODO rerun after new years?
