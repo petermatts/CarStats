@@ -12,3 +12,13 @@
 - Find way of displaying/comparing/filtering/sorting resulting data
     - Explore using matplotlib.pyplot to display specs
         - further explore interactability so that data rows can be sorted according to desired features
+
+
+Process:
+1) python3 Targets.py
+2) python3 SummaryGenerator.py
+3) python3 AllLinks.py (under construction)
+    - design a scraper for each latest model
+    - design a legacy scraper for older models
+4) script to compile all csvs into one per auto maker
+    - another for all (a master list)?
