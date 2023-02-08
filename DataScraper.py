@@ -12,7 +12,7 @@ target_specs = [
     'Maximum Horsepower @ RPM',
     'Maximum Torque @ RPM',
     'Transmission Description',
-    'Number of Transmission Speeds', #?
+    'Number of Transmission Speeds',
     'EPA Fuel Economy, combined/city/highway (mpg)',
     'EPA Fuel Economy Equivalent (for hybrid and electric vehicles), combined/city/highway (MPGe)',
     'Fuel Capacity / Gas Tank Size',
@@ -23,8 +23,9 @@ target_specs = [
     'Passenger / Seating Capacity',
     'Total Passenger Volume (cubic feet)',
     'Trunk Space (cubic feet)',
+    'Turning Diameter / Radius, curb to curb (feet)',
     'Base Curb Weight (pounds)',
-    'Maximum Towing Capacity (pounds)' #?
+    'Maximum Towing Capacity (pounds)'
 ]
 
 # function to go through all Links/*/SUMARRY.txt files
@@ -49,31 +50,29 @@ def readAll():
 
 # scrape the desired data from the given url
 def scrapeData(url: str):
-    driver = webdriver.Chrome(r"./driver/chromedriver")
-    driver.get(url)
-    driver.maximize_window()
+    driver = webdriver.Chrome(r"./driver/chromedriver") # will not need when function changes to take a driver instead of url
+    driver.get(url) # will not need when function changes to take a driver instead of url
+    driver.maximize_window() # will not need when function changes to take a driver instead of url
     time.sleep(2)
 
     specs = {}
-
     # aquire title specs
     # 0     /1/ 2            / 3     / 4     / 5   / 6
     # https://caranddrive.com/<brand>/<model>/specs/<year>
     title_stuff = url.split('/')
     specs['Brand'] = title_stuff[3].capitalize()
     specs['Model'] = title_stuff[4].capitalize()
-    # ! specs['trim']
 
+    # trim = driver.find_element(By.CLASS_NAME, 'css-1okfllu.e1l3raf13')
+    # specs['trim'] = trim.text.replace(specs['Model'], '').replace('Package Includes', '').strip()
+    year = driver.find_element(By.CLASS_NAME, 'css-1an3ngc.ezgaj230')
+    specs['Year'] = year.text.split(' ')[0]
+    specs['trim'] = year.text.replace(specs['Model'], '').replace(specs['Brand'], '').replace(specs['Year'], '').replace('Features And Specs', '')
     price = driver.find_element(By.CLASS_NAME, 'css-48aaf9.e1l3raf11')
     specs['Price'] = price.text
 
-    year = driver.find_element(By.CLASS_NAME, 'css-1an3ngc.ezgaj230')
-    specs['Year'] = year.text.split(' ')[0]
-
     # below is the main specs section
     data = driver.find_elements(By.CLASS_NAME, 'css-1ajawdl.eqxeor30')
-    # print(data)
-    # print(dir(data[0]))
 
     rows = []
     for i in range(len(data)):
@@ -85,7 +84,6 @@ def scrapeData(url: str):
         #     print(data[i].text)
 
     for i in rows:
-        # print(i)
         if i[0] in target_specs:
             specs[i[0]] = i[1]
     
@@ -95,52 +93,73 @@ def scrapeData(url: str):
 
     time.sleep(100)
 
+
 def parseSpecs(webspecs: dict):
     specs = {}
 
-    #! still need to handle trim
-    #! still need to handle hybrids
-    #! still need to handle Fuel Type!
-    #! still need to handle turbos
-    #NOTE need to update CarStatsTargetData.pdf and CarStatsTargetData.xlsx
+    #! handle errors/no values given
+
+    isElectric = webspecs['Engine Type and Required Fuel'] == 'Electric'
 
     for i in list(webspecs.keys()):
-        if i == 'Brand' or i == 'Model' or i == 'Year' or i == 'Price':
+        if i == 'Brand' or i == 'Model' or i == 'Year' or i == 'Price' or i == 'Trim':
             specs[i] = webspecs[i]
         elif i == 'EPA Classification':
             specs['EPA Class'] = webspecs[i]
+            # TODO parse to clarify
         elif i == 'Drivetrain':
-            specs[i] = ''.join(list(filter(lambda c: c.isupper(), webspecs[i])))
+            dt = webspecs[i].replace('Four', '4')
+            specs[i] = ''.join(list(filter(lambda c: c.isupper() or c.isdigit(), dt)))
         elif i == 'Engine Type and Required Fuel':
-            # TODO handle hybrids
-            engine = re.search('\w-?\d+', webspecs[i])
-            if engine != None:
-                specs['Engine'] = webspecs[i][engine.span()[0]:engine.span()[1]]
+            if isElectric:
+                specs['Engine'] = 'Electric'
+                specs['Fuel'] = 'Electric'
             else:
-                if webspecs[i] == 'Electric':
-                    specs['Engine'] = webspecs[i]
+                isHybrid = "Gas/Electric" in webspecs[i]
+                engine = re.search('\w-?\d+', webspecs[i])
+                if engine != None:
+                    engine = webspecs[i][engine.span()[0]:engine.span()[1]].replace('-', '')
+                    # engine = engine[:1] + '-' + engine[1:]
+                    specs['Engine'] = engine[:1] + '-' + engine[1:]
+                    if "Twin Turbo" in webspecs[i]:
+                        specs['Turbos'] = '2'
+                    elif "Turbo" in webspecs[i]:
+                        specs['Turbos'] = '1'
+                    else:
+                        specs['Turbos'] = '0'
+
+                    if isHybrid:
+                        specs['Fuel'] = 'Hybrid'
+                        # engine += ' Hybrid'
+                    else:
+                        gas = re.search("Regular|Premium|Gas", webspecs[i])
+                        specs['Fuel'] = webspecs[i][gas.span()[0]:gas.span()[1]]
+                        # fuel = webspecs[i][gas.span()[0]:gas.span()[1]]
+                        # specs['Fuel'] = fuel
+                    # specs['Engine'] = engine
         elif i == 'Displacement (liters/cubic inches)':
-            specs['Displacement (liters)'] = webspecs[i].split('/')[0]
+            specs['Displacement (liters)'] = webspecs[i].split('/')[0].replace('L', '').strip()
         elif i == 'Maximum Horsepower @ RPM':
             hp = webspecs[i].split(' @ ')
-            specs['Max Horsepower'] = hp[0] #? need the Max part of the name?
-            if len(hp) > 1: 
-                specs['Max HP RPM'] = hp[1] #? rename
+            specs['Max Horsepower'] = hp[0]
+            if not isElectric or len(hp) > 1: 
+                specs['Max Horsepower RPM'] = hp[1]
         elif i == 'Maximum Torque @ RPM':
             tq = webspecs[i].split(' @ ')
-            specs['Max Torque'] = tq[0] #? need the Max part of the name?
-            if len(tq) > 1: 
+            specs['Max Torque'] = tq[0]
+            if not isElectric or len(tq) > 1: 
                 specs['Max Torque RPM'] = tq[1]
         elif i == 'Transmission Description':
             specs['Transmission'] = webspecs[i].split(' ')[0]
         elif i == 'Number of Transmission Speeds':
             specs['Transmission Speeds'] = webspecs[i]
-        elif i == 'EPA Fuel Economy, combined/city/highway (mpg)':
-            fe = webspecs[i].split(' ')
+        elif not isElectric and i == 'EPA Fuel Economy, combined/city/highway (mpg)':
+            fe = webspecs[i].split('/')
             specs['MPG (combined)'] = fe[0].split(' ')[0]
             specs['MPG (city)'] = fe[1].split(' ')[0]
             specs['MPG (highway)'] = fe[2].split(' ')[0]
-        elif i == 'EPA Fuel Economy Equivalent (for hybrid and electric vehicles), combined/city/highway (MPGe)':
+        elif isElectric and i == 'EPA Fuel Economy Equivalent (for hybrid and electric vehicles), combined/city/highway (MPGe)':
+            fe = webspecs[i].split('/')
             specs['MPGe (combined)'] = fe[0].split(' ')[0]
             specs['MPGe (city)'] = fe[1].split(' ')[0]
             specs['MPGe (highway)'] = fe[2].split(' ')[0]
@@ -149,7 +168,7 @@ def parseSpecs(webspecs: dict):
         elif i == 'Length (inches)':
             specs['Length (in)'] = webspecs[i]
         elif i == 'Width, without mirrors (inches)':
-            specs['Width *no mirrors* (in)'] = webspecs[i] # ? rename
+            specs['Width, no mirrors (in)'] = webspecs[i]
         elif i == 'Height (inches)':
             specs['Height (in)'] = webspecs[i]
         elif i == 'Wheelbase (inches)':
@@ -157,9 +176,15 @@ def parseSpecs(webspecs: dict):
         elif i == 'Passenger / Seating Capacity':
             specs['Seating Cap'] = webspecs[i]
         elif i == 'Total Passenger Volume (cubic feet)':
-            specs['Passenger Space (cu. ft.)'] = webspecs[i]
+            specs['Passenger Space (cu ft)'] = webspecs[i]
         elif i == 'Trunk Space (cubic feet)':
-            specs['Trunk Space (cu. ft.)'] = webspecs[i]
+            specs['Trunk Space (cu ft)'] = webspecs[i]
+        elif i == 'Turning Diameter / Radius, curb to curb (feet)':
+            try:
+                #TODO format to a certain decimal place?
+                specs['Turn Radius (ft)'] = str(float(webspecs[i])/2) # curb to curb
+            except:
+                pass
         elif i == 'Base Curb Weight (pounds)':
             specs['Weight (lbs)'] = webspecs[i]
         elif i == 'Maximum Towing Capacity (pounds)':
@@ -182,6 +207,8 @@ def writeFile(specs: dict):
     os.chdir(specs['Year'])
 
 if __name__ == '__main__':
-    url = 'https://caranddriver.com/honda/accord/specs'
+    # url = 'https://caranddriver.com/honda/accord/specs'
+    # url = 'https://www.caranddriver.com/tesla/model-s/specs/2023/tesla_model-s_tesla-model-s_2023/433992'
+    url = 'https://www.caranddriver.com/toyota/4runner/specs/2022/toyota_4runner_toyota-4runner_2022/422563'
     scrapeData(url)
     

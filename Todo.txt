@@ -1,6 +1,7 @@
 - Phase 1
     - Modify link scraper: 
         - write resulting data to csv files in /Links/{Brand}/{Year}/{Model}.csv
+            - in Docs make a base csv file with the header row to model all csvs off of
         - finish data scraper/parser
         - make data scraper 'iterate' through all trims of all models of all brands
             - fully expecting this operation to have a long runtime
@@ -13,6 +14,9 @@
         - get everything working first
 
 - Phase 2
+    - Add 'custom' specs/stats like:
+        - hp/ton
+
     - Find way of displaying/comparing/filtering/sorting resulting data
         - Explore using matplotlib.pyplot to display specs
             - further explore interactability so that data rows can be sorted according to desired features
