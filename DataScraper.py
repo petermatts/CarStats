@@ -50,9 +50,14 @@ def readAll():
 
 # scrape the desired data from the given url
 def scrapeData(url: str):
-    driver = webdriver.Chrome(r"./driver/chromedriver") # will not need when function changes to take a driver instead of url
-    driver.get(url) # will not need when function changes to take a driver instead of url
-    driver.maximize_window() # will not need when function changes to take a driver instead of url
+    driver = webdriver.Chrome(r"./driver/chromedriver")
+    try:
+        driver.get(url)
+    except:
+        print('Bad URL:', url)
+        return
+    
+    driver.maximize_window()
     time.sleep(2)
 
     specs = {}
@@ -60,8 +65,8 @@ def scrapeData(url: str):
     # 0     /1/ 2            / 3     / 4     / 5   / 6
     # https://caranddrive.com/<brand>/<model>/specs/<year>
     title_stuff = url.split('/')
-    specs['Brand'] = title_stuff[3].capitalize()
-    specs['Model'] = title_stuff[4].capitalize()
+    specs['Brand'] = ' '.join(list(map(lambda w: w.capitalize(), title_stuff[3].split('-')))) 
+    specs['Model'] = ' '.join(list(map(lambda w: w.capitalize(), title_stuff[4].split('-')))) 
 
     # trim = driver.find_element(By.CLASS_NAME, 'css-1okfllu.e1l3raf13')
     # specs['trim'] = trim.text.replace(specs['Model'], '').replace('Package Includes', '').strip()
@@ -88,10 +93,11 @@ def scrapeData(url: str):
             specs[i[0]] = i[1]
     
     print(specs)
-    print('\n\n\n\n')
-    print(parseSpecs(specs))
+    print('\n\n')
+    # print(parseSpecs(specs))
+    writeFile(parseSpecs(specs))
 
-    time.sleep(100)
+    # time.sleep(100)
 
 
 def parseSpecs(webspecs: dict):
@@ -155,14 +161,14 @@ def parseSpecs(webspecs: dict):
             specs['Transmission Speeds'] = webspecs[i]
         elif not isElectric and i == 'EPA Fuel Economy, combined/city/highway (mpg)':
             fe = webspecs[i].split('/')
-            specs['MPG (combined)'] = fe[0].split(' ')[0]
-            specs['MPG (city)'] = fe[1].split(' ')[0]
-            specs['MPG (highway)'] = fe[2].split(' ')[0]
+            specs['MPG (combined)'] = fe[0].strip().split(' ')[0]
+            specs['MPG (city)'] = fe[1].strip().split(' ')[0]
+            specs['MPG (highway)'] = fe[2].strip().split(' ')[0]
         elif isElectric and i == 'EPA Fuel Economy Equivalent (for hybrid and electric vehicles), combined/city/highway (MPGe)':
             fe = webspecs[i].split('/')
-            specs['MPGe (combined)'] = fe[0].split(' ')[0]
-            specs['MPGe (city)'] = fe[1].split(' ')[0]
-            specs['MPGe (highway)'] = fe[2].split(' ')[0]
+            specs['MPGe (combined)'] = fe[0].strip().split(' ')[0]
+            specs['MPGe (city)'] = fe[1].strip().split(' ')[0]
+            specs['MPGe (highway)'] = fe[2].strip().split(' ')[0]
         elif i == 'Fuel Capacity / Gas Tank Size':
             specs['Fuel Cap. (Gal)'] = webspecs[i]
         elif i == 'Length (inches)':
@@ -195,20 +201,40 @@ def parseSpecs(webspecs: dict):
     return specs
 
 def writeFile(specs: dict):
+    print(specs, '\n') # temp
+
+    # print(os.getcwd())
+    base = open('./Docs/Base.csv', 'r')
+    header = base.readline()
+    print(header)
+
     # move to/write output directory
+    brand = ''
+    year = ''
+
+    try:
+        brand = specs['Brand'].replace(' ', '-')
+        year = specs['Year']
+    except:
+        print('\nFailed\n')
+        return
+
     if not os.path.isdir('Data'):
         os.mkdir('Data')
     os.chdir('Data')
-    if not os.path.isdir(specs['Brand']):
-        os.mkdir(specs['Brand'])
-    os.chdir(specs['Brand'])
-    if not os.path.isdir(specs['Year']):
-        os.mkdir(specs['Year'])
-    os.chdir(specs['Year'])
+    if not os.path.isdir(brand):
+        os.mkdir(brand)
+    os.chdir(brand)
+    if not os.path.isdir(year):
+        os.mkdir(year)
+    os.chdir(year)
+
 
 if __name__ == '__main__':
     # url = 'https://caranddriver.com/honda/accord/specs'
     # url = 'https://www.caranddriver.com/tesla/model-s/specs/2023/tesla_model-s_tesla-model-s_2023/433992'
-    url = 'https://www.caranddriver.com/toyota/4runner/specs/2022/toyota_4runner_toyota-4runner_2022/422563'
+    # url = 'https://www.caranddriver.com/toyota/4runner/specs/2022/toyota_4runner_toyota-4runner_2022/422563'
+    url = 'https://www.caranddriver.com/alfa-romeo/giulia-quadrifoglio/specs/2022/alfa-romeo_giulia-quadrifoglio_alfa-romeo-giulia-quadrifoglio_2022'
+    # url = 'https://caranddriver.com/bugatti/chiron/specs'
     scrapeData(url)
     
