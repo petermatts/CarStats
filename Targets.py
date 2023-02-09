@@ -1,3 +1,7 @@
+"""
+This file aquires the names of all brands and models and writes it to a file AllBrandsAndModels.json
+"""
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 import time
@@ -12,7 +16,6 @@ time.sleep(2)
 button = driver.find_element(By.CSS_SELECTOR, "button.css-1c9j0fn")
 button.click()
 time.sleep(2)
-
 
 
 # Start Scraping brands
@@ -50,8 +53,10 @@ for i in range(len(brands)):
         print("\t" + models_text[j])
 
     master[brands_text[i]] = models_text
-    
+
+driver.close()
+
 with open("AllBrandsAndModels.json", "w") as outfile:
     json.dump(master, outfile, indent = 4)
 
-time.sleep(10)
+# time.sleep(10)

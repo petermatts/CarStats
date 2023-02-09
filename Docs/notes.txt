@@ -32,3 +32,4 @@ Trunk Space (cu ft)
 Turn Radius (ft)
 Weight (lbs)
 Max Towing (lbs)
+URL

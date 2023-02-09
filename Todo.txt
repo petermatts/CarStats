@@ -1,17 +1,16 @@
 - Phase 1
     - Modify link scraper: 
-        - write resulting data to csv files in /Links/{Brand}/{Year}/{Model}.csv
-            - in Docs make a base csv file with the header row to model all csvs off of
-        - finish data scraper/parser
         - make data scraper 'iterate' through all trims of all models of all brands
             - fully expecting this operation to have a long runtime
                 - because of server requests and stuff like that
                 - but atleast it will be a one time operation...
                     - assuming no issues and I dont change my mind on output format after...
-        - remove old scraper (URLs.py)
+        - build script to compile data into csvs for all brands/all models across years available/everything
 
     - move source code to an src folder
         - get everything working first
+
+    - remove old scraper (URLs.py) {marked as depreciated for now}
 
 - Phase 2
     - Add 'custom' specs/stats like:

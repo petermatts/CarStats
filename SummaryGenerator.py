@@ -1,3 +1,7 @@
+"""
+From the file AllBrandsAndModels.json, this script generates link summary files 
+"""
+
 import json
 import os
 
@@ -11,17 +15,11 @@ def generateSummaryTXT():
     keys = list(data.keys())
 
     for i in keys:
-        d = i.replace(" ", "-")
-        if not os.path.isdir(d):
-            os.mkdir(d)
-        
-        os.chdir(d)
-        writeSummary(d, data[i])
-        os.chdir('../')
+        writeSummary(i.replace(" ", "-"), data[i])
 
 
 def writeSummary(brand: str, models: list[str]):
-    file = open("SUMMARY.txt", "w")
+    file = open(brand+".txt", "w")
 
     base_url = 'https://caranddriver.com/'
     L = []
