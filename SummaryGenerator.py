@@ -32,5 +32,19 @@ def writeSummary(brand: str, models: list[str]):
     file.writelines(L)
     file.close()
 
+def makeAllLinksTXT():
+    L = []
+    os.chdir('Links')
+    for x in os.listdir():
+        if os.path.isfile(x):
+            f = open("SUMMARY.txt", "r")
+            L += f.readlines()
+            f.close()
+    os.chdir('../')
+
+    file = open("AllLinks.txt", "w")
+    file.writelines(L)
+    file.close()
+
 if __name__ == '__main__':
     generateSummaryTXT()

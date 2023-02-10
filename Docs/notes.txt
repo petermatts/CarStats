@@ -1,9 +1,9 @@
 Columns to track in CSV: 
 
+Year
 Brand
 Model
 Trim
-Year
 Price
 EPA Class
 Engine

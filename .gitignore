@@ -1,5 +1,7 @@
 # Folders
 .vscode
+
+#? consider unignoring Links directory
 Links
 Data
 

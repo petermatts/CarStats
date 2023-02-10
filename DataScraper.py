@@ -28,38 +28,8 @@ target_specs = [
     'Maximum Towing Capacity (pounds)'
 ]
 
-# function to go through all Links/*/SUMARRY.txt files
-# Doesn't really do anything important rn... should play important role later
-def readAll():
-    L = []
-    os.chdir('Links')
-    for x in os.listdir():
-        if os.path.isdir(x):
-            os.chdir(x)
-
-            f = open("SUMMARY.txt", "r")
-            L += f.readlines()
-            f.close()
-
-            os.chdir('../')
-    os.chdir('../')
-
-    file = open("AllLinks.txt", "w")
-    file.writelines(L)
-    file.close()
-
 # scrape the desired data from the given url
-def scrapeData(url: str):
-    driver = webdriver.Chrome(r"./driver/chromedriver")
-    try:
-        driver.get(url)
-    except:
-        print('Bad URL:', url)
-        return
-    
-    driver.maximize_window() # not a necessary line
-    time.sleep(2)
-
+def scrapeData(driver):
     url = driver.current_url
     print('Current URL:', url)
 
@@ -94,12 +64,11 @@ def scrapeData(url: str):
             if i[0] in target_specs:
                 specs[i[0]] = i[1]
         
-        print(specs)
-        print('\n\n')
+        # print(specs)
+        # print('\n\n')
         writeFile(parseSpecs(specs))
     else:
         print('Possibly bad link:', url)
-
 
 
 def parseSpecs(webspecs: dict):
@@ -125,7 +94,8 @@ def parseSpecs(webspecs: dict):
                     engine = re.search('\w-?\d+', webspecs[i])
                     if engine != None:
                         engine = webspecs[i][engine.span()[0]:engine.span()[1]].replace('-', '')
-                        specs['Engine'] = engine[:1] + '-' + engine[1:]
+                        # specs['Engine'] = engine[:1] + '-' + engine[1:]
+                        specs['Engine'] = engine
                         
                         # check turbos
                         if "Twin Turbo" in webspecs[i]:
@@ -158,12 +128,12 @@ def parseSpecs(webspecs: dict):
             elif i == 'Number of Transmission Speeds':
                 specs['Transmission Speeds'] = webspecs[i]
             elif not isElectric and i == 'EPA Fuel Economy, combined/city/highway (mpg)':
-                fe = webspecs[i].split('/')
+                fe = webspecs[i].replace('N/A', '').split('/')
                 specs['MPG (combined)'] = fe[0].strip().split(' ')[0]
                 specs['MPG (city)'] = fe[1].strip().split(' ')[0]
                 specs['MPG (highway)'] = fe[2].strip().split(' ')[0]
             elif isElectric and i == 'EPA Fuel Economy Equivalent (for hybrid and electric vehicles), combined/city/highway (MPGe)':
-                fe = webspecs[i].split('/')
+                fe = webspecs[i].replace('N/A', '').split('/')
                 specs['MPGe (combined)'] = fe[0].strip().split(' ')[0]
                 specs['MPGe (city)'] = fe[1].strip().split(' ')[0]
                 specs['MPGe (highway)'] = fe[2].strip().split(' ')[0]
@@ -197,9 +167,8 @@ def parseSpecs(webspecs: dict):
                 pass
     return specs
 
-def writeFile(specs: dict):
-    print(specs, '\n') # temp
 
+def writeFile(specs: dict):
     base = open('./Docs/Base.csv', 'r')
     header = base.readline()
     base.close()
@@ -228,10 +197,16 @@ def writeFile(specs: dict):
         os.mkdir(year)
     os.chdir(year)
 
-    
-    file = open(model+'.csv', 'w+')
-    
+    try:
+        f = open(model+'.csv', 'x')
+        f.close()
+    except:
+        pass # file already exists
+
+    file = open(model+'.csv', 'r')
     lines = file.readlines()
+    file.close()
+
     if len(lines) == 0:
         lines = [header]
 
@@ -243,21 +218,83 @@ def writeFile(specs: dict):
         except:
             newline += ','
     newline += '\n'
-    lines.append(newline)
 
+    if newline not in lines:
+        lines.append(newline)
+
+    file = open(model+'.csv', 'w')
     file.writelines(lines)
     file.close()
+    os.chdir('../../../')
     
 
-    
+# function to go through all Links/{Brand}.txt files
+# runtime will be atrocious
+def scrape(i = None):
+    os.chdir('Links')
+    brands = os.listdir()
+    if i != None:
+        scrapeHelper(brands[i])
+    else:
+        for i in range(len(brands)):
+            scrapeHelper(brands[i])
+            time.sleep(10)
+    os.chdir('../')
 
+def scrapeHelper(filename: str):
+    file = open(filename, 'r')
+    models = file.readlines()
+    file.close()
+    opts = webdriver.ChromeOptions()
+    opts.add_argument('start-maximized')
+    driver = webdriver.Chrome(r"./driver/chromedriver", options=opts)
+    
+    sleep_const = 4
+
+    # i = 0
+    for i in range(len(models)):
+        url = models[i].rstrip()
+        try:
+            driver.get(url)
+        except:
+            print('Bad URL:', url)
+            return
+        
+        time.sleep(sleep_const)
+
+        year_buttons = driver.find_element(By.ID, 'yearSelect').find_elements(By.TAG_NAME, 'option')[1:]
+        year_buttons.reverse()
+        for y in range(len(year_buttons)):
+            year_buttons = driver.find_element(By.ID, 'yearSelect').find_elements(By.TAG_NAME, 'option')[1:]
+            year_buttons.reverse()
+            year_buttons[y].click()
+            time.sleep(sleep_const)
+            style_buttons = driver.find_element(By.ID, 'styleSelect').find_elements(By.TAG_NAME, 'option')[1:]
+            for s in range(len(style_buttons)):
+                style_buttons = driver.find_element(By.ID, 'styleSelect').find_elements(By.TAG_NAME, 'option')[1:]
+                style_buttons[s].click()
+                time.sleep(sleep_const)
+                trim_buttons = driver.find_element(By.ID, 'trimSelect').find_elements(By.TAG_NAME, 'option')[1:]
+                for t in range(len(trim_buttons)):
+                    trim_buttons = driver.find_element(By.ID, 'trimSelect').find_elements(By.TAG_NAME, 'option')[1:]
+                    print(trim_buttons[t].text)
+                    trim_buttons[t].click()
+                    time.sleep(sleep_const)
+
+                    os.chdir('../')
+                    scrapeData(driver)
+                    os.chdir('Links')
+        time.sleep(5)
+        driver.close()
+    
 
 if __name__ == '__main__':
-    url = 'https://caranddriver.com/honda/accord/specs'
+    # url = 'https://caranddriver.com/honda/accord/specs'
     # url = 'https://www.caranddriver.com/tesla/model-s/specs/2023/tesla_model-s_tesla-model-s_2023/433992'
     # url = 'https://www.caranddriver.com/toyota/4runner/specs/2022/toyota_4runner_toyota-4runner_2022/422563'
     # url = 'https://www.caranddriver.com/alfa-romeo/giulia-quadrifoglio/specs/2022/alfa-romeo_giulia-quadrifoglio_alfa-romeo-giulia-quadrifoglio_2022'
     # url = 'https://www.caranddriver.com/ford/f-150-lightning/specs/2022/ford_f-150-electric_ford-f-150-lightning_2022'
     # url = 'https://caranddriver.com/bugatti/chiron/specs'
-    scrapeData(url)
+    # scrapeData(url)
+    scrape(20)
     

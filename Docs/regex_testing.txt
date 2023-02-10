@@ -1,3 +1,4 @@
+Engine Type and Required Fuel:
 Electric
 Gas/Electric I-4
 Gas I4
@@ -14,3 +15,13 @@ Premium Unleaded H-6
 Premium Unleaded I-4
 Regular Unleaded I-4
 Intercooled Turbo Regular Unleaded I-4
+
+
+EPA Classification:
+Large Cars
+Midsize Cars
+Subcompact Cars
+Minicompact Cars
+Two Seater
+Two Seaters
+Small SUV 4WD
