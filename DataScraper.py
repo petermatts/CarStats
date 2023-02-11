@@ -1,8 +1,12 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.common.exceptions import NoSuchElementException
 import os
 import time
 import re
+import datetime
 
 target_specs = [
     'EPA Classification',
@@ -29,9 +33,8 @@ target_specs = [
 ]
 
 # scrape the desired data from the given url
-def scrapeData(driver):
+def scrapeData(driver: webdriver):
     url = driver.current_url
-    print('Current URL:', url)
 
     specs = {
         'URL': url
@@ -42,33 +45,40 @@ def scrapeData(driver):
     # https://caranddrive.com/<brand>/<model>/specs/<year>
     title_stuff = url.split('/')
     specs['Brand'] = ' '.join(list(map(lambda w: w.capitalize(), title_stuff[3].split('-')))) 
-    specs['Model'] = ' '.join(list(map(lambda w: w.capitalize(), title_stuff[4].split('-')))) 
+    model = ' '.join(list(map(lambda w: w.capitalize(), title_stuff[4].split('-')))) 
+    m = re.search("-\d{4}$", model)
+    if m != None:
+        model = model[:-5]
+        # model = model[:m.span()[0]]
+    specs['Model'] = model
 
-    if url != 'https://www.caranddriver.com/error':
-        year = driver.find_element(By.CLASS_NAME, 'css-1an3ngc.ezgaj230')
-        specs['Year'] = year.text.split(' ')[0]
-        specs['Trim'] = year.text.replace('-', ' ').replace(specs['Model'], '').replace(specs['Brand'], '').replace(specs['Year'], '').replace('Features And Specs', '').strip()
-        price = driver.find_element(By.CLASS_NAME, 'css-48aaf9.e1l3raf11')
-        specs['Price'] = price.text.replace(',', '')
+    driver.implicitly_wait(10)
+    year = driver.find_element(By.CLASS_NAME, 'css-1an3ngc.ezgaj230')
+    driver.implicitly_wait(0.01)
+    specs['Year'] = year.text.split(' ')[0]
+    specs['Trim'] = year.text.replace('-', ' ').replace(specs['Model'], '').replace(specs['Brand'], '').replace(specs['Year'], '').replace('Features And Specs', '').strip()
+    price = driver.find_element(By.CLASS_NAME, 'css-48aaf9.e1l3raf11')
+    specs['Price'] = price.text.replace(',', '')
 
-        # below is the main specs section
-        data = driver.find_elements(By.CLASS_NAME, 'css-1ajawdl.eqxeor30')
+    # below is the main specs section
+    data = driver.find_elements(By.CLASS_NAME, 'css-1ajawdl.eqxeor30')
 
-        rows = []
-        for i in range(len(data)):
-            row = data[i].find_elements(By.TAG_NAME, 'div')
-            if len(row) != 0:
-                rows.append((row[0].text, row[1].text))
+    rows = []
+    for i in range(len(data)):
+        # print(i+1, '/', len(data), end='\r')
+        print('\tFinding Data', i+1, end='\r')
+        row = data[i].find_elements(By.TAG_NAME, 'div')
+        if len(row) != 0:
+            rows.append((row[0].text, row[1].text))
+        else:
+            break #? optimize
 
-        for i in rows:
-            if i[0] in target_specs:
-                specs[i[0]] = i[1]
-        
-        # print(specs)
-        # print('\n\n')
-        writeFile(parseSpecs(specs))
-    else:
-        print('Possibly bad link:', url)
+    for i in rows:
+        if i[0] in target_specs:
+            specs[i[0]] = i[1]
+    
+    print('\tWriting to CSV')
+    writeFile(parseSpecs(specs))
 
 
 def parseSpecs(webspecs: dict):
@@ -81,7 +91,6 @@ def parseSpecs(webspecs: dict):
                 specs[i] = webspecs[i]
             elif i == 'EPA Classification':
                 specs['EPA Class'] = webspecs[i]
-                # TODO parse to clarify
             elif i == 'Drivetrain':
                 dt = webspecs[i].replace('Four', '4')
                 specs[i] = ''.join(list(filter(lambda c: c.isupper() or c.isdigit(), dt)))
@@ -110,18 +119,21 @@ def parseSpecs(webspecs: dict):
                             specs['Fuel'] = 'Hybrid'
                         else:
                             gas = re.search("Regular|Premium|Gas", webspecs[i])
-                            specs['Fuel'] = webspecs[i][gas.span()[0]:gas.span()[1]]
+                            try:
+                                specs['Fuel'] = webspecs[i][gas.span()[0]:gas.span()[1]]
+                            except:
+                                pass
             elif i == 'Displacement (liters/cubic inches)':
                 specs['Displacement (liters)'] = webspecs[i].split('/')[0].replace('L', '').strip()
             elif i == 'Maximum Horsepower @ RPM':
                 hp = webspecs[i].split(' @ ')
                 specs['Max Horsepower'] = hp[0]
-                if not isElectric or len(hp) > 1: 
+                if not isElectric and len(hp) > 1: 
                     specs['Max Horsepower RPM'] = hp[1]
             elif i == 'Maximum Torque @ RPM':
                 tq = webspecs[i].split(' @ ')
                 specs['Max Torque'] = tq[0]
-                if not isElectric or len(tq) > 1: 
+                if not isElectric and len(tq) > 1: 
                     specs['Max Torque RPM'] = tq[1]
             elif i == 'Transmission Description':
                 specs['Transmission'] = webspecs[i].split(' ')[0]
@@ -241,60 +253,87 @@ def scrape(i = None):
             time.sleep(10)
     os.chdir('../')
 
-def scrapeHelper(filename: str):
+def scrapeHelper(filename: str, start_year = datetime.date.today().year):
     file = open(filename, 'r')
     models = file.readlines()
     file.close()
+
     opts = webdriver.ChromeOptions()
     opts.add_argument('start-maximized')
-    driver = webdriver.Chrome(r"./driver/chromedriver", options=opts)
-    
-    sleep_const = 4
 
-    # i = 0
-    for i in range(len(models)):
+    timeout = 5
+    sleep_const = 2
+
+    start_model = 0 #! for debugging purposes only
+    start_year = 0 #! for debugging purposes only
+
+    for i in range(start_model, len(models)):
+        driver = webdriver.Chrome(r"./driver/chromedriver", options=opts)
+        driver.implicitly_wait(timeout)
         url = models[i].rstrip()
         try:
             driver.get(url)
         except:
             print('Bad URL:', url)
-            return
-        
-        time.sleep(sleep_const)
+            continue
 
-        year_buttons = driver.find_element(By.ID, 'yearSelect').find_elements(By.TAG_NAME, 'option')[1:]
-        year_buttons.reverse()
-        for y in range(len(year_buttons)):
+        year = ''
+        style = ''
+
+        url = driver.current_url
+        if url != 'https://www.caranddriver.com/error':
             year_buttons = driver.find_element(By.ID, 'yearSelect').find_elements(By.TAG_NAME, 'option')[1:]
             year_buttons.reverse()
-            year_buttons[y].click()
-            time.sleep(sleep_const)
-            style_buttons = driver.find_element(By.ID, 'styleSelect').find_elements(By.TAG_NAME, 'option')[1:]
-            for s in range(len(style_buttons)):
-                style_buttons = driver.find_element(By.ID, 'styleSelect').find_elements(By.TAG_NAME, 'option')[1:]
-                style_buttons[s].click()
-                time.sleep(sleep_const)
-                trim_buttons = driver.find_element(By.ID, 'trimSelect').find_elements(By.TAG_NAME, 'option')[1:]
-                for t in range(len(trim_buttons)):
-                    trim_buttons = driver.find_element(By.ID, 'trimSelect').find_elements(By.TAG_NAME, 'option')[1:]
-                    print(trim_buttons[t].text)
-                    trim_buttons[t].click()
-                    time.sleep(sleep_const)
+            for y in range(len(year_buttons)):
+                driver.implicitly_wait(timeout)
+                year_buttons = driver.find_element(By.ID, 'yearSelect').find_elements(By.TAG_NAME, 'option')[1:]
+                year_buttons.reverse()
 
-                    os.chdir('../')
-                    scrapeData(driver)
-                    os.chdir('Links')
-        time.sleep(5)
-        driver.close()
+                # for scraping latest year
+                if int(year_buttons[y].text) < start_year:
+                    continue
+
+                # save time to jump start if error encountered in scraping
+                #! for debugging purposes only
+                # if i==start_model and int(year_buttons[y].text) < start_year:
+                #     continue
+                
+                year = year_buttons[y].text
+                year_buttons[y].click()
+                time.sleep(sleep_const)
+                style_buttons = driver.find_element(By.ID, 'styleSelect').find_elements(By.TAG_NAME, 'option')[1:]
+                for s in range(len(style_buttons)):
+                    driver.implicitly_wait(timeout)
+                    style_buttons = driver.find_element(By.ID, 'styleSelect').find_elements(By.TAG_NAME, 'option')[1:]
+                    style = style_buttons[s].text
+                    style_buttons[s].click()
+                    time.sleep(sleep_const)
+                    trim_buttons = driver.find_element(By.ID, 'trimSelect').find_elements(By.TAG_NAME, 'option')[1:]
+                    for t in range(len(trim_buttons)):
+                        driver.implicitly_wait(timeout)
+                        trim_buttons = driver.find_element(By.ID, 'trimSelect').find_elements(By.TAG_NAME, 'option')[1:]
+                        print(year, style, trim_buttons[t].text)
+                        trim_buttons[t].click()
+
+                        os.chdir('../')
+                        scrapeData(driver)
+                        os.chdir('Links')
+        else:
+            print('Possibly bad link:', url)
+    time.sleep(sleep_const)
+    driver.close() #!
     
 
 if __name__ == '__main__':
-    # url = 'https://caranddriver.com/honda/accord/specs'
-    # url = 'https://www.caranddriver.com/tesla/model-s/specs/2023/tesla_model-s_tesla-model-s_2023/433992'
-    # url = 'https://www.caranddriver.com/toyota/4runner/specs/2022/toyota_4runner_toyota-4runner_2022/422563'
-    # url = 'https://www.caranddriver.com/alfa-romeo/giulia-quadrifoglio/specs/2022/alfa-romeo_giulia-quadrifoglio_alfa-romeo-giulia-quadrifoglio_2022'
-    # url = 'https://www.caranddriver.com/ford/f-150-lightning/specs/2022/ford_f-150-electric_ford-f-150-lightning_2022'
-    # url = 'https://caranddriver.com/bugatti/chiron/specs'
-    # scrapeData(url)
-    scrape(20)
+    start = time.time()
+    scrape(0)
+    finish = time.time()
+
+    runtime = finish-start
+    hours = int(runtime/3600)
+    runtime = runtime % 3600
+    minutes = int(runtime/60)
+    seconds = runtime
+
+    print('\nScraping took h:', hours, 'm:', minutes, 's', seconds)
     

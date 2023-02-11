@@ -1,16 +1,7 @@
 - Phase 1
-    - Modify link scraper: 
-        - make data scraper 'iterate' through all trims of all models of all brands
-            - fully expecting this operation to have a long runtime
-                - because of server requests and stuff like that
-                - but atleast it will be a one time operation...
-                    - assuming no issues and I dont change my mind on output format after...
-        - build script to compile data into csvs for all brands/all models across years available/everything
-
+    - build script to compile data into csvs for all brands/all models across years available/everything
     - move source code to an src folder
         - get everything working first
-
-    - remove old scraper (URLs.py) {marked as depreciated for now}
 
 - Phase 2
     - Add 'custom' specs/stats like:
@@ -19,3 +10,4 @@
     - Find way of displaying/comparing/filtering/sorting resulting data
         - Explore using matplotlib.pyplot to display specs
             - further explore interactability so that data rows can be sorted according to desired features
+        - html or react?
