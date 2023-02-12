@@ -56,7 +56,7 @@ for i in range(len(brands)):
 
 driver.close()
 
-with open("AllBrandsAndModels.json", "w") as outfile:
+with open("../AllBrandsAndModels.json", "w") as outfile:
     json.dump(master, outfile, indent = 4)
 
 # time.sleep(10)

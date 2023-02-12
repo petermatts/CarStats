@@ -1,13 +1,15 @@
 - Phase 1
-    - build script to compile data into csvs for all brands/all models across years available/everything
+    - RUN script to compile data into csvs for all brands/all models across years available/everything
     - move source code to an src folder
         - get everything working first
+            - still some tweeks to scraper that are trickling in
+    - test Targets.py in src and add implicitly_wait in Targets.py
+    - test SummaryGenerator.py in src
 
 - Phase 2
-    - Add 'custom' specs/stats like:
-        - hp/ton
-
     - Find way of displaying/comparing/filtering/sorting resulting data
         - Explore using matplotlib.pyplot to display specs
             - further explore interactability so that data rows can be sorted according to desired features
         - html or react?
+    - Add 'custom' specs/stats like:
+        - hp/ton

@@ -6,7 +6,7 @@ import json
 import os
 
 def generateSummaryTXT():
-    data = json.load(open("AllBrandsAndModels.json"))
+    data = json.load(open("../AllBrandsAndModels.json"))
     if not os.path.isdir('Links'):
         os.mkdir('Links')
 
@@ -34,10 +34,10 @@ def writeSummary(brand: str, models: list[str]):
 
 def makeAllLinksTXT():
     L = []
-    os.chdir('Links')
+    os.chdir('../Links')
     for x in os.listdir():
         if os.path.isfile(x):
-            f = open("SUMMARY.txt", "r")
+            f = open(x, "r")
             L += f.readlines()
             f.close()
     os.chdir('../')

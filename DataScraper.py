@@ -66,7 +66,7 @@ def scrapeData(driver: webdriver):
     rows = []
     for i in range(len(data)):
         # print(i+1, '/', len(data), end='\r')
-        print('\tFinding Data', i+1, end='\r')
+        print('\tFind Data', i+1, end='\r')
         row = data[i].find_elements(By.TAG_NAME, 'div')
         if len(row) != 0:
             rows.append((row[0].text, row[1].text))
@@ -77,7 +77,6 @@ def scrapeData(driver: webdriver):
         if i[0] in target_specs:
             specs[i[0]] = i[1]
     
-    print('\tWriting to CSV')
     writeFile(parseSpecs(specs))
 
 
@@ -264,10 +263,14 @@ def scrapeHelper(filename: str, start_year = datetime.date.today().year):
     timeout = 5
     sleep_const = 2
 
-    start_model = 0 #! for debugging purposes only
-    start_year = 0 #! for debugging purposes only
+    start_model = 17 #! for debugging purposes only
+    start_year = 2022 #! for debugging purposes only
 
     for i in range(start_model, len(models)):
+        # specific model scraping
+        # if i != start_model:
+        #     continue
+
         driver = webdriver.Chrome(r"./driver/chromedriver", options=opts)
         driver.implicitly_wait(timeout)
         url = models[i].rstrip()
@@ -280,6 +283,16 @@ def scrapeHelper(filename: str, start_year = datetime.date.today().year):
         year = ''
         style = ''
 
+        try:
+            err = driver.find_element(By.TAG_NAME, 'h2')
+            if err.text == 'Oops! We don\'t have the page you\'re looking for.':
+                errfile = open("ProblemModels.txt", "a")
+                errfile.write(models[i])
+                errfile.close()
+                continue
+        except:
+            pass
+
         url = driver.current_url
         if url != 'https://www.caranddriver.com/error':
             year_buttons = driver.find_element(By.ID, 'yearSelect').find_elements(By.TAG_NAME, 'option')[1:]
@@ -290,13 +303,15 @@ def scrapeHelper(filename: str, start_year = datetime.date.today().year):
                 year_buttons.reverse()
 
                 # for scraping latest year
-                if int(year_buttons[y].text) < start_year:
-                    continue
-
-                # save time to jump start if error encountered in scraping
-                #! for debugging purposes only
-                # if i==start_model and int(year_buttons[y].text) < start_year:
+                # if int(year_buttons[y].text) < start_year:
                 #     continue
+
+
+                #! for debugging purposes only
+                # save time to jump start if error encountered in scraping
+                # jumps to a specific year on a specific model
+                if i==start_model and int(year_buttons[y].text) < start_year:
+                    continue
                 
                 year = year_buttons[y].text
                 year_buttons[y].click()
@@ -326,14 +341,15 @@ def scrapeHelper(filename: str, start_year = datetime.date.today().year):
 
 if __name__ == '__main__':
     start = time.time()
-    scrape(0)
+    scrape(67)
     finish = time.time()
 
     runtime = finish-start
     hours = int(runtime/3600)
     runtime = runtime % 3600
     minutes = int(runtime/60)
+    runtime = runtime % 60
     seconds = runtime
 
-    print('\nScraping took h:', hours, 'm:', minutes, 's', seconds)
+    print('\nScraping took h:', hours, 'm:', minutes, 's', round(seconds, 3))
     
