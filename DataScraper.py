@@ -1,8 +1,5 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.common.exceptions import NoSuchElementException
 import os
 import time
 import re
@@ -263,8 +260,8 @@ def scrapeHelper(filename: str, start_year = datetime.date.today().year):
     timeout = 5
     sleep_const = 2
 
-    start_model = 17 #! for debugging purposes only
-    start_year = 2022 #! for debugging purposes only
+    start_model = 0 #! for debugging purposes only
+    start_year = 0 #! for debugging purposes only
 
     for i in range(start_model, len(models)):
         # specific model scraping
@@ -283,18 +280,18 @@ def scrapeHelper(filename: str, start_year = datetime.date.today().year):
         year = ''
         style = ''
 
-        try:
-            err = driver.find_element(By.TAG_NAME, 'h2')
-            if err.text == 'Oops! We don\'t have the page you\'re looking for.':
-                errfile = open("ProblemModels.txt", "a")
-                errfile.write(models[i])
-                errfile.close()
-                continue
-        except:
-            pass
 
         url = driver.current_url
         if url != 'https://www.caranddriver.com/error':
+            try:
+                err = driver.find_element(By.TAG_NAME, 'h2')
+                if err.text == 'Oops! We don\'t have the page you\'re looking for.':
+                    errfile = open("../ProblemModels.txt", "a")
+                    errfile.write(models[i])
+                    errfile.close()
+                    continue
+            except:
+                pass
             year_buttons = driver.find_element(By.ID, 'yearSelect').find_elements(By.TAG_NAME, 'option')[1:]
             year_buttons.reverse()
             for y in range(len(year_buttons)):
@@ -328,20 +325,26 @@ def scrapeHelper(filename: str, start_year = datetime.date.today().year):
                         driver.implicitly_wait(timeout)
                         trim_buttons = driver.find_element(By.ID, 'trimSelect').find_elements(By.TAG_NAME, 'option')[1:]
                         print(year, style, trim_buttons[t].text)
+
+                        #! Big issue what if a bad link is encountered here: happens for Tesla Model Y 2021
+                        #! debugging purposes only, manually skip the issue causing link
+                        # if trim_buttons[t].text == 'Model Y Standard Range RWD *Ltd Avail*':
+                        #     continue
+
                         trim_buttons[t].click()
 
                         os.chdir('../')
                         scrapeData(driver)
                         os.chdir('Links')
         else:
-            print('Possibly bad link:', url)
-    time.sleep(sleep_const)
-    driver.close() #!
+            print('Possibly bad link:', models[i])
+        time.sleep(sleep_const)
+        driver.close() #!
     
 
 if __name__ == '__main__':
     start = time.time()
-    scrape(67)
+    scrape(64)
     finish = time.time()
 
     runtime = finish-start
