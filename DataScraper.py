@@ -258,10 +258,10 @@ def scrapeHelper(filename: str, start_year = datetime.date.today().year):
     opts.add_argument('start-maximized')
 
     timeout = 5
-    sleep_const = 2
+    sleep_const = 3
 
-    start_model = 0 #! for debugging purposes only
-    start_year = 0 #! for debugging purposes only
+    start_model = 32 #! for debugging purposes only
+    start_year = 2020 #! for debugging purposes only
 
     for i in range(start_model, len(models)):
         # specific model scraping
@@ -315,6 +315,10 @@ def scrapeHelper(filename: str, start_year = datetime.date.today().year):
                 time.sleep(sleep_const)
                 style_buttons = driver.find_element(By.ID, 'styleSelect').find_elements(By.TAG_NAME, 'option')[1:]
                 for s in range(len(style_buttons)):
+                    #! for debugging purposes only
+                    # if i == start_model and y == start_year and s < 1:
+                    #     continue
+
                     driver.implicitly_wait(timeout)
                     style_buttons = driver.find_element(By.ID, 'styleSelect').find_elements(By.TAG_NAME, 'option')[1:]
                     style = style_buttons[s].text
@@ -327,7 +331,7 @@ def scrapeHelper(filename: str, start_year = datetime.date.today().year):
                         print(year, style, trim_buttons[t].text)
 
                         #! Big issue what if a bad link is encountered here: happens for Tesla Model Y 2021
-                        #! debugging purposes only, manually skip the issue causing link
+                        #! for debugging purposes only, manually skip the issue causing trim
                         # if trim_buttons[t].text == 'Model Y Standard Range RWD *Ltd Avail*':
                         #     continue
 
@@ -344,7 +348,7 @@ def scrapeHelper(filename: str, start_year = datetime.date.today().year):
 
 if __name__ == '__main__':
     start = time.time()
-    scrape(64)
+    scrape(5)
     finish = time.time()
 
     runtime = finish-start
