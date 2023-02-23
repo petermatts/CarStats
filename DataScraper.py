@@ -43,9 +43,9 @@ def scrapeData(driver: webdriver):
     title_stuff = url.split('/')
     specs['Brand'] = ' '.join(list(map(lambda w: w.capitalize(), title_stuff[3].split('-')))) 
     model = ' '.join(list(map(lambda w: w.capitalize(), title_stuff[4].split('-')))) 
-    m = re.search("-\d{4}$", model)
+    m = re.search("\d{4}$", model)
     if m != None:
-        model = model[:-5]
+        model = model[:-4].rstrip()
         # model = model[:m.span()[0]]
     specs['Model'] = model
 
@@ -238,18 +238,18 @@ def writeFile(specs: dict):
 
 # function to go through all Links/{Brand}.txt files
 # runtime will be atrocious
-def scrape(i = None):
+def scrape(i = None, start_model = 0, start_year = datetime.date.today().year):
     os.chdir('Links')
     brands = os.listdir()
     if i != None:
-        scrapeHelper(brands[i])
+        scrapeHelper(brands[i], start_model, start_year)
     else:
         for i in range(len(brands)):
-            scrapeHelper(brands[i])
+            scrapeHelper(brands[i], start_model, start_year)
             time.sleep(10)
     os.chdir('../')
 
-def scrapeHelper(filename: str, start_year = datetime.date.today().year):
+def scrapeHelper(filename: str, start_model = 0, start_year = datetime.date.today().year):
     file = open(filename, 'r')
     models = file.readlines()
     file.close()
@@ -260,8 +260,8 @@ def scrapeHelper(filename: str, start_year = datetime.date.today().year):
     timeout = 5
     sleep_const = 3
 
-    start_model = 32 #! for debugging purposes only
-    start_year = 2020 #! for debugging purposes only
+    # start_model = 0 #! for debugging purposes only
+    # start_year = 0 #! for debugging purposes only
 
     for i in range(start_model, len(models)):
         # specific model scraping
@@ -304,7 +304,7 @@ def scrapeHelper(filename: str, start_year = datetime.date.today().year):
                 #     continue
 
 
-                #! for debugging purposes only
+                #! for debugging purposes only, main debugging optimizer
                 # save time to jump start if error encountered in scraping
                 # jumps to a specific year on a specific model
                 if i==start_model and int(year_buttons[y].text) < start_year:
@@ -333,6 +333,7 @@ def scrapeHelper(filename: str, start_year = datetime.date.today().year):
                         #! Big issue what if a bad link is encountered here: happens for Tesla Model Y 2021
                         #! for debugging purposes only, manually skip the issue causing trim
                         # if trim_buttons[t].text == 'Model Y Standard Range RWD *Ltd Avail*':
+                        # if trim_buttons[t].text == 'Rio 5-Door S IVT':
                         #     continue
 
                         trim_buttons[t].click()
@@ -348,7 +349,8 @@ def scrapeHelper(filename: str, start_year = datetime.date.today().year):
 
 if __name__ == '__main__':
     start = time.time()
-    scrape(5)
+    # brand, model, year
+    scrape(15, 0, 0)
     finish = time.time()
 
     runtime = finish-start

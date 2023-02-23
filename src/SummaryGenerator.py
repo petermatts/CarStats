@@ -21,7 +21,7 @@ def generateSummaryTXT():
 def writeSummary(brand: str, models: list[str]):
     file = open(brand+".txt", "w")
 
-    base_url = 'https://caranddriver.com/'
+    base_url = 'https://www.caranddriver.com/'
     L = []
 
     for i in models:
