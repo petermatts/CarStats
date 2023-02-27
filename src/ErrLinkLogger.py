@@ -1,0 +1,1 @@
+# Log all links that produce an error so that potential corrections may be sought out manually

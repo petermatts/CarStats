@@ -43,10 +43,11 @@ def scrapeData(driver: webdriver):
     title_stuff = url.split('/')
     specs['Brand'] = ' '.join(list(map(lambda w: w.capitalize(), title_stuff[3].split('-')))) 
     model = ' '.join(list(map(lambda w: w.capitalize(), title_stuff[4].split('-')))) 
-    m = re.search("\d{4}$", model)
+    m = re.search("-\d{4}$", model)
+    # if m != None and specs['Brand'] != 'Ram':
     if m != None:
-        model = model[:-4].rstrip()
-        # model = model[:m.span()[0]]
+        # model = model[:-4].rstrip()
+        model = model[:m.span()[0]]
     specs['Model'] = model
 
     driver.implicitly_wait(10)
@@ -114,7 +115,7 @@ def parseSpecs(webspecs: dict):
                         if isHybrid:
                             specs['Fuel'] = 'Hybrid'
                         else:
-                            gas = re.search("Regular|Premium|Gas", webspecs[i])
+                            gas = re.search("Regular|Premium|Gas|Diesel", webspecs[i])
                             try:
                                 specs['Fuel'] = webspecs[i][gas.span()[0]:gas.span()[1]]
                             except:
@@ -138,8 +139,9 @@ def parseSpecs(webspecs: dict):
             elif not isElectric and i == 'EPA Fuel Economy, combined/city/highway (mpg)':
                 fe = webspecs[i].replace('N/A', '').split('/')
                 specs['MPG (combined)'] = fe[0].strip().split(' ')[0]
-                specs['MPG (city)'] = fe[1].strip().split(' ')[0]
-                specs['MPG (highway)'] = fe[2].strip().split(' ')[0]
+                if len(fe)>1:
+                    specs['MPG (city)'] = fe[1].strip().split(' ')[0]
+                    specs['MPG (highway)'] = fe[2].strip().split(' ')[0]
             elif isElectric and i == 'EPA Fuel Economy Equivalent (for hybrid and electric vehicles), combined/city/highway (MPGe)':
                 fe = webspecs[i].replace('N/A', '').split('/')
                 specs['MPGe (combined)'] = fe[0].strip().split(' ')[0]
@@ -260,11 +262,9 @@ def scrapeHelper(filename: str, start_model = 0, start_year = datetime.date.toda
     timeout = 5
     sleep_const = 3
 
-    # start_model = 0 #! for debugging purposes only
-    # start_year = 0 #! for debugging purposes only
-
     for i in range(start_model, len(models)):
         # specific model scraping
+        # ! for debugging purposes only
         # if i != start_model:
         #     continue
 
@@ -279,7 +279,6 @@ def scrapeHelper(filename: str, start_model = 0, start_year = datetime.date.toda
 
         year = ''
         style = ''
-
 
         url = driver.current_url
         if url != 'https://www.caranddriver.com/error':
@@ -302,7 +301,6 @@ def scrapeHelper(filename: str, start_model = 0, start_year = datetime.date.toda
                 # for scraping latest year
                 # if int(year_buttons[y].text) < start_year:
                 #     continue
-
 
                 #! for debugging purposes only, main debugging optimizer
                 # save time to jump start if error encountered in scraping
@@ -350,7 +348,7 @@ def scrapeHelper(filename: str, start_model = 0, start_year = datetime.date.toda
 if __name__ == '__main__':
     start = time.time()
     # brand, model, year
-    scrape(15, 0, 0)
+    scrape(12, 22, 2010)
     finish = time.time()
 
     runtime = finish-start

@@ -10,12 +10,13 @@ import json
 driver = webdriver.Chrome(r"./driver/chromedriver")
 driver.get("https://caranddriver.com")
 driver.maximize_window()
-time.sleep(2)
+driver.implicitly_wait(5)
+# time.sleep(2)
 
 # Open Modal to scrape
 button = driver.find_element(By.CSS_SELECTOR, "button.css-1c9j0fn")
 button.click()
-time.sleep(2)
+# time.sleep(2)
 
 
 # Start Scraping brands
@@ -33,8 +34,10 @@ sel = driver.find_elements(By.TAG_NAME, "select")
 master = {}
 # Scrape Models
 for i in range(len(brands)):
+    brands = driver.find_elements(By.TAG_NAME, "option")
+    brands = brands[1:-2]
     brands[i].click()
-    time.sleep(5)
+    # time.sleep(5)
     models = driver.find_elements(By.TAG_NAME, "option")
     
     index = 0

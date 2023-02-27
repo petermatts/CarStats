@@ -12,6 +12,9 @@
         "TSX",
         "ZDX"
     ],
+    "Afeela": [
+        "EV Sedan"
+    ],
     "Alfa Romeo": [
         "4C",
         "8C",
@@ -104,6 +107,7 @@
         "8-series Gran Coupe",
         "i3",
         "i4",
+        "i5",
         "i7",
         "i8",
         "i8 M",
@@ -197,6 +201,7 @@
         "Cobalt",
         "Colorado",
         "Corvette",
+        "Corvette E-Ray",
         "Corvette EV",
         "Corvette SUV",
         "Corvette Z06",
@@ -579,6 +584,7 @@
         "GranTurismo Folgore",
         "Grecale",
         "Grecale Folgore",
+        "Grecale Trofeo",
         "Levante",
         "MC20",
         "Quattroporte"
@@ -609,6 +615,7 @@
         "600LT",
         "650S",
         "720S",
+        "750S",
         "765LT",
         "Artura",
         "Elva",
@@ -635,8 +642,8 @@
         "GL63",
         "GLA-class",
         "GLB35",
-        "GLC43 4Matic / GLC63 4Matic",
-        "GLC43 Coupe / GLC63 Coupe",
+        "GLC-Class",
+        "GLC-Class Coupe",
         "GLE-class",
         "GLE43 4Matic / GLE63 4Matic",
         "GLE43 Coupe 4Matic / GLE63 S Coupe 4Matic",
@@ -671,6 +678,7 @@
         "EQG",
         "EQS",
         "EQS SUV",
+        "eSprinter",
         "F-cell",
         "G-class",
         "G63 / G65 AMG",
@@ -697,9 +705,13 @@
         "Sprinter"
     ],
     "Mercedes-Maybach": [
+        "57",
+        "62",
         "EQS",
         "GLS-class",
-        "S-Class"
+        "Landaulet",
+        "S-Class",
+        "SL-Class"
     ],
     "Mercury": [
         "Grand Marquis",
@@ -789,9 +801,11 @@
         "918",
         "Cayenne",
         "Cayenne Coupe",
+        "Cayenne Coupe Turbo / Turbo S",
         "Cayenne Turbo / Turbo S",
         "Macan",
         "Macan EV",
+        "Macan GTS",
         "Macan Turbo",
         "Panamera",
         "Panamera Sport Turismo",
@@ -801,10 +815,9 @@
     ],
     "Ram": [
         "1500",
-        "1500 EV",
+        "1500 REV",
         "1500 TRX",
         "2500 / 3500",
-        "Dakota",
         "ProMaster",
         "ProMaster City"
     ],
