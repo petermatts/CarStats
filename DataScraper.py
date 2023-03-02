@@ -43,11 +43,11 @@ def scrapeData(driver: webdriver):
     title_stuff = url.split('/')
     specs['Brand'] = ' '.join(list(map(lambda w: w.capitalize(), title_stuff[3].split('-')))) 
     model = ' '.join(list(map(lambda w: w.capitalize(), title_stuff[4].split('-')))) 
-    m = re.search("-\d{4}$", model)
-    # if m != None and specs['Brand'] != 'Ram':
-    if m != None:
-        # model = model[:-4].rstrip()
-        model = model[:m.span()[0]]
+    m = re.search("\d{4}$", model)
+    # if m != None:
+    if m != None and specs['Brand'] != 'Ram':
+        model = model[:-4].rstrip()
+        # model = model[:m.span()[0]]
     specs['Model'] = model
 
     driver.implicitly_wait(10)
@@ -348,7 +348,7 @@ def scrapeHelper(filename: str, start_model = 0, start_year = datetime.date.toda
 if __name__ == '__main__':
     start = time.time()
     # brand, model, year
-    scrape(12, 22, 2010)
+    scrape(41, 31, 2013)
     finish = time.time()
 
     runtime = finish-start
@@ -358,5 +358,5 @@ if __name__ == '__main__':
     runtime = runtime % 60
     seconds = runtime
 
-    print('\nScraping took h:', hours, 'm:', minutes, 's', round(seconds, 3))
+    print('\nScraping took:\nh:', hours, '\nm:', minutes, '\ns:', round(seconds, 3))
     

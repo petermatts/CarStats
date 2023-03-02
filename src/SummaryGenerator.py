@@ -40,11 +40,12 @@ def makeAllLinksTXT():
             f = open(x, "r")
             L += f.readlines()
             f.close()
-    os.chdir('../')
+    os.chdir('../Docs')
 
     file = open("AllLinks.txt", "w")
     file.writelines(L)
     file.close()
+    os.chdir('../')
 
 if __name__ == '__main__':
     os.chdir('../')
