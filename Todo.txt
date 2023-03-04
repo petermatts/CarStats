@@ -1,14 +1,11 @@
 1.0 Design and TODO
 
-- Phase 1 Set Up & Design
-    - RUN script to compile data into csvs for all brands/all models across years available/everything
+- Phase 1 Set Up & Design : Done
 
 - Phase 2 Modifications/Revisions
-    - Counter Script (count number of models in each brand)
     - Error Link Handling
         - Find links in csvs that do not end with regex '\d{6}$' as well
     - CSV correction script
-    - CSV compilation script
 
 - Phase 3 Display
     - Find way of displaying/comparing/filtering/sorting resulting data
