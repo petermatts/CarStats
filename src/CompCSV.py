@@ -46,5 +46,23 @@ def AllData():
     file.writelines(L)
     file.close()
 
+    os.chdir('../')
+
+def removeCompCSVs():
+    os.chdir('../Data')
+    for brand in os.listdir():
+        try:
+            filename = str(brand) + '/' + str(brand) + '.csv'
+            os.remove(filename)
+        except:
+            pass
+
+    try: 
+        os.remove('AllData.csv')
+    except:
+        pass
+
+
 if __name__ == '__main__':
     AllData()
+    # removeCompCSVs()

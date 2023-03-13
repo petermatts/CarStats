@@ -334,6 +334,8 @@ def scrapeHelper(filename: str, start_model = 0, start_year = datetime.date.toda
                         # if trim_buttons[t].text == 'Rio 5-Door S IVT':
                         #     continue
 
+                        #! potential solution: recursively call this function, adding a tuple parameter of trim button to skip with year?
+
                         trim_buttons[t].click()
 
                         os.chdir('../')
@@ -343,7 +345,79 @@ def scrapeHelper(filename: str, start_model = 0, start_year = datetime.date.toda
             print('Possibly bad link:', models[i])
         time.sleep(sleep_const)
         driver.close() #!
+
+# TODO test this function
+# scrape by model url
+def scrapeByURL(url: str, start_model = 0, start_year = datetime.date.today().year):
+    opts = webdriver.ChromeOptions()
+    opts.add_argument('start-maximized')
+
+    timeout = 5
+    sleep_const = 3
     
+    driver = webdriver.Chrome(r"./driver/chromedriver", options=opts)
+    driver.implicitly_wait(timeout)
+    try:
+        driver.get(url)
+    except:
+        print('Bad URL:', url)
+        return
+
+    # year = ''
+    # style = ''
+
+    url = driver.current_url
+    year_buttons = driver.find_element(By.ID, 'yearSelect').find_elements(By.TAG_NAME, 'option')[1:]
+    year_buttons.reverse()
+    for y in range(len(year_buttons)):
+        driver.implicitly_wait(timeout)
+        year_buttons = driver.find_element(By.ID, 'yearSelect').find_elements(By.TAG_NAME, 'option')[1:]
+        year_buttons.reverse()
+
+        # for scraping latest year
+        # if int(year_buttons[y].text) < start_year:
+        #     continue
+
+        #! for debugging purposes only, main debugging optimizer
+        # save time to jump start if error encountered in scraping
+        # jumps to a specific year on a specific model
+        # if i==start_model and int(year_buttons[y].text) < start_year:
+        #     continue
+
+        year = year_buttons[y].text
+        year_buttons[y].click()
+        time.sleep(sleep_const)
+        style_buttons = driver.find_element(By.ID, 'styleSelect').find_elements(By.TAG_NAME, 'option')[1:]
+        for s in range(len(style_buttons)):
+            #! for debugging purposes only
+            # if i == start_model and y == start_year and s < 1:
+            #     continue
+
+            driver.implicitly_wait(timeout)
+            style_buttons = driver.find_element(By.ID, 'styleSelect').find_elements(By.TAG_NAME, 'option')[1:]
+            style = style_buttons[s].text
+            style_buttons[s].click()
+            time.sleep(sleep_const)
+            trim_buttons = driver.find_element(By.ID, 'trimSelect').find_elements(By.TAG_NAME, 'option')[1:]
+            for t in range(len(trim_buttons)):
+                driver.implicitly_wait(timeout)
+                trim_buttons = driver.find_element(By.ID, 'trimSelect').find_elements(By.TAG_NAME, 'option')[1:]
+                print(year, style, trim_buttons[t].text)
+
+                #! Big issue what if a bad link is encountered here: happens for Tesla Model Y 2021
+                #! for debugging purposes only, manually skip the issue causing trim
+                # if trim_buttons[t].text == 'Model Y Standard Range RWD *Ltd Avail*':
+                # if trim_buttons[t].text == 'Rio 5-Door S IVT':
+                #     continue
+
+                #! potential solution: recursively call this function, adding a tuple parameter of trim button to skip with year?
+
+                trim_buttons[t].click()
+
+                os.chdir('../')
+                scrapeData(driver)
+                os.chdir('Links')
+    driver.close() #!
 
 if __name__ == '__main__':
     start = time.time()
