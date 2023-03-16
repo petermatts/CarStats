@@ -3,11 +3,14 @@
 - Phase 1 Set Up & Design : Done
 
 - Phase 2 Modifications/Revisions
-    - Error Link Handling
-        - Find links in csvs that do not end with regex '\d{6}$' as well
-    - CSV correction script
+    - Urgent: fix width data issue, see git issue #24
+    - Run error link detector (src/ErrLinkLogger.py) and remove ProblemModels.txt
+        - Find links in csvs that do not end with regex '\d{6}$' as well? keep in seprate log
+    - CSV correction script(s)
 
 - Phase 3 Display
+    - use python sys module to allow command line args running scripts that alter/write data
+        - commented out sys import in many of the src scripts where this would be handy
     - Find way of displaying/comparing/filtering/sorting resulting data
         - Explore using matplotlib.pyplot to display specs
             - further explore interactability so that data rows can be sorted according to desired features

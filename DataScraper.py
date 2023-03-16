@@ -73,7 +73,7 @@ def scrapeData(driver: webdriver):
 
     for i in rows:
         if i[0] in target_specs:
-            specs[i[0]] = i[1]
+            specs[i[0]] = i[1].replace(',', '') # vital to remove commas as data will be stored in CSV files
     
     writeFile(parseSpecs(specs))
 
@@ -86,6 +86,7 @@ def parseSpecs(webspecs: dict):
         if webspecs[i] != 'NA': #? or '-TBD-' or ''
             if i == 'Brand' or i == 'Model' or i == 'Year' or i == 'Price' or i == 'Trim' or i == 'URL':
                 specs[i] = webspecs[i]
+                # specs[i] = webspecs[i].replace(',', '')
             elif i == 'EPA Classification':
                 specs['EPA Class'] = webspecs[i]
             elif i == 'Drivetrain':
@@ -134,6 +135,7 @@ def parseSpecs(webspecs: dict):
                     specs['Max Torque RPM'] = tq[1]
             elif i == 'Transmission Description':
                 specs['Transmission'] = webspecs[i].split(' ')[0]
+                # specs['Transmission'] = webspecs[i].split(' ')[0].replace(',', '')
             elif i == 'Number of Transmission Speeds':
                 specs['Transmission Speeds'] = webspecs[i]
             elif not isElectric and i == 'EPA Fuel Economy, combined/city/highway (mpg)':
@@ -152,7 +154,7 @@ def parseSpecs(webspecs: dict):
             elif i == 'Length (inches)':
                 specs['Length (in)'] = webspecs[i]
             elif i == 'Width, without mirrors (inches)':
-                specs['Width, no mirrors (in)'] = webspecs[i]
+                specs['Width no mirrors (in)'] = webspecs[i]
             elif i == 'Height (inches)':
                 specs['Height (in)'] = webspecs[i]
             elif i == 'Wheelbase (inches)':
@@ -171,6 +173,7 @@ def parseSpecs(webspecs: dict):
                     pass
             elif i == 'Base Curb Weight (pounds)':
                 specs['Weight (lbs)'] = webspecs[i]
+                # specs['Weight (lbs)'] = webspecs[i].replace(",", "")
             elif i == 'Maximum Towing Capacity (pounds)':
                 specs['Max Towing (lbs)'] = webspecs[i]
             else:

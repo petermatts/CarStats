@@ -4,6 +4,7 @@ From the file AllBrandsAndModels.json, this script generates link summary files
 
 import json
 import os
+# import sys
 
 def generateSummaryTXT():
     data = json.load(open("AllBrandsAndModels.json"))

@@ -1,6 +1,7 @@
 # compile CSVs into master CSV files
 
 import os
+# import sys
 
 def AllData():
     base = open('../Docs/Base.csv', 'r')

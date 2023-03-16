@@ -3,6 +3,8 @@
 import requests
 import time
 import os
+import re
+# import sys
 
 # Traverse Links Directory
 def getLinks():
@@ -53,5 +55,46 @@ def checkLink(url: str, L: list):
     if r.status_code != 200:
         L.append(url + ',' + str(r.status_code) + ',\n')
 
+def no_code_links():
+    os.chdir('../Data')
+
+    links = []
+
+    for d in os.listdir():
+        if os.path.isdir(d):
+            os.chdir(d)
+            print(os.getcwd())
+            for y in os.listdir():
+                if os.path.isdir(y):
+                    os.chdir(y)
+
+                    for f in os.listdir():
+                        file = open(f, 'r')
+                        lines = file.readlines()
+                        file.close() 
+
+                        idx = lines[0].split(",").index("URL")
+
+                        for i in range(1, len(lines)):
+                            temp = lines[i].split(",")
+                            if not re.search("\d{6}$", temp[idx]) and temp[idx] != "":
+                                links.append(temp[idx] + '\n')
+                            # if temp[idx] == "":
+                            # if temp[idx].isdecimal():
+                                # print(os.getcwd())
+                    os.chdir('../')
+            os.chdir('../')
+
+
+    os.chdir('../')
+    if not os.path.isdir('Log'):
+        os.mkdir('Log')
+    os.chdir('Log')
+
+    f = open("IncompleteLinks.txt", "w")
+    f.writelines(links)
+    f.close()
+
 if __name__ == '__main__':
-    getLinks()
+    no_code_links()
+    # getLinks()
