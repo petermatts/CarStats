@@ -23,10 +23,10 @@ def getLinks():
 
         for l in range(len(links)):
             if l != len(links)-1:
-                print(brand.replace('.txt', ''), format(100*l/len(links), '.1f'), '%', end='\r')
+                print(brand.replace('.txt', ''), format(100*l/len(links), '.1f'), '\b%', end='\r')
             else:
                 print(brand.replace('.txt', ''), '100 %\t')
-            checkLink(links[l].rstrip(), L)
+            checkLink(links[l].rstrip(), L) # line that makes all the magic happen
 
     # Tests
     # checkLink('https://www.caranddriver.com/mercedes-amg/glc-class/specs', L) # status 404
@@ -54,6 +54,7 @@ def checkLink(url: str, L: list):
 
     if r.status_code != 200:
         L.append(url + ',' + str(r.status_code) + ',\n')
+
 
 def no_code_links():
     os.chdir('../Data')
@@ -96,5 +97,5 @@ def no_code_links():
     f.close()
 
 if __name__ == '__main__':
-    no_code_links()
-    # getLinks()
+    # no_code_links()
+    getLinks()

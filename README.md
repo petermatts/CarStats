@@ -22,5 +22,5 @@ Graphic of all specs being taken into consideration coming soon
 
 ## Future Designs and Plans
 
-Details Coming soon
+See `Todo.txt`
 

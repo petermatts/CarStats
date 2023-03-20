@@ -1,3 +1,7 @@
+"""
+Script that corrects ill-formated data file names and corrects them
+"""
+
 import os
 import re
 # import sys
@@ -48,7 +52,7 @@ def fix():
 
 if __name__ == '__main__':
     os.chdir('../Data')
-    # detect()
-    fix()
+    detect()
+    # fix()
 
     
