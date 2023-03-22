@@ -4,9 +4,6 @@
 
 - Phase 2 Modifications/Revisions
     - Urgent: fix width data issue, see git issue #24
-    - Run error link detector (src/ErrLinkLogger.py)
-        - remove ProblemModels.txt
-        - Find links in csvs that do not end with regex '\d{6}$' as well? keep in seprate log
     - CSV correction script(s)
 
 - Phase 3 Display

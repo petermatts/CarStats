@@ -26,7 +26,7 @@ def writeSummary(brand: str, models: list[str]):
     L = []
 
     for i in models:
-        m = i.replace(" / ", "-").replace(" ", "-").lower()
+        m = i.replace(" / ", "-").replace("/", "-").replace(".", "-").replace(" ", "-").lower()
         url = base_url + brand.lower() + '/' + m + '/specs\n'
         L.append(url)
 

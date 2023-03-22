@@ -349,9 +349,9 @@ def scrapeHelper(filename: str, start_model = 0, start_year = datetime.date.toda
         time.sleep(sleep_const)
         driver.close() #!
 
-# TODO test this function
+
 # scrape by model url
-def scrapeByURL(url: str, start_model = 0, start_year = datetime.date.today().year):
+def scrapeByURL(url: str, start_year = datetime.date.today().year):
     opts = webdriver.ChromeOptions()
     opts.add_argument('start-maximized')
 
@@ -373,6 +373,7 @@ def scrapeByURL(url: str, start_model = 0, start_year = datetime.date.today().ye
     year_buttons = driver.find_element(By.ID, 'yearSelect').find_elements(By.TAG_NAME, 'option')[1:]
     year_buttons.reverse()
     for y in range(len(year_buttons)):
+        # print('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
         driver.implicitly_wait(timeout)
         year_buttons = driver.find_element(By.ID, 'yearSelect').find_elements(By.TAG_NAME, 'option')[1:]
         year_buttons.reverse()
@@ -381,19 +382,13 @@ def scrapeByURL(url: str, start_model = 0, start_year = datetime.date.today().ye
         # if int(year_buttons[y].text) < start_year:
         #     continue
 
-        #! for debugging purposes only, main debugging optimizer
-        # save time to jump start if error encountered in scraping
-        # jumps to a specific year on a specific model
-        # if i==start_model and int(year_buttons[y].text) < start_year:
-        #     continue
-
         year = year_buttons[y].text
         year_buttons[y].click()
         time.sleep(sleep_const)
         style_buttons = driver.find_element(By.ID, 'styleSelect').find_elements(By.TAG_NAME, 'option')[1:]
         for s in range(len(style_buttons)):
             #! for debugging purposes only
-            # if i == start_model and y == start_year and s < 1:
+            # if y == start_year and s == 0:
             #     continue
 
             driver.implicitly_wait(timeout)
@@ -405,15 +400,17 @@ def scrapeByURL(url: str, start_model = 0, start_year = datetime.date.today().ye
             for t in range(len(trim_buttons)):
                 driver.implicitly_wait(timeout)
                 trim_buttons = driver.find_element(By.ID, 'trimSelect').find_elements(By.TAG_NAME, 'option')[1:]
-                print(year, style, trim_buttons[t].text)
 
-                #! Big issue what if a bad link is encountered here: happens for Tesla Model Y 2021
-                #! for debugging purposes only, manually skip the issue causing trim
-                # if trim_buttons[t].text == 'Model Y Standard Range RWD *Ltd Avail*':
-                # if trim_buttons[t].text == 'Rio 5-Door S IVT':
+                #! for debugging purposes only
+                # print(len(trim_buttons), t)
+                # if int(year) == start_year and s == 0 and t < 3:
                 #     continue
 
-                #! potential solution: recursively call this function, adding a tuple parameter of trim button to skip with year?
+                # if trim_buttons[t].text == "Tacoma 4WD TRD Sport Access Cab 6' Bed V6 AT (Natl)" \
+                    # or trim_buttons[t].text == "Tacoma 4WD TRD Off Road Access Cab 6' Bed V6 AT (Natl)":
+                    # continue
+
+                print(year, style, trim_buttons[t].text)
 
                 trim_buttons[t].click()
 
@@ -422,18 +419,55 @@ def scrapeByURL(url: str, start_model = 0, start_year = datetime.date.today().ye
                 os.chdir('Links')
     driver.close() #!
 
-if __name__ == '__main__':
-    start = time.time()
+def scrapeLinks():
     # brand, model, year
     scrape(41, 31, 2013)
-    finish = time.time()
 
+# this function should be altered in accordance with the format and name of the correction file
+def scapeFixLinks():
+    os.chdir('Log')
+    filename = 'ErrorLinks-Fix'
+    file = open(filename + '.csv', 'r')
+    lines = file.readlines()
+    file.close()
+
+    links = []
+    for i in lines:
+        data = i.split(',')
+        if data[2] != '':
+            links.append(data[2] + '/specs')
+
+    # for i in links:
+    #     print(i)
+    # print(len(links))
+
+    # file = open(filename + '.txt', 'w')
+    # for i in links:
+    #     file.write(i + '\n')
+    # file.close()
+
+    # scrapeByURL(links[30], 2022)
+
+    for i in range(31, len(links)):
+        scrapeByURL(links[i])
+        time.sleep(3)
+
+
+
+if __name__ == '__main__':
+    start = time.time()
+
+    # scrapeLinks()
+
+    scapeFixLinks()
+
+    finish = time.time()
     runtime = finish-start
     hours = int(runtime/3600)
     runtime = runtime % 3600
     minutes = int(runtime/60)
     runtime = runtime % 60
     seconds = runtime
-
     print('\nScraping took:\nh:', hours, '\nm:', minutes, '\ns:', round(seconds, 3))
+
     

@@ -25,7 +25,7 @@ def getLinks():
             if l != len(links)-1:
                 print(brand.replace('.txt', ''), format(100*l/len(links), '.1f'), '\b%', end='\r')
             else:
-                print(brand.replace('.txt', ''), '100 %\t')
+                print(brand.replace('.txt', ''), '100.0 %')
             checkLink(links[l].rstrip(), L) # line that makes all the magic happen
 
     # Tests
