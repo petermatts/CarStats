@@ -3,15 +3,15 @@
 - Phase 1 Set Up & Design : Done
 
 - Phase 2 Modifications/Revisions
-    - Urgent: fix width data issue, see git issue #24
-    - CSV correction script(s)
+    - CSV correction script(s) git issue #21
+    - scrape widths? git issue #28
 
 - Phase 3 Display
-    - use python sys module to allow command line args running scripts that alter/write data
+    - use python sys module to allow command line args running scripts that alter/write data: git issue #29
         - commented out sys import in many of the src scripts where this would be handy
     - Find way of displaying/comparing/filtering/sorting resulting data
         - Explore using matplotlib.pyplot to display specs
             - further explore interactability so that data rows can be sorted according to desired features
         - html or react?
-    - Add 'custom' specs/stats like:
+    - Add 'custom' specs/stats like: git issue #23
         - hp/ton

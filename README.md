@@ -18,7 +18,7 @@ Ideally once all data is collected it should be displayed properly, most likely 
 
 ## Specs
 
-Graphic of all specs being taken into consideration coming soon
+Graphic of all specs being taken into consideration **coming soon**
 
 ## Future Designs and Plans
 

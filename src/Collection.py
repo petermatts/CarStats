@@ -64,7 +64,7 @@ if __name__ == '__main__':
         21    : MPGe (highway)
         22    : Fuel Cap. (Gal)
         23    : Length (in)
-        24    : Width no mirrors (in) #! issue from here down see issue #24
+        24    : Width no mirrors (in)
         25    : Wheelbase (in)
         26    : Seating Cap
         27    : Passenger Space (cu ft)
@@ -77,4 +77,4 @@ if __name__ == '__main__':
     
     # use excel file to find index of brand
     # collect_attr(attribute col number, brand index number)
-    collect_attr(0, 0)
+    collect_attr(2, 0)
