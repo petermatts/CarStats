@@ -36,6 +36,59 @@ def collect_attr(attr: int, idx = -1):
     print(header)
     print(collection)
 
+def run():
+    curr_dir = os.getcwd()
+    os.chdir('../Data')
+    brands = []
+    for i in os.listdir():
+        if os.path.isdir(i):
+            brands.append(i)
+    os.chdir(curr_dir)
+
+    if len(sys.argv) < 3:
+        raise ValueError("Missing Arguments")
+    
+    
+    attr = sys.argv[1]
+    brand = sys.argv[2]
+    bad_attr_arg = False
+    bad_brand_arg = False
+    try:
+        brand = int(brand)
+    except:
+        try:
+            brand = brands.index(brand)
+        except:
+            bad_brand_arg = True
+           
+    if bad_brand_arg:
+        msg = "Acceptable values: " + str(brands) + "\nOr indexes [0,"+  str(len(brands)-1) + "]"
+        # raise ValueError("Incorrect brand string.\n", msg)
+        print("Incorrect brand string.")
+        print(msg)
+        return
+
+    try:
+        attr = int(attr)
+    except:
+        try:
+            attr = attrs.index(attr)
+        except:
+            bad_attr_arg = True
+
+    if bad_attr_arg:
+        msg = "Acceptable values: " + str(attrs) + "\nOr indexes [0," + str(len(attrs)-1) + "]"
+        # raise ValueError("Incorrect attribute string.\n", msg)
+        print("Incorrect attribute string.")
+        print(msg)
+        return
+            
+
+
+    # use excel file to find index of brand
+    # collect_attr(attribute col number, brand index number)
+    # collect_attr(6, 0)
+    collect_attr(attr, brand)
 
 if __name__ == '__main__':
     """
@@ -111,39 +164,5 @@ if __name__ == '__main__':
         "URL"
     ]
 
-    curr_dir = os.getcwd()
-    os.chdir('../Data')
-    brands = []
-    for i in os.listdir():
-        if os.path.isdir(i):
-            brands.append(i)
-    os.chdir(curr_dir)
+    run()
 
-    if len(sys.argv) < 3:
-        raise ValueError("Missing Arguments")
-    
-    
-    attr = sys.argv[1]
-    brand = sys.argv[2]
-
-    try:
-        brand = int(brand)
-    except:
-        try:
-            brand = brands.index(brand)
-        except:
-            raise ValueError("Incorrect brand string")
-
-    try:
-        attr = int(attr)
-    except:
-        try:
-            attr = attrs.index(attr)
-        except:
-            raise ValueError("Incorrect attribute string")
-
-
-    # use excel file to find index of brand
-    # collect_attr(attribute col number, brand index number)
-    # collect_attr(6, 0)
-    collect_attr(attr, brand)

@@ -8,7 +8,7 @@ Script to return a set (no duplicates) of all possible datapoints in a specified
 
 This will be helpful for debugging and implementing `Corrections.py` and the correction scripts in the `Corrections` folder.
 
-**TODO** add sys args to this script.
+Run with `python3 Collections.py {attribute/index} {brand/index}`. Spell out attribute or brand or give an index for them instead. Incorrect spelling results in an error.
 
 WARNING: be sure to run CompCSV.py before running this script.
 
