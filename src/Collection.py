@@ -74,7 +74,76 @@ if __name__ == '__main__':
         31    : Max Towing (lbs)
         32    : URL
     """
+
+    attrs = [
+        "Year",
+        "Brand",
+        "Model",
+        "Trim",
+        "Price",
+        "EPA Class",
+        "Engine",
+        "Turbos",
+        "Fuel",
+        "Displacement (liters)",
+        "Max Horsepower",
+        "Max Horsepwer RPM",
+        "Max Torque",
+        "Max Torque RPM",
+        "Transmission",
+        "Transmission Speeds",
+        "MPG (combined)",
+        "MPG (city)",
+        "MPG (highway)",
+        "MPGe (combined)",
+        "MPGe (city)",
+        "MPGe (highway)",
+        "Fuel Cap. (Gal)",
+        "Length (in)",
+        "Width no mirrors (in)",
+        "Wheelbase (in)",
+        "Seating Cap",
+        "Passenger Space (cu ft)",
+        "Trunk Space (cu ft)",
+        "Turn Radius (ft)",
+        "Weight (lbs)",
+        "Max Towing (lbs)",
+        "URL"
+    ]
+
+    curr_dir = os.getcwd()
+    os.chdir('../Data')
+    brands = []
+    for i in os.listdir():
+        if os.path.isdir(i):
+            brands.append(i)
+    os.chdir(curr_dir)
+
+    if len(sys.argv) < 3:
+        raise ValueError("Missing Arguments")
     
+    
+    attr = sys.argv[1]
+    brand = sys.argv[2]
+
+    try:
+        brand = int(brand)
+    except:
+        try:
+            brand = brands.index(brand)
+        except:
+            raise ValueError("Incorrect brand string")
+
+    try:
+        attr = int(attr)
+    except:
+        try:
+            attr = attrs.index(attr)
+        except:
+            raise ValueError("Incorrect attribute string")
+
+
     # use excel file to find index of brand
     # collect_attr(attribute col number, brand index number)
-    collect_attr(2, 0)
+    # collect_attr(6, 0)
+    collect_attr(attr, brand)

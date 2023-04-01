@@ -4,6 +4,7 @@
 
 - Phase 2 Modifications/Revisions
     - CSV correction script(s) git issue #21
+        - in progress
     - scrape widths? git issue #28
 
 - Phase 3 Display
