@@ -1,13 +1,3 @@
-# from . import Acura
-# from . import AlfaRomeo
-# from . import AstonMartin
-# from . import Audi
-# from . import Bentley
-# from . import BMW
-# from . import Buick
-
-# from . import *
-
 from os.path import dirname, basename, isfile, join
 import glob
 modules = glob.glob(join(dirname(__file__), "*.py"))
