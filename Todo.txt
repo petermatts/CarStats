@@ -3,9 +3,7 @@
 - Phase 1 Set Up & Design : Done
 
 - Phase 2 Modifications/Revisions
-    - CSV correction script(s) git issue #21
-        - in progress
-    - scrape widths? git issue #28
+    - Redo Scraper - 2.0 git issue #31
 
 - Phase 3 Display
     - use python sys module to allow command line args running scripts that alter/write data: git issue #29
