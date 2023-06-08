@@ -5,13 +5,16 @@ import time
 import re
 import datetime
 import json
+import yaml
 
-def scrapeData(driver: webdriver):
+def scrapeData(driver: webdriver, specs: dict = {}):
     url = driver.current_url
 
-    specs = {
-        'URL': url
-    }
+    # specs = {
+    #     'URL': url
+    # }
+    specs['URL'] = url
+
     title_stuff = url.split('/')
     specs['Brand'] = ' '.join(list(map(lambda w: w.capitalize(), title_stuff[3].split('-')))) 
     model = ' '.join(list(map(lambda w: w.capitalize(), title_stuff[4].split('-')))) 
@@ -25,6 +28,8 @@ def scrapeData(driver: webdriver):
     driver.implicitly_wait(10)
     year = driver.find_element(By.CLASS_NAME, 'css-1an3ngc.ezgaj230')
     driver.implicitly_wait(0.01)
+
+    #TODO  detect year and trim from specs dropdown options
     specs['Year'] = year.text.split(' ')[0]
     specs['Trim'] = year.text.replace('-', ' ').replace(specs['Model'], '').replace(specs['Brand'], '').replace(specs['Year'], '').replace('Features And Specs', '').strip()
     price = driver.find_element(By.CLASS_NAME, 'css-48aaf9.e1l3raf11')
@@ -74,7 +79,10 @@ def scrapeByURL(url: str, start_year = datetime.date.today().year):
     data = scrapeData(driver)
     writeJSONData(data)
 
-def makeJsonFile(path: str) -> bool:
+def scrapeBrand():
+    pass
+
+def makeFile(path: str, ext: str = '') -> bool:
     """
     Creates a new json file for the given path containing an empty array []
     Returns True if the file was created successfully and False if file already exists
@@ -93,8 +101,9 @@ def makeJsonFile(path: str) -> bool:
         os.chdir(cwd)
         return False
     
-    with open(dirs[-1], 'w') as file:
-        file.write('[]')
+    if ext.lower() == 'json':
+        with open(dirs[-1], 'w') as file:
+            file.write('[]')
 
     os.chdir(cwd)
     return True
@@ -106,20 +115,30 @@ def writeJSONData(specs: dict):
     year = specs['Year']
 
     # make data file
-    path = './Data/JSON/' + brand + '/' + year + '/' + model + '.json'
-    makeJsonFile(path)
+    # path = './Data/JSON/' + brand + '/' + year + '/' + model + '.json'
+    path = './Data/YAML/' + brand + '/' + year + '/' + model + '.yaml'
+    makeFile(path, ext='yaml')
 
     # read existing data and write the new data to the file
-    data = None
-    contents = None
-    with open(path, 'r') as file:
-        contents = json.load(file)
-        contents.append(specs)
-        data = json.dumps(contents, indent = 4)
-    
-    with open(path, 'w') as outfile:
-        outfile.write(data)
+    # data = None
+    # contents = None
+    # with open(path, 'r') as file:
+    #     contents = json.load(file)
 
+    #     if specs in contents: # if data was already found
+    #         #? more efficient to go by URLs manually?
+    #         #TODO ^^^
+    #         return
+        
+    #     contents.append(specs)
+    #     data = json.dumps(contents, indent = 4)
+    
+    # with open(path, 'w') as outfile:
+    #     outfile.write(data)
+
+    with open(path, 'a') as file:
+        data = yaml.dump([specs])
+        file.write(data)
 
 
 if __name__ == "__main__":
