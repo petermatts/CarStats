@@ -4,7 +4,7 @@ Year
 Brand
 Model
 Trim
-Price
+Price *
 EPA Class
 Engine
 Turbos
@@ -32,4 +32,7 @@ Trunk Space (cu ft)
 Turn Radius (ft)
 Weight (lbs)
 Max Towing (lbs)
-URL
+URL **
+
+* unreliable
+** potential latest models issue

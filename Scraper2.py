@@ -57,7 +57,7 @@ def scrapeData(driver: webdriver, specs: dict = {}):
 
     return specs
 
-
+# for testing purposes
 def scrapeByURL(url: str, start_year = datetime.date.today().year):
     opts = webdriver.ChromeOptions()
     opts.add_argument('start-maximized')
@@ -77,10 +77,140 @@ def scrapeByURL(url: str, start_year = datetime.date.today().year):
     print(url)
 
     data = scrapeData(driver)
-    writeJSONData(data)
+    writeData(data)
 
-def scrapeBrand():
-    pass
+
+def scrapeBrand(brand_filename: str):
+    """brand_filename is the path to the brands links in Links folder"""
+    brand = brand_filename.split('/')[-1].replace('.txt', '')
+    timeout = 5 #? can be changed (seconds)
+    sleep_const = 3 #? can be changed (seconds)
+
+    # get links
+    with open(brand_filename, 'r') as file:
+        links = file.readlines()
+    
+    # open debug file (open with defaults if it doesn't exist)
+    debug_path = './Debug/' + brand + '.yaml'
+    debug = openDebugFile(debug_path)
+    u = debug['link_idx']
+
+    while u < len(links):
+        url = links[u]
+        opts = webdriver.ChromeOptions()
+        opts.add_argument('start-maximized')
+        driver = webdriver.Chrome(r"./driver/chromedriver", options=opts)
+        driver.implicitly_wait(timeout) #? static, only needs to be called once per session
+
+        try:
+            driver.get(url)
+        except:
+            print('Bad URL:', url)
+            # return
+            u += 1
+            continue
+
+        # iterative scraping over dropdown like in old scraper, updating debug file
+        # TODO get it to call itself again with debug values if error occurs
+        # ? move this into the try block for get(url)
+        try:
+            #! check to make sure driver did not find an error link
+
+            year_buttons = driver.find_element(By.ID, 'yearSelect').find_elements(By.TAG_NAME, 'option')[1:]
+            year_buttons.reverse()
+            y = debug['year_idx']
+            s = debug['style_idx']
+            t = debug['trim_idx']
+
+            while y < len(year_buttons):
+                driver.implicitly_wait(timeout) #? static, only needs to be called once per session
+                year_buttons = driver.find_element(By.ID, 'yearSelect').find_elements(By.TAG_NAME, 'option')[1:]
+                year_buttons.reverse()
+
+                debug['year_text'] = year_buttons[y].text
+                year_buttons[y].click()
+                time.sleep(sleep_const)
+
+                style_buttons = driver.find_element(By.ID, 'styleSelect').find_elements(By.TAG_NAME, 'option')[1:]
+                while s < len(style_buttons):
+                    driver.implicitly_wait(timeout) #? static, only needs to be called once per session
+                    style_buttons = driver.find_element(By.ID, 'styleSelect').find_elements(By.TAG_NAME, 'option')[1:]
+
+                    debug['style_text'] = style_buttons[s].text
+                    style_buttons[s].click()
+                    time.sleep(sleep_const)
+
+                    trim_buttons = driver.find_element(By.ID, 'trimSelect').find_elements(By.TAG_NAME, 'option')[1:]
+                    while t < len(trim_buttons):
+                        driver.implicitly_wait(timeout) #? static, only needs to be called once per session
+                        trim_buttons = driver.find_element(By.ID, 'trimSelect').find_elements(By.TAG_NAME, 'option')[1:]
+                        
+                        debug['trim_text'] = trim_buttons[t].text
+                        print(debug['year_text'], debug['style_text'], debug['trim_text'])
+                        trim_buttons[t].click()
+
+                        updateDebugFile(debug_path, debug)
+
+                        # scrapeData(driver) # TODO pass specs dict
+
+                        time.sleep(10) # for testing
+
+                        t += 1
+                        debug['trim_idx'] = t
+
+                    s += 1
+                    debug['style_idx'] = s
+                    t = 0
+                    debug['trim_idx'] = t
+                    # debug['trim_text'] = ''
+
+                y += 1
+                debug['year_idx'] = y
+                s = 0
+                debug['style_idx'] = s
+                # debug['style_text'] = ''
+        except:
+            pass
+        
+        # print(links[u].rstrip())
+        y = 0
+        debug['year_idx'] = y
+        u += 1
+        debug['link_idx'] = u
+        updateDebugFile(debug_path, debug)
+
+
+def openDebugFile(path: str):
+    def makeDebugFile(path: str):
+        """Assumes valid path and only needs to make file"""
+
+        default = {
+            'link_idx': 0,
+            'year_idx': 0,
+            'year_text': '',
+            'style_idx': 0,
+            'style_text': '',
+            'trim_idx': 0,
+            'trim_text': ''
+        }
+
+        with open(path, 'w') as f:
+            data = yaml.dump(default)
+            f.write(data)
+    
+    try:
+        with open(path, 'r') as file:
+            data = yaml.safe_load(file)
+            return data
+    except:
+        makeDebugFile(path)
+        return openDebugFile(path)
+
+
+def updateDebugFile(path: str, debug_data: dict):
+    with open(path, 'w') as f:
+        f.write(yaml.dump(debug_data))
+
 
 def makeFile(path: str, ext: str = '') -> bool:
     """
@@ -109,32 +239,14 @@ def makeFile(path: str, ext: str = '') -> bool:
     return True
 
 
-def writeJSONData(specs: dict):
+def writeData(specs: dict[str, str]):
     brand = specs['Brand']
     model = specs['Model']
     year = specs['Year']
 
     # make data file
-    # path = './Data/JSON/' + brand + '/' + year + '/' + model + '.json'
-    path = './Data/YAML/' + brand + '/' + year + '/' + model + '.yaml'
+    path = './Data/YAML/' + brand + '/' + year + '/' + model.upper() + '.yaml'
     makeFile(path, ext='yaml')
-
-    # read existing data and write the new data to the file
-    # data = None
-    # contents = None
-    # with open(path, 'r') as file:
-    #     contents = json.load(file)
-
-    #     if specs in contents: # if data was already found
-    #         #? more efficient to go by URLs manually?
-    #         #TODO ^^^
-    #         return
-        
-    #     contents.append(specs)
-    #     data = json.dumps(contents, indent = 4)
-    
-    # with open(path, 'w') as outfile:
-    #     outfile.write(data)
 
     with open(path, 'a') as file:
         data = yaml.dump([specs])
@@ -142,17 +254,23 @@ def writeJSONData(specs: dict):
 
 
 if __name__ == "__main__":
-    start = time.time()
+    # start = time.time()
 
     # scrape here
-    URL = 'https://www.caranddriver.com/honda/accord/specs'
-    scrapeByURL(URL)
+    # URL = 'https://www.caranddriver.com/honda/accord/specs'
+    # scrapeByURL(URL)
 
-    finish = time.time()
-    runtime = finish-start
-    hours = int(runtime/3600)
-    runtime = runtime % 3600
-    minutes = int(runtime/60)
-    runtime = runtime % 60
-    seconds = runtime
-    print('\nScraping took %dh:%2dm:%2.3fs' % (hours, minutes, seconds))
+    # finish = time.time()
+    # runtime = finish-start
+    # hours = int(runtime/3600)
+    # runtime = runtime % 3600
+    # minutes = int(runtime/60)
+    # runtime = runtime % 60
+    # seconds = runtime
+    # print('\nScraping took %dh:%2dm:%2.3fs' % (hours, minutes, seconds))
+
+    # scrapeBrand('./Links/Honda.txt')
+    scrapeBrand('./Links/Tesla.txt')
+
+
+
