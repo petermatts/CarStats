@@ -1,48 +1,36 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+import sys
+import requests
 import os
 import time
 import re
 import datetime
-import json
 import yaml
+# import json
 
-def scrapeData(driver: webdriver, specs: dict = {}):
-    url = driver.current_url
+#? am I using async/await properly here? --- test to find out
+async def scrapeData(driver: webdriver, specs: dict = {}):
+    specs['URL'] = driver.current_url
 
-    # specs = {
-    #     'URL': url
-    # }
-    specs['URL'] = url
-
-    title_stuff = url.split('/')
-    specs['Brand'] = ' '.join(list(map(lambda w: w.capitalize(), title_stuff[3].split('-')))) 
-    model = ' '.join(list(map(lambda w: w.capitalize(), title_stuff[4].split('-')))) 
-    m = re.search("\d{4}$", model)
-    # if m != None:
-    if m != None and specs['Brand'] != 'Ram':
-        model = model[:-4].rstrip()
-        # model = model[:m.span()[0]]
-    specs['Model'] = model
+    # verify that link loads successfully
+    r = await requests.get(specs['URL'])
+    # r.raise_for_status() #? use this instead of below conditional
+    if r.status_code != 200:
+        raise ValueError(r.status_code)
 
     driver.implicitly_wait(10)
-    year = driver.find_element(By.CLASS_NAME, 'css-1an3ngc.ezgaj230')
-    driver.implicitly_wait(0.01)
-
-    #TODO  detect year and trim from specs dropdown options
-    specs['Year'] = year.text.split(' ')[0]
-    specs['Trim'] = year.text.replace('-', ' ').replace(specs['Model'], '').replace(specs['Brand'], '').replace(specs['Year'], '').replace('Features And Specs', '').strip()
     price = driver.find_element(By.CLASS_NAME, 'css-48aaf9.e1l3raf11')
     specs['Price'] = price.text.replace(',', '')
 
     data = driver.find_elements(By.CLASS_NAME, 'css-1ajawdl.eqxeor30')
-    # rows = []
+    rows = []
     for i in range(len(data)):
         # print(i+1, '/', len(data), end='\r')
         print('\tFind Data', i+1, end='\r')
         row = data[i].find_elements(By.TAG_NAME, 'div')
         if len(row) != 0:
-            # rows.append((row[0].text.replace(',', ''), row[1].text.replace(',', '')))
+            rows.append((row[0].text.replace(',', ''), row[1].text.replace(',', '')))
             key = row[0].text.replace(',', '')
             value = row[1].text.replace(',', '')
             if key != '':
@@ -50,10 +38,12 @@ def scrapeData(driver: webdriver, specs: dict = {}):
         else:
             break #? optimize
 
-    print()
-    print('Specifications:')
-    for i in specs:
-        print(i, specs[i])
+    # print()
+    # print('Specifications:')
+    # for i in specs:
+    #     print(i, specs[i])
+
+    # print('returining specs') # debugging
 
     return specs
 
@@ -83,6 +73,7 @@ def scrapeByURL(url: str, start_year = datetime.date.today().year):
 def scrapeBrand(brand_filename: str):
     """brand_filename is the path to the brands links in Links folder"""
     brand = brand_filename.split('/')[-1].replace('.txt', '')
+
     timeout = 5 #? can be changed (seconds)
     sleep_const = 3 #? can be changed (seconds)
 
@@ -102,11 +93,12 @@ def scrapeBrand(brand_filename: str):
         driver = webdriver.Chrome(r"./driver/chromedriver", options=opts)
         driver.implicitly_wait(timeout) #? static, only needs to be called once per session
 
+        model = links[u].split('/')[4]
+
         try:
             driver.get(url)
         except:
             print('Bad URL:', url)
-            # return
             u += 1
             continue
 
@@ -143,17 +135,28 @@ def scrapeBrand(brand_filename: str):
                     trim_buttons = driver.find_element(By.ID, 'trimSelect').find_elements(By.TAG_NAME, 'option')[1:]
                     while t < len(trim_buttons):
                         driver.implicitly_wait(timeout) #? static, only needs to be called once per session
-                        trim_buttons = driver.find_element(By.ID, 'trimSelect').find_elements(By.TAG_NAME, 'option')[1:]
-                        
+                        trim_buttons = driver.find_element(By.ID, 'trimSelect').find_elements(By.TAG_NAME, 'option')[1:]                  
                         debug['trim_text'] = trim_buttons[t].text
-                        print(debug['year_text'], debug['style_text'], debug['trim_text'])
                         trim_buttons[t].click()
 
                         updateDebugFile(debug_path, debug)
 
-                        # scrapeData(driver) # TODO pass specs dict
+                        init_specs = {
+                            'Brand': brand,
+                            'Year': debug['year_text'],
+                            'Model': model,
+                            'Style': debug['style_text'],
+                            'Trim': debug['trim_text'],
+                        }
 
-                        time.sleep(10) # for testing
+                        # scrapeData(driver)
+                        print(debug['year_text'], debug['style_text'], debug['trim_text'])
+                        data = scrapeData(driver, init_specs)
+
+                        writeData(data)
+
+                        # time.sleep(5) # for testing
+                        # updateDebugFile(debug_path, debug)
 
                         t += 1
                         debug['trim_idx'] = t
@@ -217,7 +220,12 @@ def makeFile(path: str, ext: str = '') -> bool:
     Creates a new json file for the given path containing an empty array []
     Returns True if the file was created successfully and False if file already exists
     """
-    print(path)
+    # print(path)
+
+    # check path exists before doing anything else
+    if os.path.isfile(path):
+        return False
+
     cwd = os.getcwd()
 
     dirs = path.split('/')
@@ -227,9 +235,9 @@ def makeFile(path: str, ext: str = '') -> bool:
         os.chdir(d)
 
     # check if path already exists
-    if os.path.isfile(dirs[-1]):
-        os.chdir(cwd)
-        return False
+    # if os.path.isfile(dirs[-1]):
+    #     os.chdir(cwd)
+    #     return False
     
     if ext.lower() == 'json':
         with open(dirs[-1], 'w') as file:
@@ -246,11 +254,21 @@ def writeData(specs: dict[str, str]):
 
     # make data file
     path = './Data/YAML/' + brand + '/' + year + '/' + model.upper() + '.yaml'
+    # print('making file') # debugging
     makeFile(path, ext='yaml')
+    # print('made file') # debugging
 
+    # print('writing to file') # debugging
     with open(path, 'a') as file:
         data = yaml.dump([specs])
         file.write(data)
+    # print('done') # debugging
+
+
+def driver():
+    """I hope anyone reading this can appreciate the pun that is this function name"""
+
+    # TODO
 
 
 if __name__ == "__main__":
