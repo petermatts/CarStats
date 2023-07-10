@@ -12,6 +12,101 @@ def KeyMap(webspecs: dict[str, str]) -> dict[str, str]:
     specs = {}
     isElectric = webspecs['Engine Type and Required Fuel'] == 'Electric'
 
+    # TODO overhaul into intercooled/turbocharged/twinturbo/turbo/etc...
+    def EngineAndGas(v: str):
+        if isElectric:
+            return {'Engine': 'Electric', 'Fuel': 'Electric'}
+        else:
+            isHybrid = "Gas/Electric" in v
+            engine = re.search('\w-?\d+', v)
+
+            result = {}
+            if engine != None:
+                engine = v[engine.span()[0]:engine.span()[1]].replace('-', '')
+                result.update({'Engine': engine})
+                
+                # check turbos
+                # if "Twin Turbo" in webspecs[i]:
+                #     specs['Turbos'] = '2'
+                # elif "Turbo" in webspecs[i]:
+                #     specs['Turbos'] = '1'
+                # else:
+                #     specs['Turbos'] = '0'
+
+                # check hybrid
+                if not isHybrid:
+                    gas = re.search("Regular|Premium|Gas|Diesel", v)
+                    try:
+                        result.update({'Fuel': v[gas.span()[0]:gas.span()[1]]})
+                    except:
+                        pass
+                else:
+                    result.update({'Fuel': 'Hybrid'})
+            
+            return result
+
+    def Horsepower(v: str):
+        hp = v.split(' @ ')
+        if len(hp) > 1 and not isElectric:
+            return {'Max Horsepower': hp[0], 'Max Horsepower RPM': hp[1]}
+        else:
+            return {'Max Horsepower': hp[0]}
+
+    def Torque(v: str):
+        hp = v.split(' @ ')
+        if len(hp) >= 1 and not isElectric:
+            return {'Max Horsepower': hp[0], 'Max Horsepower RPM': hp[1]}
+        else:
+            return {'Max Horsepower': hp[0]}
+
+    def MPG(v: str):
+        fe = v.replace('N/A', '').split('/')
+        comb = fe[0].strip().split(' ')[0]
+        hwy = None
+        city = None
+
+        if len(fe) > 1:
+            city = fe[1].strip().split(' ')[0]
+            hwy = fe[2].strip().split(' ')[0]
+
+        if isElectric:
+            return {'MPGe (combined)': comb, 'MPGe (highway)': hwy, 'MPGe (city)': city}
+        else:
+            return {'MPG (combined)': comb, 'MPG (highway)': hwy, 'MPG (city)': city}
+
+    def TurnRad(v: str):
+        try:
+            return {'Turn Radius (feet)': str(round(float(v)/2, 2))}
+        except:
+            return {}
+        
+    def default(k: str, v: str):
+        return {k: v}
+
+    switch = {
+        'EPA Classification': lambda v: {'EPA Class': v},
+        'Drivetrain': lambda v: {'Drivetrain': ''.join(list(filter(lambda c: c.isupper() or c.isdigit(), v)))},
+        'Engine Type and Required Fuel': EngineAndGas,
+        'Displacement (liters/cubic inches)': lambda v: {'Displacement (Liters)': v.split('/')[0].replace('L', '').strip()},
+        'Maximum Horsepower @ RPM': Horsepower,
+        'Maximum Torque @ RPM': Torque,
+        'Transmission Description': lambda v: {'Transmission': v.split(' ')[0]}, #? change
+        'Number of Transmission Speeds': lambda v: {'Transmission Speeds': v},
+        'EPA Fuel Economy, combined/city/highway (mpg)': MPG,
+        'EPA Fuel Economy Equivalent (for hybrid and electric vehicles), combined/city/highway (MPGe)': MPG,
+        'Fuel Capacity / Gas Tank Size': lambda v: {'Fuel Capacity (Gallons)': v},
+        # 'Length (inches)': lambda v: {'Length (inches)': v},
+        'Width, without mirrors (inches)': lambda v: {'Width (inches)': v},
+        # 'Height (inches)': lambda v: {'Height (inches)': v},
+        # 'Wheelbase (inches)': lambda v: {'Wheelbase (inches)': v},
+        'Passenger / Seating Capacity': lambda v: {'Seating Capacity': v},
+        'Total Passenger Volume (cubic feet)': lambda v: {'Passenger Space (cubic feet)': v},
+        # 'Trunk Space (cubic feet)': lambda v: {'Truck Space (cubic feet)': v},
+        'Turning Diameter / Radius, curb to curb (feet)': TurnRad,
+        'Base Curb Weight (pounds)': lambda v: {'Weight (lbs)': v},
+        'Maximum Towing Capacity (pounds)': lambda v: {'Towing Capacity': v}
+    }
+
     for i in list(webspecs.keys()):
         if webspecs[i] != 'NA': # N/A or ? or '-TBD-' or ''
             if i == 'Brand' or i == 'Model' or i == 'Year' or i == 'Price' or i == 'Trim' or i == 'URL':

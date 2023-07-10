@@ -1,5 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.common.exceptions import TimeoutException
 import sys
 import requests
 import os
@@ -15,7 +16,7 @@ async def scrapeData(driver: webdriver, specs: dict = {}):
 
     # verify that link loads successfully
     r = await requests.get(specs['URL'])
-    # r.raise_for_status() #? use this instead of below conditional
+    r.raise_for_status() #? use this instead of below conditional
     if r.status_code != 200:
         raise ValueError(r.status_code)
 
@@ -115,7 +116,7 @@ def scrapeBrand(brand_filename: str):
             t = debug['trim_idx']
 
             while y < len(year_buttons):
-                driver.implicitly_wait(timeout) #? static, only needs to be called once per session
+                # driver.implicitly_wait(timeout) #? static, only needs to be called once per session
                 year_buttons = driver.find_element(By.ID, 'yearSelect').find_elements(By.TAG_NAME, 'option')[1:]
                 year_buttons.reverse()
 
@@ -125,7 +126,7 @@ def scrapeBrand(brand_filename: str):
 
                 style_buttons = driver.find_element(By.ID, 'styleSelect').find_elements(By.TAG_NAME, 'option')[1:]
                 while s < len(style_buttons):
-                    driver.implicitly_wait(timeout) #? static, only needs to be called once per session
+                    # driver.implicitly_wait(timeout) #? static, only needs to be called once per session
                     style_buttons = driver.find_element(By.ID, 'styleSelect').find_elements(By.TAG_NAME, 'option')[1:]
 
                     debug['style_text'] = style_buttons[s].text
@@ -134,7 +135,7 @@ def scrapeBrand(brand_filename: str):
 
                     trim_buttons = driver.find_element(By.ID, 'trimSelect').find_elements(By.TAG_NAME, 'option')[1:]
                     while t < len(trim_buttons):
-                        driver.implicitly_wait(timeout) #? static, only needs to be called once per session
+                        # driver.implicitly_wait(timeout) #? static, only needs to be called once per session
                         trim_buttons = driver.find_element(By.ID, 'trimSelect').find_elements(By.TAG_NAME, 'option')[1:]                  
                         debug['trim_text'] = trim_buttons[t].text
                         trim_buttons[t].click()
@@ -151,7 +152,16 @@ def scrapeBrand(brand_filename: str):
 
                         # scrapeData(driver)
                         print(debug['year_text'], debug['style_text'], debug['trim_text'])
-                        data = scrapeData(driver, init_specs)
+                        data = None
+                        try:
+                            data = scrapeData(driver, init_specs)
+                        except ValueError:
+                            t += 1
+                            debug['trim_idx'] = t
+                            updateDebugFile(debug_path, debug)
+                            raise ValueError('Bad Link')
+                        except requests.HTTPError:
+                            raise ValueError('Request Timeout')
 
                         writeData(data)
 
@@ -172,8 +182,8 @@ def scrapeBrand(brand_filename: str):
                 s = 0
                 debug['style_idx'] = s
                 # debug['style_text'] = ''
-        except:
-            pass
+        except TimeoutException:
+            raise ValueError('Selenium Timeout')
         
         # print(links[u].rstrip())
         y = 0
@@ -268,27 +278,55 @@ def writeData(specs: dict[str, str]):
 def driver():
     """I hope anyone reading this can appreciate the pun that is this function name"""
 
-    # TODO
+    if len(sys.argv) > 1:
+        path = './Links/' + sys.argv[1] + '.txt'
+
+        if os.path.isfile(path):
+            try:
+                scrapeBrand(path)
+            except:
+                driver() # recursive call until successful completion of scrapping
+        else:
+            print('Invalid Brand Arguement. Valid Arguments are:')
+            options = os.listdir('./Links')
+            longest = 0
+            for i in range(len(options)):
+                options[i] = options[i][:-4]
+                if len(options[i]) > longest:
+                       longest = len(options[i])
+
+            msg = ''
+            for i in range(len(options)):
+                msg += options[i]
+                msg += ' '*(longest - len(options[i]) + 2)
+                if i % 5 == 4:
+                    msg += '\n'
+            msg += '\n'
+            print(msg)
+    else:
+        print('\nNo Scrapping brand arguments\n')
 
 
 if __name__ == "__main__":
-    # start = time.time()
+    start = time.time()
 
     # scrape here
     # URL = 'https://www.caranddriver.com/honda/accord/specs'
     # scrapeByURL(URL)
 
-    # finish = time.time()
-    # runtime = finish-start
-    # hours = int(runtime/3600)
-    # runtime = runtime % 3600
-    # minutes = int(runtime/60)
-    # runtime = runtime % 60
-    # seconds = runtime
-    # print('\nScraping took %dh:%2dm:%2.3fs' % (hours, minutes, seconds))
+    finish = time.time()
+    runtime = finish-start
+    hours = int(runtime/3600)
+    runtime = runtime % 3600
+    minutes = int(runtime/60)
+    runtime = runtime % 60
+    seconds = runtime
 
     # scrapeBrand('./Links/Honda.txt')
-    scrapeBrand('./Links/Tesla.txt')
+    # scrapeBrand('./Links/Tesla.txt')
+
+    driver()
+    print('\nScraping took %dh:%2dm:%2.3fs' % (hours, minutes, seconds))
 
 
 
