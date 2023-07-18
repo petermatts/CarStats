@@ -19,10 +19,14 @@ def YAML_TO_JSON():
 
     for b in brands:
         os.chdir(b)
+        if not os.path.exists('../../JSON/' + b):
+            os.mkdir('../../JSON/' + b)
         years = os.listdir()
         
         for y in years:
             os.chdir(y)
+            if not os.path.exists('../../../JSON/' + b + '/' + y):
+                os.mkdir('../../../JSON/' + b + '/' + y)
             models = os.listdir()
 
             for m in models:
@@ -31,20 +35,24 @@ def YAML_TO_JSON():
                     data = yaml.safe_load(f)
 
                 fname = m.split('.')[0] + '.json' # change to JSON file name
+                fname = '../../../JSON/' + b + '/' + y + '/' + fname 
 
                 # todo filter duplicates in data
 
-                #! data is a list of dicts
+                # data is a list of dicts
                 for d in range(len(data)):
                     data[d] = KeyMap(data[d]) # process data
 
-                data = json.dump(data, indent=4)
+                print(fname[len('../../../JSON/'):])
+                data = json.dumps(data, indent=4)
                 with open(fname, 'w') as f:
                     f.write(data)
 
+            os.chdir('..')
+        os.chdir('..')
 
 def JSON_TO_CSV():
     pass # TODO
 
 if __name__ == '__main__':
-    pass
+    YAML_TO_JSON()
