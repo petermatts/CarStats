@@ -18,7 +18,7 @@ Ideally once all data is collected it should be displayed properly, most likely 
 
 ## Specs
 
-Graphic of all specs being taken into consideration **coming soon**
+Graphic of all specs being taken into consideration **coming soon** or see `Base.txt` or `Base.csv` in the `Docs` folder. 
 
 ## Future Designs and Plans
 

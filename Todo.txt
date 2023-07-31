@@ -4,18 +4,10 @@
 
 - Phase 2 Modifications/Revisions
     - Redo Scraper - 2.0 (git issue #31)
-        - itteration of years, models, trims
-        - revise how scraper gets vehicle trim
-        - keep a log of last scraped vehicle button indexes (make sure their order is consistent)
-            - this will make scrapping easier if errors occur.
-            - keep logs in yaml/json format containing indecies and corresponding text values
-            - (git issue #34)
-    - conversion scripts (git issue #33)
-        - yaml -> csv
-        - yaml -> json?
-        - json -> csv?
+        - Bad trims error (git issue #38) needs testing
+        - test on Tesla and maybe another smallish brand
     - new correction scripts (git issue #35)
-    - Redo/revise link acquisition and correction scripts
+    - Redo/revise link acquisition and (link) correction scripts (git issue #40)
     - Update documentation (git issue #36)
 
 - Phase 3 Display

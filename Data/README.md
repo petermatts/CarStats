@@ -2,7 +2,9 @@
 
 ## CSV
 
-Contains parsed/formatted (hopefully) data that comes from the 
+Contains parsed/formatted (hopefully) data that comes from the semi parse JSON data.
+
+This is where the data takes on its final form for display to a user.
 
 Included in `.gitignore` because this is a large folder.
 
@@ -21,12 +23,3 @@ Included in `.gitignore` because this is a large folder.
 Raw webscraped data.
 
 Included in `.gitignore` because this is a large folder.
-
-<!-- ## Scripts
-
-*Planned*
-
-Put these in `src` directory?
-
-- `Complile.py` := compile CSV files into one large CSV file (do the same for JSON files?)
-- `Convert.py` := convert JSON data into formatted CSV data -->

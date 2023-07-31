@@ -11,7 +11,6 @@ def KeyMap(webspecs: dict[str, str]) -> dict[str, str]:
     specs = {}
     isElectric = lambda: webspecs['Engine Type and Required Fuel'] == 'Electric'
 
-    # TODO overhaul into intercooled/turbocharged/twinturbo/turbo/etc...
     def EngineAndGas(k: str = '', v: str = ''):
         if isElectric:
             return {'Engine': 'Electric', 'Fuel': 'Electric'}
@@ -25,12 +24,14 @@ def KeyMap(webspecs: dict[str, str]) -> dict[str, str]:
                 result.update({'Engine': engine})
                 
                 # check turbos
-                # if "Twin Turbo" in webspecs[i]:
-                #     specs['Turbos'] = '2'
-                # elif "Turbo" in webspecs[i]:
-                #     specs['Turbos'] = '1'
-                # else:
-                #     specs['Turbos'] = '0'
+                if "Twin Turbo" in v:
+                    specs['Turbo'] = 'Twin Turbo'
+                elif "Intercooled Turbo" in v:
+                    specs['Turbo'] = 'Intercooled Turbo'
+                elif "Intercooled Supercharger" in v:
+                    specs['Turbo'] = 'Intercooled Supercharger'
+                elif "Turbo" in v:
+                    specs['Turbo'] = 'Turbo'
 
                 # check hybrid
                 if not isHybrid:
