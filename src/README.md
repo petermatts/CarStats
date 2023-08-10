@@ -30,7 +30,9 @@ Verifies that all model links for all brands are correct (response code is 200),
 
 Outputs `../Log/IncompleteLinks.txt` for links in base format. (no 6 digit code at the end of the link, just a generic specs link). This most likely happens when a car model is brand new.
 
-**TODO** add sys args to this script.
+Command Line Arguments:
+- `code` checks for links without the expected trailing 6 digits and logs them to `IncompleteLinks.txt`
+- `check` checks all links in the `Links` directory and logs links that do not return a status code of 200 to `ErrorLinks.csv`
 
 ### `FileNameVerify.py`
 
@@ -47,7 +49,9 @@ All output files are in the `Links` folder.
 
 This script does not require the `Data` folder to run. It is necessary to run to, scrape data for the data folder.
 
-**TODO** add sys args to this script.
+Command Line Arguements:
+- `all` - generate `AllLinks.txt`
+- `summary` - generate `AllBrandsAndModels.json` do not run if `AllLinks.txt` does not exist
 
 ### `Targets.py`
 

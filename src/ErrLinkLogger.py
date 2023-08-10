@@ -4,17 +4,11 @@ import requests
 import time
 import os
 import re
-# import sys
+import sys
 
 # Traverse Links Directory
 def getLinks():
     L = []
-
-    # TODO  traverse link directory and call checkLink on each brand \
-    #   alternatively use Docs/AllLinks.txt but Links directory should be better
-    # TODO print percent progress of checking each brand
-    # TODO be sure to sleep for a small amount of time between requests
-
     os.chdir('../Links')
     for brand in os.listdir():
         f = open(brand, 'r')
@@ -27,6 +21,7 @@ def getLinks():
             else:
                 print(brand.replace('.txt', ''), '100.0 %')
             checkLink(links[l].rstrip(), L) # line that makes all the magic happen
+            time.sleep(0.05)
 
     # Tests
     # checkLink('https://www.caranddriver.com/mercedes-amg/glc-class/specs', L) # status 404
@@ -35,13 +30,11 @@ def getLinks():
     # checkLink('https://www.caranddriver.com/honda/civic/specs', L) # status 200
     # checkLink('https://www.caranddriver.com/tesla/cybertruck/specs', L) # status 404
 
-
     os.chdir('../')
     if not os.path.isdir('Log'):
         os.mkdir('Log')
     os.chdir('Log')
 
-    #? make it a csv instead and put corrected link in next col
     # file = open('../ErrorLinks.txt', 'w')
     file = open('ErrorLinks.csv', 'w')
     file.writelines(L)
@@ -60,7 +53,6 @@ def no_code_links():
     os.chdir('../Data')
 
     links = []
-
     for d in os.listdir():
         if os.path.isdir(d):
             os.chdir(d)
@@ -86,7 +78,6 @@ def no_code_links():
                     os.chdir('../')
             os.chdir('../')
 
-
     os.chdir('../')
     if not os.path.isdir('Log'):
         os.mkdir('Log')
@@ -97,5 +88,12 @@ def no_code_links():
     f.close()
 
 if __name__ == '__main__':
-    # no_code_links()
-    getLinks()
+    if len(sys.argv) > 1:
+        if sys.argv[1].lower() == 'code':
+            no_code_links()
+        elif sys.argv[1].lower() == 'check':
+            getLinks()
+        else:
+            print("Invalid arguement. Expected one of:\n\tcheck\n\t")
+    else:
+        print("Missing argument")

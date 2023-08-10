@@ -136,4 +136,5 @@ if __name__ == '__main__':
         else:
             print("Error Invalid Arg:", sys.argv[1])
     else:
-        print("Error No Args")
+        print("Error No Args. Expected one of:\n")
+        print("YAML to JSON:\n\tyaml-json\n\tyaml2json\n\nJSON to CSV:\n\tjson-csv\n\tjson2csv")

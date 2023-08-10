@@ -4,9 +4,10 @@ From the file AllBrandsAndModels.json, this script generates link summary files
 
 import json
 import os
-# import sys
+import sys
 
 def generateSummaryTXT():
+    os.chdir('../')
     data = json.load(open("AllBrandsAndModels.json"))
     if not os.path.isdir('Links'):
         os.mkdir('Links')
@@ -33,9 +34,10 @@ def writeSummary(brand: str, models: list[str]):
     file.writelines(L)
     file.close()
 
+
 def makeAllLinksTXT():
     L = []
-    os.chdir('Links')
+    os.chdir('../Links')
     for x in os.listdir():
         if os.path.isfile(x):
             f = open(x, "r")
@@ -48,7 +50,14 @@ def makeAllLinksTXT():
     file.close()
     os.chdir('../')
 
+
 if __name__ == '__main__':
-    os.chdir('../')
-    # makeAllLinksTXT()
-    generateSummaryTXT()
+    if len(sys.argv) > 1:
+        if sys.argv[1].lower() == 'all':
+            makeAllLinksTXT()
+        elif sys.argv[1].lower() == 'summary':
+            generateSummaryTXT()
+        else:
+            print("Invalid argument. Expected one of:\n\tall\n\tsummary")
+    else:
+        print("Expected an argument:\n\tall\n\tsummary")
