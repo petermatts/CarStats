@@ -5,10 +5,8 @@ import sys
 import requests
 import os
 import time
-import re
 import datetime
 import yaml
-# import json
 
 #? am I using async/await properly here? --- test to find out
 async def scrapeData(driver: webdriver, specs: dict = {}):
@@ -91,7 +89,8 @@ def scrapeBrand(brand_filename: str):
         url = links[u]
         opts = webdriver.ChromeOptions()
         opts.add_argument('start-maximized')
-        driver = webdriver.Chrome(r"./driver/chromedriver", options=opts)
+        driver = webdriver.Chrome(options=opts)
+        print("gets here")
         driver.implicitly_wait(timeout) #? static, only needs to be called once per session
 
         model = links[u].split('/')[4]
@@ -100,6 +99,8 @@ def scrapeBrand(brand_filename: str):
             driver.get(url)
         except:
             print('Bad URL:', url)
+            with open('Logs/BadScrapeLinks.log', 'a') as file:
+                file.write(url)
             u += 1
             continue
 
@@ -159,9 +160,11 @@ def scrapeBrand(brand_filename: str):
                             t += 1
                             debug['trim_idx'] = t
                             updateDebugFile(debug_path, debug)
-                            raise ValueError('Bad Link')
+                            # raise ValueError('Bad Link')
+                            return -1
                         except requests.HTTPError:
-                            raise ValueError('Request Timeout')
+                            # raise ValueError('Request Timeout')
+                            return -2
 
                         writeData(data)
 
@@ -183,7 +186,8 @@ def scrapeBrand(brand_filename: str):
                 debug['style_idx'] = s
                 # debug['style_text'] = ''
         except TimeoutException:
-            raise ValueError('Selenium Timeout')
+            # raise ValueError('Selenium Timeout')
+            return -3
         
         # print(links[u].rstrip())
         y = 0
@@ -282,10 +286,17 @@ def driver():
         path = './Links/' + sys.argv[1] + '.txt'
 
         if os.path.isfile(path):
-            try:
-                scrapeBrand(path)
-            except:
-                driver() # recursive call until successful completion of scrapping
+            result = scrapeBrand(path)
+            if result < 0:
+                if result == -1:
+                    print("Bad link encountered, skipping")
+                elif result == -2:
+                    print("Request timeout encountered, waiting a bit before retrying")
+                    time.sleep(180)
+                elif result == -3:
+                    print("Selenium timeout encountered, waiting a bit before retrying")
+                    time.sleep(180)
+                # driver() # recursive call until successful completion of scrapping
         else:
             print('Invalid Brand Arguement. Valid Arguments are:')
             options = os.listdir('./Links')
