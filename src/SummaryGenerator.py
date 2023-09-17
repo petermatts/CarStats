@@ -5,6 +5,7 @@ From the file AllBrandsAndModels.json, this script generates link summary files
 import json
 import os
 import sys
+import re
 
 def generateSummaryTXT():
     os.chdir('../')
@@ -27,7 +28,8 @@ def writeSummary(brand: str, models: list[str]):
     L = []
 
     for i in models:
-        m = i.replace(" / ", "-").replace("/", "-").replace(".", "-").replace(" ", "-").lower()
+        m = i.replace(" / ", "-").replace("/", "-").replace(" & ", "-").replace(".", "").replace(" ", "-").lower()
+        m = m.replace("\u014d", "o").replace("\u00e1", "a") # special character replacements
         url = base_url + brand.lower() + '/' + m + '/specs\n'
         L.append(url)
 

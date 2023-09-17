@@ -9,17 +9,17 @@ import datetime
 import yaml
 
 #? am I using async/await properly here? --- test to find out
-async def scrapeData(driver: webdriver, specs: dict = {}):
+def scrapeData(driver: webdriver, specs: dict = {}):
     specs['URL'] = driver.current_url
 
     # verify that link loads successfully
-    r = await requests.get(specs['URL'])
-    r.raise_for_status() #? use this instead of below conditional
+    r = requests.get(specs['URL'], timeout=5)
+
     if r.status_code != 200:
         raise ValueError(r.status_code)
 
     driver.implicitly_wait(10)
-    price = driver.find_element(By.CLASS_NAME, 'css-48aaf9.e1l3raf11')
+    price = driver.find_element(By.CLASS_NAME, 'css-11vbyw7.e1l3raf11')
     specs['Price'] = price.text.replace(',', '')
 
     data = driver.find_elements(By.CLASS_NAME, 'css-1ajawdl.eqxeor30')
@@ -89,8 +89,9 @@ def scrapeBrand(brand_filename: str):
         url = links[u]
         opts = webdriver.ChromeOptions()
         opts.add_argument('start-maximized')
+        opts.add_argument('--ignore-certificate-errors')
+        opts.add_experimental_option('excludeSwitches', ['enable-logging'])
         driver = webdriver.Chrome(options=opts)
-        print("gets here")
         driver.implicitly_wait(timeout) #? static, only needs to be called once per session
 
         model = links[u].split('/')[4]
@@ -196,6 +197,8 @@ def scrapeBrand(brand_filename: str):
         debug['link_idx'] = u
         updateDebugFile(debug_path, debug)
 
+    return 1 # success :)
+
 
 def openDebugFile(path: str):
     def makeDebugFile(path: str):
@@ -283,6 +286,9 @@ def driver():
     """I hope anyone reading this can appreciate the pun that is this function name"""
 
     if len(sys.argv) > 1:
+        
+
+
         path = './Links/' + sys.argv[1] + '.txt'
 
         if os.path.isfile(path):
@@ -290,13 +296,14 @@ def driver():
             if result < 0:
                 if result == -1:
                     print("Bad link encountered, skipping")
+                    time.sleep(5)
                 elif result == -2:
                     print("Request timeout encountered, waiting a bit before retrying")
                     time.sleep(180)
                 elif result == -3:
                     print("Selenium timeout encountered, waiting a bit before retrying")
                     time.sleep(180)
-                # driver() # recursive call until successful completion of scrapping
+                driver() # recursive call until successful completion of scrapping
         else:
             print('Invalid Brand Arguement. Valid Arguments are:')
             options = os.listdir('./Links')
@@ -318,6 +325,13 @@ def driver():
         print('\nNo Scrapping brand arguments\n')
 
 
+"""
+    To run: `python Scraper2.py {brand} {model} {--latest}`
+
+    @param {brand} is REQUIRED
+    @param {model} is optional
+    @param {--latest} is optional
+"""
 if __name__ == "__main__":
     start = time.time()
 
@@ -333,11 +347,5 @@ if __name__ == "__main__":
     runtime = runtime % 60
     seconds = runtime
 
-    # scrapeBrand('./Links/Honda.txt')
-    # scrapeBrand('./Links/Tesla.txt')
-
     driver()
     print('\nScraping took %dh:%2dm:%2.3fs' % (hours, minutes, seconds))
-
-
-

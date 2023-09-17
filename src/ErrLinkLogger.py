@@ -1,5 +1,7 @@
 # Log all links that produce an error so that potential corrections may be sought out manually
 
+# https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+
 import requests
 import time
 import os
@@ -42,11 +44,22 @@ def getLinks():
 
 # Verify if link is good or bad (gives error code)
 def checkLink(url: str, L: list):
-    r = requests.get(url)
+    s = requests.Session()
+    # s.max_redirects = 100
+    try:
+        r = s.get(url)
+    except requests.exceptions.TooManyRedirects:
+        L.append(url.replace('/specs', '') + ',302,\n') # too many redirects
+        return
+    except requests.exceptions.ConnectionError:
+        print(url + " is thaving connection issues, sleeping for a minute then trying again", end='\r')
+        time.sleep(60)
+        checkLink(url, L)
+
     # print(r.status_code)
 
     if r.status_code != 200:
-        L.append(url + ',' + str(r.status_code) + ',\n')
+        L.append(url.replace('/specs', '') + ',' + str(r.status_code) + ',\n')
 
 
 def no_code_links():
@@ -87,13 +100,48 @@ def no_code_links():
     f.writelines(links)
     f.close()
 
+
+def fix():
+    with open('../Log/ErrorLinks-Fix.csv', 'r') as f:
+        L = f.readlines()
+
+    fixes = {}
+    for link in L:
+        slice = link.split(',')
+        if slice[2] != '':
+            fix_link = slice[2]
+            if '/specs' not in fix_link:
+                fix_link += '/specs'
+            fixes[slice[0]] = fix_link
+    
+    # print(fixes.values())
+
+    os.chdir('../Links')
+    for brand in os.listdir():
+        links = []
+        with open(brand, 'r') as f:
+            links = f.readlines()
+
+        for i in range(len(links)):
+            new_link = fixes.get(links[i].replace('/specs', '').rstrip())
+            if new_link != None:
+                links[i] = new_link + '\n'
+
+        with open(brand, 'w') as f:
+            f.writelines(links)
+
+    os.chdir('../src')
+
+
 if __name__ == '__main__':
     if len(sys.argv) > 1:
         if sys.argv[1].lower() == 'code':
             no_code_links()
         elif sys.argv[1].lower() == 'check':
             getLinks()
+        elif sys.argv[1].lower() == 'fix':
+            fix()
         else:
-            print("Invalid arguement. Expected one of:\n\tcheck\n\t")
+            print("Invalid arguement. Expected one of:\n\tcode\n\tcheck\n\tfix")
     else:
-        print("Missing argument")
+        print("Missing argument. Expected one of:\n\tcode\n\tcheck\n\tfix")

@@ -3,12 +3,14 @@
 - Phase 1 Set Up & Design : Done
 
 - Phase 2 Modifications/Revisions
-    - Redo Scraper - 2.0 (git issue #31)
-        - Bad trims error (git issue #38) needs testing
-        - test on Tesla and maybe another smallish brand
+    - merge branch Scraper-v2.0 into main branch
     - new correction scripts (git issue #35)
     - Redo/revise link acquisition and (link) correction scripts (git issue #40)
     - Update documentation (git issue #36)
+    - more specific options for scraping (git issue #43):
+        - scrape latest year
+        - scrape all of a specific model
+        - both
 
 - Phase 3 Display
     - use python sys module to allow command line args running scripts that alter/write data: git issue #29
