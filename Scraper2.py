@@ -25,7 +25,6 @@ def scrapeData(driver: webdriver, specs: dict = {}):
     data = driver.find_elements(By.CLASS_NAME, 'css-1ajawdl.eqxeor30')
     rows = []
     for i in range(len(data)):
-        # print(i+1, '/', len(data), end='\r')
         print('\tFind Data', i+1, end='\r')
         row = data[i].find_elements(By.TAG_NAME, 'div')
         if len(row) != 0:
@@ -98,11 +97,17 @@ def scrapeBrand(brand_filename: str):
 
         try:
             driver.get(url)
+            r = requests.get(url, timeout=5)
+            if r.status_code == 404: #? or do != 200
+                print('status', r.status_code)
+                raise ValueError()
         except:
             print('Bad URL:', url)
-            with open('Logs/BadScrapeLinks.log', 'a') as file:
+            with open('Log/BadScrapeLinks.log', 'a') as file:
                 file.write(url)
             u += 1
+            debug['link_idx'] = u
+            updateDebugFile(debug_path, debug)
             continue
 
         # iterative scraping over dropdown like in old scraper, updating debug file
@@ -322,7 +327,24 @@ def driver():
             msg += '\n'
             print(msg)
     else:
-        print('\nNo Scrapping brand arguments\n')
+        # I could probably clean this up a bit but its ok
+        options = os.listdir('./Links')
+        longest = 0
+        for i in range(len(options)):
+            options[i] = options[i][:-4]
+            if len(options[i]) > longest:
+                    longest = len(options[i])
+
+        msg = ''
+        for i in range(len(options)):
+            msg += options[i]
+            msg += ' '*(longest - len(options[i]) + 2)
+            if i % 5 == 4:
+                msg += '\n'
+        msg += '\n'
+        print('\nNo Scrapping brand arguments. Expected one of\n')
+        print(msg)
+
 
 
 """
@@ -338,6 +360,7 @@ if __name__ == "__main__":
     # scrape here
     # URL = 'https://www.caranddriver.com/honda/accord/specs'
     # scrapeByURL(URL)
+    driver()
 
     finish = time.time()
     runtime = finish-start
@@ -347,5 +370,4 @@ if __name__ == "__main__":
     runtime = runtime % 60
     seconds = runtime
 
-    driver()
     print('\nScraping took %dh:%2dm:%2.3fs' % (hours, minutes, seconds))
