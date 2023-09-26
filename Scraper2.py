@@ -8,7 +8,6 @@ import time
 import datetime
 import yaml
 
-#? am I using async/await properly here? --- test to find out
 def scrapeData(driver: webdriver, specs: dict = {}):
     specs['URL'] = driver.current_url
 
@@ -45,35 +44,17 @@ def scrapeData(driver: webdriver, specs: dict = {}):
 
     return specs
 
-# for testing purposes
-def scrapeByURL(url: str, start_year = datetime.date.today().year):
-    opts = webdriver.ChromeOptions()
-    opts.add_argument('start-maximized')
-    
-    driver = webdriver.Chrome(r"./driver/chromedriver", options=opts)
-    driver.implicitly_wait(5)
-    try:
-        driver.get(url)
-    except:
-        print('Bad URL:', url)
-        return
-    
-    url = driver.current_url
-    year_buttons = driver.find_element(By.ID, 'yearSelect').find_elements(By.TAG_NAME, 'option')[1:]
-    year_buttons.reverse()
-    
-    print(url)
-
-    data = scrapeData(driver)
-    writeData(data)
-
+def getSelectors(driver) -> tuple:
+    select = driver.find_elements(By.CLASS_NAME, 'e1rdmryi0.cad-dropdown-filters__control.css-1l5x637-control')
+    yearSelect, styleSelect, trimSelect = select
+    return (yearSelect, styleSelect, trimSelect)
 
 def scrapeBrand(brand_filename: str):
     """brand_filename is the path to the brands links in Links folder"""
     brand = brand_filename.split('/')[-1].replace('.txt', '')
 
     timeout = 5 #? can be changed (seconds)
-    sleep_const = 3 #? can be changed (seconds)
+    sleep_const = 5 #? can be changed (seconds)
 
     # get links
     with open(brand_filename, 'r') as file:
@@ -99,7 +80,7 @@ def scrapeBrand(brand_filename: str):
             driver.get(url)
             r = requests.get(url, timeout=5)
             if r.status_code == 404: #? or do != 200
-                print('status', r.status_code)
+                # print('status', r.status_code)
                 raise ValueError()
         except:
             print('Bad URL:', url)
@@ -111,41 +92,40 @@ def scrapeBrand(brand_filename: str):
             continue
 
         # iterative scraping over dropdown like in old scraper, updating debug file
-        # TODO get it to call itself again with debug values if error occurs
-        # ? move this into the try block for get(url)
         try:
-            #! check to make sure driver did not find an error link
+            yearSelect, styleSelect, trimSelect = getSelectors(driver)
+            yearSelect.click()
+            years = driver.find_element(By.ID, 'react-select-2-listbox').find_elements(By.XPATH, './/*')[2:]
+            years.reverse()
 
-            year_buttons = driver.find_element(By.ID, 'yearSelect').find_elements(By.TAG_NAME, 'option')[1:]
-            year_buttons.reverse()
+            time.sleep(sleep_const)
+
             y = debug['year_idx']
             s = debug['style_idx']
             t = debug['trim_idx']
 
-            while y < len(year_buttons):
-                # driver.implicitly_wait(timeout) #? static, only needs to be called once per session
-                year_buttons = driver.find_element(By.ID, 'yearSelect').find_elements(By.TAG_NAME, 'option')[1:]
-                year_buttons.reverse()
-
-                debug['year_text'] = year_buttons[y].text
-                year_buttons[y].click()
+            while y < len(years):
+                years = driver.find_element(By.ID, 'react-select-2-listbox').find_elements(By.XPATH, './/*')[2:]
+                years.reverse()
+                debug['year_text'] = years[y].text
+                years[y].click()
                 time.sleep(sleep_const)
 
-                style_buttons = driver.find_element(By.ID, 'styleSelect').find_elements(By.TAG_NAME, 'option')[1:]
-                while s < len(style_buttons):
-                    # driver.implicitly_wait(timeout) #? static, only needs to be called once per session
-                    style_buttons = driver.find_element(By.ID, 'styleSelect').find_elements(By.TAG_NAME, 'option')[1:]
-
-                    debug['style_text'] = style_buttons[s].text
-                    style_buttons[s].click()
+                styleSelect.click()
+                styles = driver.find_element(By.ID, 'react-select-3-listbox').find_elements(By.XPATH, './/*')[2:]
+                while s < len(styles):
+                    styles = driver.find_element(By.ID, 'react-select-3-listbox').find_elements(By.XPATH, './/*')[2:]
+                    debug['style_text'] = styles[s].text
+                    styles[s].click()
                     time.sleep(sleep_const)
 
-                    trim_buttons = driver.find_element(By.ID, 'trimSelect').find_elements(By.TAG_NAME, 'option')[1:]
-                    while t < len(trim_buttons):
-                        # driver.implicitly_wait(timeout) #? static, only needs to be called once per session
-                        trim_buttons = driver.find_element(By.ID, 'trimSelect').find_elements(By.TAG_NAME, 'option')[1:]                  
-                        debug['trim_text'] = trim_buttons[t].text
-                        trim_buttons[t].click()
+                    trimSelect.click()
+                    trims = driver.find_element(By.ID, 'react-select-4-listbox').find_elements(By.XPATH, './/*')[2:]
+                    while t < len(trims):
+                        trims = driver.find_element(By.ID, 'react-select-4-listbox').find_elements(By.XPATH, './/*')[2:]
+                        debug['trim_text'] = trims[t].text
+                        trims[t].click()
+                        time.sleep(sleep_const)
 
                         updateDebugFile(debug_path, debug)
 
@@ -157,7 +137,6 @@ def scrapeBrand(brand_filename: str):
                             'Trim': debug['trim_text'],
                         }
 
-                        # scrapeData(driver)
                         print(debug['year_text'], debug['style_text'], debug['trim_text'])
                         data = None
                         try:
@@ -166,36 +145,43 @@ def scrapeBrand(brand_filename: str):
                             t += 1
                             debug['trim_idx'] = t
                             updateDebugFile(debug_path, debug)
-                            # raise ValueError('Bad Link')
                             return -1
                         except requests.HTTPError:
-                            # raise ValueError('Request Timeout')
                             return -2
 
                         writeData(data)
 
-                        # time.sleep(5) # for testing
-                        # updateDebugFile(debug_path, debug)
-
+                        try:
+                            yearSelect, styleSelect, trimSelect = getSelectors(driver)
+                        except:
+                            pass
+                        trimSelect.click()
                         t += 1
                         debug['trim_idx'] = t
-
+                    try:
+                        yearSelect, styleSelect, trimSelect = getSelectors(driver)
+                    except:
+                        pass
+                    styleSelect.click()
                     s += 1
                     debug['style_idx'] = s
                     t = 0
                     debug['trim_idx'] = t
                     # debug['trim_text'] = ''
-
+                try:
+                    yearSelect, styleSelect, trimSelect = getSelectors(driver)
+                except:
+                    pass
+                yearSelect.click()
                 y += 1
                 debug['year_idx'] = y
                 s = 0
                 debug['style_idx'] = s
                 # debug['style_text'] = ''
         except TimeoutException:
-            # raise ValueError('Selenium Timeout')
             return -3
         
-        # print(links[u].rstrip())
+        # sort of like a reset - resets years but not links
         y = 0
         debug['year_idx'] = y
         u += 1
@@ -276,15 +262,11 @@ def writeData(specs: dict[str, str]):
 
     # make data file
     path = './Data/YAML/' + brand + '/' + year + '/' + model.upper() + '.yaml'
-    # print('making file') # debugging
     makeFile(path, ext='yaml')
-    # print('made file') # debugging
 
-    # print('writing to file') # debugging
     with open(path, 'a') as file:
         data = yaml.dump([specs])
         file.write(data)
-    # print('done') # debugging
 
 
 def driver():
