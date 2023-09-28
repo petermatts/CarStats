@@ -10,6 +10,7 @@ import yaml
 import sys
 
 from ConversionHelper import KeyMap
+# from Duplicates import remove_yaml_duplicates
 
 cwd = os.getcwd()
 
@@ -37,7 +38,7 @@ def YAML_TO_JSON():
                 fname = m.split('.')[0] + '.json' # change to JSON file name
                 fname = '../../../JSON/' + b + '/' + y + '/' + fname 
 
-                # todo filter duplicates in data
+                # todo filter duplicates in data - see Duplicates.py and git issue #47
 
                 # data is a list of dicts
                 for d in range(len(data)):

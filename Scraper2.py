@@ -1,11 +1,12 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import TimeoutException, ElementClickInterceptedException, NoSuchElementException
+import datetime
+import os
+import re
 import sys
 import requests
-import os
 import time
-import datetime
 import yaml
 
 def scrapeData(driver: webdriver, specs: dict = {}):
@@ -49,12 +50,12 @@ def getSelectors(driver) -> tuple:
     yearSelect, styleSelect, trimSelect = select
     return (yearSelect, styleSelect, trimSelect)
 
-def scrapeBrand(brand_filename: str):
+def scrapeBrand(brand_filename: str, modelname: str = None, year: int = None, latest: bool = False):
     """brand_filename is the path to the brands links in Links folder"""
     brand = brand_filename.split('/')[-1].replace('.txt', '')
 
     timeout = 5 #? can be changed (seconds)
-    sleep_const = 5 #? can be changed (seconds)
+    sleep_const = 3 #? can be changed (seconds)
 
     # get links
     with open(brand_filename, 'r') as file:
@@ -67,6 +68,13 @@ def scrapeBrand(brand_filename: str):
 
     while u < len(links):
         url = links[u]
+
+        if modelname != None and url.split('/')[4].lower() != modelname.lower():
+            # if model param is valid and url is not of the model... skip it
+            u += 1
+            continue
+
+
         opts = webdriver.ChromeOptions()
         opts.add_argument('start-maximized')
         opts.add_argument('--ignore-certificate-errors')
@@ -105,8 +113,19 @@ def scrapeBrand(brand_filename: str):
             t = debug['trim_idx']
 
             while y < len(years):
+                time.sleep(sleep_const)
                 years = driver.find_element(By.ID, 'react-select-2-listbox').find_elements(By.XPATH, './/*')[2:]
                 years.reverse()
+
+                if latest and y < len(years)-1:
+                    # skip to latest year if latest param is true
+                    y += 1
+                    continue
+                elif year != None and int(years[y].text) != year:
+                    # only scrape specified year if year is defined
+                    y += 1
+                    continue
+
                 debug['year_text'] = years[y].text
                 years[y].click()
                 time.sleep(sleep_const)
@@ -114,6 +133,7 @@ def scrapeBrand(brand_filename: str):
                 styleSelect.click()
                 styles = driver.find_element(By.ID, 'react-select-3-listbox').find_elements(By.XPATH, './/*')[2:]
                 while s < len(styles):
+                    time.sleep(sleep_const)
                     styles = driver.find_element(By.ID, 'react-select-3-listbox').find_elements(By.XPATH, './/*')[2:]
                     debug['style_text'] = styles[s].text
                     styles[s].click()
@@ -122,6 +142,7 @@ def scrapeBrand(brand_filename: str):
                     trimSelect.click()
                     trims = driver.find_element(By.ID, 'react-select-4-listbox').find_elements(By.XPATH, './/*')[2:]
                     while t < len(trims):
+                        time.sleep(sleep_const)
                         trims = driver.find_element(By.ID, 'react-select-4-listbox').find_elements(By.XPATH, './/*')[2:]
                         debug['trim_text'] = trims[t].text
                         trims[t].click()
@@ -180,6 +201,11 @@ def scrapeBrand(brand_filename: str):
                 # debug['style_text'] = ''
         except TimeoutException:
             return -3
+        # except NoSuchElementException:
+        #   return -4
+        # except ElementClickInterceptedException:
+        #   #? advance to next iteration (trim/style/year)?
+        #   return -5
         
         # sort of like a reset - resets years but not links
         y = 0
@@ -260,6 +286,8 @@ def writeData(specs: dict[str, str]):
     model = specs['Model']
     year = specs['Year']
 
+    print("\tWriting data ", end="\r")
+
     # make data file
     path = './Data/YAML/' + brand + '/' + year + '/' + model.upper() + '.yaml'
     makeFile(path, ext='yaml')
@@ -268,48 +296,13 @@ def writeData(specs: dict[str, str]):
         data = yaml.dump([specs])
         file.write(data)
 
+    print("\tDone!        ", end="\r")
+
 
 def driver():
     """I hope anyone reading this can appreciate the pun that is this function name"""
 
-    if len(sys.argv) > 1:
-        
-
-
-        path = './Links/' + sys.argv[1] + '.txt'
-
-        if os.path.isfile(path):
-            result = scrapeBrand(path)
-            if result < 0:
-                if result == -1:
-                    print("Bad link encountered, skipping")
-                    time.sleep(5)
-                elif result == -2:
-                    print("Request timeout encountered, waiting a bit before retrying")
-                    time.sleep(180)
-                elif result == -3:
-                    print("Selenium timeout encountered, waiting a bit before retrying")
-                    time.sleep(180)
-                driver() # recursive call until successful completion of scrapping
-        else:
-            print('Invalid Brand Arguement. Valid Arguments are:')
-            options = os.listdir('./Links')
-            longest = 0
-            for i in range(len(options)):
-                options[i] = options[i][:-4]
-                if len(options[i]) > longest:
-                       longest = len(options[i])
-
-            msg = ''
-            for i in range(len(options)):
-                msg += options[i]
-                msg += ' '*(longest - len(options[i]) + 2)
-                if i % 5 == 4:
-                    msg += '\n'
-            msg += '\n'
-            print(msg)
-    else:
-        # I could probably clean this up a bit but its ok
+    def getBrandList():
         options = os.listdir('./Links')
         longest = 0
         for i in range(len(options)):
@@ -317,24 +310,102 @@ def driver():
             if len(options[i]) > longest:
                     longest = len(options[i])
 
-        msg = ''
+        brands = ''
         for i in range(len(options)):
-            msg += options[i]
-            msg += ' '*(longest - len(options[i]) + 2)
+            brands += options[i]
+            brands += ' '*(longest - len(options[i]) + 2)
             if i % 5 == 4:
-                msg += '\n'
-        msg += '\n'
-        print('\nNo Scrapping brand arguments. Expected one of\n')
-        print(msg)
+                brands += '\n'
+        brands += '\n'
+        return brands
 
+    def getModelList():
+        # NOTE: precondition that --help flag must be supplied after brand
+        with open('./Links/'+sys.argv[1]+'.txt', 'r') as f:
+            lines = f.readlines()
+
+        options = []
+        longest = 0
+        for line in lines:
+            model = line.split('/')[4]
+            options.append(model)
+            if len(model) > longest:
+                longest = len(model)
+
+        models = ''
+        for i in range(len(options)):
+            models += options[i]
+            models += ' '*(longest - len(options[i]) + 2)
+            if i % 5 == 4:
+                models += '\n'
+        models += '\n'
+        return models  
+
+    brands = getBrandList()
+
+    # get option parameters for scraper
+    model = None
+    year = None
+    latest = "--latest" in sys.argv
+    r = re.compile("--\d\d\d\d") # find year arguement
+    ys = list(filter(r.match, sys.argv))
+    if len(ys) == 1:
+        year = int(ys[0].split('-')[-1])
+    # end option configuration
+
+    if len(sys.argv) > 1:
+        path = './Links/' + sys.argv[1] + '.txt'
+
+        if os.path.isfile(path):
+            if len(sys.argv) > 2 and sys.argv[2] == "--help":
+                print("Here are all models of brand", sys.argv[1] + ":\n")
+                print(getModelList())
+                return -1
+            elif len(sys.argv) > 2:
+                model = sys.argv[2]
+
+            result = scrapeBrand(path, modelname=model, year=year, latest=latest)
+            if result < 0:
+                if result == -1:
+                    print("Bad link encountered, skipping")
+                    time.sleep(5)
+                elif result == -2:
+                    print("Request timeout encountered, waiting 2m before retrying")
+                    time.sleep(120)
+                elif result == -3:
+                    print("Selenium timeout encountered, waiting 2m before retrying")
+                    time.sleep(120)
+                elif result == -4:
+                    print("Selenium NoSuchElementException encountered, waiting 10s before retrying")
+                    time.sleep(10)
+                elif result == -5:
+                    print("Selenium ElementClickInterceptedException encountered, waiting 30s before retrying")
+                    time.sleep(30)
+
+                driver() # recursive call until successful completion of scrapping
+        else:
+            print('Invalid Brand Arguement. Valid Arguments are:')
+            print(brands)
+            return -1
+    else:
+        print('\nNo Scrapping brand arguments. Expected one of\n')
+        print(brands)
+        return -1
+
+    return 1
 
 
 """
-    To run: `python Scraper2.py {brand} {model} {--latest}`
+    To run: `python Scraper2.py {brand} {model|--help} {--latest|--year}`
 
     @param {brand} is REQUIRED
     @param {model} is optional
+    @param {--help} is optional
     @param {--latest} is optional
+    @param {--year} is optional (example --2024)
+
+    Important note: {model} and {--help} parameters cannot be used together
+    Important note: {--latest} and {--year} parameters cannot be used together
 """
 if __name__ == "__main__":
     start = time.time()
@@ -342,7 +413,7 @@ if __name__ == "__main__":
     # scrape here
     # URL = 'https://www.caranddriver.com/honda/accord/specs'
     # scrapeByURL(URL)
-    driver()
+    status = driver()
 
     finish = time.time()
     runtime = finish-start
@@ -352,4 +423,5 @@ if __name__ == "__main__":
     runtime = runtime % 60
     seconds = runtime
 
-    print('\nScraping took %dh:%2dm:%2.3fs' % (hours, minutes, seconds))
+    if status == 1:
+        print('\nScraping took %dh:%2dm: %2.3fs' % (hours, minutes, seconds))
