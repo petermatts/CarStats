@@ -1,20 +1,16 @@
 # Log all links that produce an error so that potential corrections may be sought out manually
 
+# https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+
 import requests
 import time
 import os
 import re
-# import sys
+import sys
 
 # Traverse Links Directory
 def getLinks():
     L = []
-
-    # TODO  traverse link directory and call checkLink on each brand \
-    #   alternatively use Docs/AllLinks.txt but Links directory should be better
-    # TODO print percent progress of checking each brand
-    # TODO be sure to sleep for a small amount of time between requests
-
     os.chdir('../Links')
     for brand in os.listdir():
         f = open(brand, 'r')
@@ -27,6 +23,7 @@ def getLinks():
             else:
                 print(brand.replace('.txt', ''), '100.0 %')
             checkLink(links[l].rstrip(), L) # line that makes all the magic happen
+            time.sleep(0.05)
 
     # Tests
     # checkLink('https://www.caranddriver.com/mercedes-amg/glc-class/specs', L) # status 404
@@ -35,13 +32,11 @@ def getLinks():
     # checkLink('https://www.caranddriver.com/honda/civic/specs', L) # status 200
     # checkLink('https://www.caranddriver.com/tesla/cybertruck/specs', L) # status 404
 
-
     os.chdir('../')
     if not os.path.isdir('Log'):
         os.mkdir('Log')
     os.chdir('Log')
 
-    #? make it a csv instead and put corrected link in next col
     # file = open('../ErrorLinks.txt', 'w')
     file = open('ErrorLinks.csv', 'w')
     file.writelines(L)
@@ -49,18 +44,28 @@ def getLinks():
 
 # Verify if link is good or bad (gives error code)
 def checkLink(url: str, L: list):
-    r = requests.get(url)
+    s = requests.Session()
+    # s.max_redirects = 100
+    try:
+        r = s.get(url)
+    except requests.exceptions.TooManyRedirects:
+        L.append(url.replace('/specs', '') + ',302,\n') # too many redirects
+        return
+    except requests.exceptions.ConnectionError:
+        print(url + " is thaving connection issues, sleeping for a minute then trying again", end='\r')
+        time.sleep(60)
+        checkLink(url, L)
+
     # print(r.status_code)
 
     if r.status_code != 200:
-        L.append(url + ',' + str(r.status_code) + ',\n')
+        L.append(url.replace('/specs', '') + ',' + str(r.status_code) + ',\n')
 
 
 def no_code_links():
     os.chdir('../Data')
 
     links = []
-
     for d in os.listdir():
         if os.path.isdir(d):
             os.chdir(d)
@@ -86,7 +91,6 @@ def no_code_links():
                     os.chdir('../')
             os.chdir('../')
 
-
     os.chdir('../')
     if not os.path.isdir('Log'):
         os.mkdir('Log')
@@ -96,6 +100,48 @@ def no_code_links():
     f.writelines(links)
     f.close()
 
+
+def fix():
+    with open('../Log/ErrorLinks-Fix.csv', 'r') as f:
+        L = f.readlines()
+
+    fixes = {}
+    for link in L:
+        slice = link.split(',')
+        if slice[2] != '':
+            fix_link = slice[2]
+            if '/specs' not in fix_link:
+                fix_link += '/specs'
+            fixes[slice[0]] = fix_link
+    
+    # print(fixes.values())
+
+    os.chdir('../Links')
+    for brand in os.listdir():
+        links = []
+        with open(brand, 'r') as f:
+            links = f.readlines()
+
+        for i in range(len(links)):
+            new_link = fixes.get(links[i].replace('/specs', '').rstrip())
+            if new_link != None:
+                links[i] = new_link + '\n'
+
+        with open(brand, 'w') as f:
+            f.writelines(links)
+
+    os.chdir('../src')
+
+
 if __name__ == '__main__':
-    # no_code_links()
-    getLinks()
+    if len(sys.argv) > 1:
+        if sys.argv[1].lower() == 'code':
+            no_code_links()
+        elif sys.argv[1].lower() == 'check':
+            getLinks()
+        elif sys.argv[1].lower() == 'fix':
+            fix()
+        else:
+            print("Invalid arguement. Expected one of:\n\tcode\n\tcheck\n\tfix")
+    else:
+        print("Missing argument. Expected one of:\n\tcode\n\tcheck\n\tfix")

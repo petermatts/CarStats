@@ -18,6 +18,7 @@
     "Alfa Romeo": [
         "4C",
         "8C",
+        "33 Stradale",
         "Giulia",
         "Giulia Quadrifoglio",
         "GTV",
@@ -28,6 +29,7 @@
     "Aston Martin": [
         "DB9 GT",
         "DB11",
+        "DB12",
         "DBS",
         "DBX",
         "One-77",
@@ -54,6 +56,7 @@
         "Q3",
         "Q4 e-tron",
         "Q5",
+        "Q6 e-tron",
         "Q7",
         "Q8",
         "Q8 e-tron",
@@ -177,6 +180,7 @@
         "ELR",
         "Escalade / Escalade ESV",
         "Escalade EXT",
+        "Escalade IQ",
         "Lyriq",
         "SRX",
         "STS",
@@ -244,7 +248,6 @@
         "Avenger",
         "Caliber",
         "Challenger",
-        "Challenger eMuscle",
         "Challenger SRT / SRT Hellcat",
         "Challenger SRT Demon",
         "Charger",
@@ -287,10 +290,11 @@
         "500X"
     ],
     "Fisker": [
+        "Alaska",
         "Karma",
         "Ocean",
         "Pear",
-        "Ronin"
+        "R\u014dnin"
     ],
     "Ford": [
         "Bronco",
@@ -319,7 +323,9 @@
         "GT",
         "Maverick",
         "Mustang",
-        "Mustang Mach E",
+        "Mustang GTD",
+        "Mustang Mach-E",
+        "Mustang Raptor / Raptor R",
         "Mustang Shelby GT350 / GT350R",
         "Mustang Shelby GT500",
         "Puma",
@@ -337,9 +343,12 @@
         "G70",
         "G80",
         "G90",
+        "GT90",
         "GV60",
         "GV70",
-        "GV80"
+        "GV80",
+        "GV80 Coupe",
+        "GV90"
     ],
     "GMC": [
         "Acadia",
@@ -393,6 +402,7 @@
         "Genesis coupe",
         "Ioniq",
         "Ioniq 5",
+        "Ioniq 5 N",
         "Ioniq 6",
         "Ioniq 7",
         "Ioniq Electric",
@@ -404,11 +414,13 @@
         "RM20 N",
         "Santa Cruz",
         "Santa Fe",
+        "Santa Fe Hybrid",
         "Santa Fe Sport",
         "Sonata",
         "Tiburon",
         "Tucson",
         "Tucson Fuel Cell",
+        "Tucson Hybrid",
         "Veloster",
         "Veloster N",
         "Venue",
@@ -419,7 +431,6 @@
         "G",
         "JX",
         "M",
-        "Q40",
         "Q50",
         "Q50 Red Sport 400",
         "Q60",
@@ -475,6 +486,7 @@
         "Borrego",
         "Cadenza",
         "Carnival",
+        "EV5",
         "EV6",
         "EV9",
         "Forte",
@@ -494,6 +506,7 @@
         "Spectra",
         "Spectra5",
         "Sportage",
+        "Sportage Hybrid",
         "Stinger",
         "Telluride"
     ],
@@ -506,13 +519,15 @@
         "Countach",
         "Gallardo",
         "Hurac\u00e1n",
+        "Lanzador",
         "Murcielago",
+        "Revuelto",
         "Si\u00e1n",
         "Urus"
     ],
     "Land Rover": [
         "Defender",
-        "Defender 80",
+        "Defender Sport",
         "Discovery",
         "Discovery Sport",
         "LR2",
@@ -522,7 +537,7 @@
         "Range Rover EV",
         "Range Rover Evoque",
         "Range Rover Sport",
-        "Range Rover Sport Supercharged / SVR",
+        "Range Rover Sport SV",
         "Range Rover Supercharged",
         "Range Rover Velar"
     ],
@@ -538,7 +553,6 @@
         "IS F",
         "LC",
         "LFA",
-        "LQ",
         "LS",
         "LX",
         "NX",
@@ -547,6 +561,8 @@
         "RX",
         "RZ",
         "SC",
+        "TX",
+        "TZ",
         "UX"
     ],
     "Lincoln": [
@@ -569,10 +585,12 @@
     "Lotus": [
         "Eletre",
         "Elise",
+        "Emeya",
         "Emira",
         "Evija",
         "Evora GT",
-        "Exige"
+        "Exige",
+        "Type 135"
     ],
     "Lucid Motors": [
         "Air",
@@ -590,7 +608,6 @@
         "Quattroporte"
     ],
     "Mazda": [
-        "B-series",
         "CX-3",
         "CX-5",
         "CX-7",
@@ -599,6 +616,7 @@
         "CX-50",
         "CX-70",
         "CX-90",
+        "CX-90 Hybrid",
         "Mazda 2",
         "Mazda 3",
         "Mazda 5",
@@ -645,16 +663,14 @@
         "GLC-Class",
         "GLC-Class Coupe",
         "GLE-class",
-        "GLE43 4Matic / GLE63 4Matic",
         "GLE43 Coupe 4Matic / GLE63 S Coupe 4Matic",
         "GLS63 4Matic",
         "GT",
         "GT R",
         "GT43 / GT53 / GT63 / GT63 S",
-        "S63 / S65",
-        "SL55 / SL63",
-        "SLC43",
-        "SLK55"
+        "S63",
+        "SL-Class",
+        "SLC43"
     ],
     "Mercedes-Benz": [
         "A-class",
@@ -664,7 +680,6 @@
         "CL-class",
         "CL63 / CL65 AMG",
         "CLA-class",
-        "CLA45 AMG",
         "CLE-class",
         "CLK-class",
         "CLS-class",
@@ -707,20 +722,19 @@
     "Mercedes-Maybach": [
         "57",
         "62",
-        "EQS",
+        "EQS SUV",
         "GLS-class",
         "Landaulet",
         "S-Class",
         "SL-Class"
     ],
     "Mercury": [
-        "Grand Marquis",
         "Mountaineer"
     ],
     "Mini": [
+        "Aceman",
         "Cooper Clubman / S",
         "Cooper Clubman JCW",
-        "Cooper Countryman / S",
         "Cooper Countryman JCW",
         "Cooper Coupe",
         "Cooper Coupe S / JCW",
@@ -730,7 +744,9 @@
         "Cooper Paceman",
         "Cooper Paceman S / JCW",
         "Cooper Roadster",
-        "Cooper Roadster S / JCW"
+        "Cooper Roadster S / JCW",
+        "Countryman",
+        "Countryman Electric"
     ],
     "Mitsubishi": [
         "Eclipse",
@@ -794,6 +810,7 @@
     "Porsche": [
         "718 Boxster",
         "718 Cayman",
+        "718 EV",
         "911",
         "911 GT2 RS",
         "911 GT3 / GT3 RS",
@@ -801,8 +818,9 @@
         "918",
         "Cayenne",
         "Cayenne Coupe",
-        "Cayenne Coupe Turbo / Turbo S",
-        "Cayenne Turbo / Turbo S",
+        "Cayenne Coupe Turbo / Turbo S / Turbo GT",
+        "Cayenne EV",
+        "Cayenne Turbo / Turbo S / Turbo GT",
         "Macan",
         "Macan EV",
         "Macan GTS",
@@ -819,14 +837,17 @@
         "1500 TRX",
         "2500 / 3500",
         "ProMaster",
-        "ProMaster City"
+        "ProMaster City",
+        "ProMaster EV",
+        "Rampage"
     ],
     "Rimac": [
         "Nevera"
     ],
     "Rivian": [
         "R1S",
-        "R1T"
+        "R1T",
+        "R2S"
     ],
     "Rolls-Royce": [
         "Cullinan",
@@ -906,7 +927,9 @@
         "Compact Cruiser",
         "Corolla",
         "Corolla Cross",
+        "Corolla Cross Hybrid",
         "Corolla iM",
+        "Corolla Pickup",
         "Crown",
         "GR Corolla",
         "GR Supra",
@@ -927,6 +950,7 @@
         "Tacoma",
         "Tacoma Electric",
         "Tundra",
+        "Tundra Hybrid",
         "Venza",
         "Yaris",
         "Yaris iA"
@@ -950,10 +974,10 @@
         "Golf GTI",
         "Golf R",
         "Golf SportWagen",
-        "ID. Buzz",
         "ID.4",
         "ID.7",
         "ID.8",
+        "ID.Buzz",
         "Jetta",
         "Jetta GLI",
         "New Beetle",
@@ -968,6 +992,7 @@
         "C30",
         "C40 Recharge",
         "C70",
+        "EX30",
         "EX90",
         "S40",
         "S60",

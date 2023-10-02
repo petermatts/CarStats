@@ -3,9 +3,13 @@
 - Phase 1 Set Up & Design : Done
 
 - Phase 2 Modifications/Revisions
-    - CSV correction script(s) git issue #21
-        - in progress
-    - scrape widths? git issue #28
+    - merge branch Scraper-v2.0 into main branch
+    - new correction scripts (git issue #35)
+    - more specific options for scraping (git issue #43):
+        - scrape latest year
+        - scrape all of a specific model
+        - both
+    - more options for data conversion (git issue #45)
 
 - Phase 3 Display
     - use python sys module to allow command line args running scripts that alter/write data: git issue #29
@@ -16,3 +20,4 @@
         - html or react?
     - Add 'custom' specs/stats like: git issue #23
         - hp/ton
+    - potential more generic idea: allow for manual additions in general

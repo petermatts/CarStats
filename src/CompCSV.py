@@ -1,7 +1,7 @@
 # compile CSVs into master CSV files
 
 import os
-# import sys
+import sys
 
 def AllData():
     base = open('../Docs/Base.csv', 'r')
@@ -10,7 +10,7 @@ def AllData():
 
     L = [header]
 
-    os.chdir('../Data')
+    os.chdir('../Data/CSV')
     for brand in os.listdir():
         if not os.path.isdir(brand):
             continue
@@ -50,7 +50,7 @@ def AllData():
     os.chdir('../')
 
 def removeCompCSVs():
-    os.chdir('../Data')
+    os.chdir('../Data/CSV')
     for brand in os.listdir():
         try:
             filename = str(brand) + '/' + str(brand) + '.csv'
