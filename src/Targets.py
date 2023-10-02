@@ -7,14 +7,18 @@ from selenium.webdriver.common.by import By
 import time
 import json
 
-driver = webdriver.Chrome(r"./driver/chromedriver")
+opts = webdriver.ChromeOptions()
+opts.add_argument('start-maximized')
+# opts.add_argument('--ignore-certificate-errors')
+# opts.add_argument("--allow-running-insecure-content")
+opts.add_experimental_option('excludeSwitches', ['enable-logging'])
+driver = webdriver.Chrome(options=opts)
 driver.get("https://caranddriver.com")
-driver.maximize_window()
 driver.implicitly_wait(5)
 # time.sleep(2)
 
 # Open Modal to scrape
-button = driver.find_element(By.CSS_SELECTOR, "button.css-1c9j0fn")
+button = driver.find_element(By.CLASS_NAME, "css-m1nbu6.e2dlv6s0")
 button.click()
 # time.sleep(2)
 
@@ -27,19 +31,21 @@ brands = brands[1:-2]
 brands_text = list(brands)
 for i in range(len(brands)):
     brands_text[i] = brands[i].text
-    # print(i.text)
+    # print(brands[i].text)
 
 sel = driver.find_elements(By.TAG_NAME, "select")
 
 master = {}
 # Scrape Models
-for i in range(len(brands)):
+length = len(brands)
+for i in range(length):
     brands = driver.find_elements(By.TAG_NAME, "option")
     brands = brands[1:-2]
     brands[i].click()
-    # time.sleep(5)
+
+    time.sleep(2)
     models = driver.find_elements(By.TAG_NAME, "option")
-    
+
     index = 0
     for j in range(len(models)):
         if models[j].text == "Select a Model":
