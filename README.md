@@ -69,8 +69,14 @@ See `Todo.txt`
 
 10. (Optional) run `Duplicates.py` to search for and remove duplicates from the YAML data. 
 
-11. Run `Conversion.py yaml-json` or `Conversion.py yaml2json` to convert the YAML data into JSON data.
+11. Run `FileNameVerifyer.py` to find and fix files with bard names, i.e. files that have a "-{year}" in the name.
 
-12. Run `Conversion.py json-csv` or `Conversion.py json2csv` to convert the JSON data into the final formatted CSV data
+    Run with `detect` option to display all problematic files and `fix` to fix these files.
+
+    Note: it may be a good idea to back up the `Data` folder to another place before doing this. It should be fine, but just in case.
+
+12. Run `Conversion.py yaml-json` or `Conversion.py yaml2json` to convert the YAML data into JSON data.
+
+13. Run `Conversion.py json-csv` or `Conversion.py json2csv` to convert the JSON data into the final formatted CSV data
 
 

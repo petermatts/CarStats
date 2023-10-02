@@ -23,25 +23,18 @@ def scrapeData(driver: webdriver, specs: dict = {}):
     specs['Price'] = price.text.replace(',', '')
 
     data = driver.find_elements(By.CLASS_NAME, 'css-1ajawdl.eqxeor30')
-    rows = []
+    # rows = []
     for i in range(len(data)):
         print('\tFind Data', i+1, end='\r')
         row = data[i].find_elements(By.TAG_NAME, 'div')
         if len(row) != 0:
-            rows.append((row[0].text.replace(',', ''), row[1].text.replace(',', '')))
+            # rows.append((row[0].text.replace(',', ''), row[1].text.replace(',', '')))
             key = row[0].text.replace(',', '')
             value = row[1].text.replace(',', '')
             if key != '':
                 specs[key] = value
         else:
             break #? optimize
-
-    # print()
-    # print('Specifications:')
-    # for i in specs:
-    #     print(i, specs[i])
-
-    # print('returining specs') # debugging
 
     return specs
 
@@ -55,7 +48,7 @@ def scrapeBrand(brand_filename: str, modelname: str = None, year: int = None, la
     brand = brand_filename.split('/')[-1].replace('.txt', '')
 
     timeout = 5 #? can be changed (seconds)
-    sleep_const = 3 #? can be changed (seconds)
+    sleep_const = 2 #? can be changed (seconds)
 
     # get links
     with open(brand_filename, 'r') as file:
@@ -169,6 +162,8 @@ def scrapeBrand(brand_filename: str, modelname: str = None, year: int = None, la
                             return -1
                         except requests.HTTPError:
                             return -2
+                        except requests.exceptions.ConnectTimeout:
+                            return -2
 
                         writeData(data)
 
@@ -201,11 +196,11 @@ def scrapeBrand(brand_filename: str, modelname: str = None, year: int = None, la
                 # debug['style_text'] = ''
         except TimeoutException:
             return -3
-        # except NoSuchElementException:
-        #   return -4
-        # except ElementClickInterceptedException:
-        #   #? advance to next iteration (trim/style/year)?
-        #   return -5
+        except NoSuchElementException:
+            return -4
+        except ElementClickInterceptedException:
+            #? advance to next iteration (trim/style/year)?
+            return -5
         
         # sort of like a reset - resets years but not links
         y = 0
@@ -334,8 +329,13 @@ def driver():
 
         models = ''
         for i in range(len(options)):
-            models += options[i]
-            models += ' '*(longest - len(options[i]) + 2)
+            m = options[i]
+
+            if sys.argv[1].lower() != 'ram' and re.search("-\d{4}", m) and not re.search("(\d{4}|SILVERADO|SIERRA)-\d{4}", m):
+                m = m[:-5] # remove possible "-{year}" at the end of the model
+
+            models += m
+            models += ' '*(longest - len(m) + 2)
             if i % 5 == 4:
                 models += '\n'
         models += '\n'
@@ -363,6 +363,8 @@ def driver():
                 return -1
             elif len(sys.argv) > 2:
                 model = sys.argv[2]
+                if sys.argv[1].lower() != 'ram' and re.search("-\d{4}", model) and not re.search("(\d{4}|SILVERADO|SIERRA)-\d{4}", model):
+                    model = model[:-5]
 
             result = scrapeBrand(path, modelname=model, year=year, latest=latest)
             if result < 0:
@@ -382,9 +384,11 @@ def driver():
                     print("Selenium ElementClickInterceptedException encountered, waiting 30s before retrying")
                     time.sleep(30)
 
+                #! change to an iterative approach instead of recursion?
                 driver() # recursive call until successful completion of scrapping
         else:
-            print('Invalid Brand Arguement. Valid Arguments are:')
+            if sys.argv[1] != "--help":
+                print('Invalid Brand Arguement. Valid Arguments are:')
             print(brands)
             return -1
     else:
@@ -424,4 +428,4 @@ if __name__ == "__main__":
     seconds = runtime
 
     if status == 1:
-        print('\nScraping took %dh:%2dm: %2.3fs' % (hours, minutes, seconds))
+        print('\nScraping took %dh:%2dm:%2.3fs' % (hours, minutes, seconds))
