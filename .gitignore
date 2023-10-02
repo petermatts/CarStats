@@ -2,13 +2,9 @@
 .vscode
 **/__pycache__
 
-#? consider unignoring Links and Debug directories
-Links
-Debug
 Data/CSV
 Data/JSON
 Data/YAML
-
 
 # Files
 # AllLinks.txt

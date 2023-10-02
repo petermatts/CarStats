@@ -57,13 +57,15 @@ See `Todo.txt`
 
 7. Go up a directory into the main directory `cd ..`
 
-8. Run the data scraper `Scraper2.py` (might get renamed)
+8. Run the data scraper `DataScraper2.py`
 
     - Required: pass the brand you would like to scrape as first argument
     - Optional: pass specific model within brand you would like to scrape
     - Optional: pass in year or --latest to scrape a specific year or the latest year available
 
     This writes data to `Data/YAML/*`
+
+    \* `DataScraper1.py` is out of date, do not use - this file should be removed anyways
 
 9. To convert/format data, you must change directories to access the script for this: `cd src/data`
 
