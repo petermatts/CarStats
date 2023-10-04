@@ -9,6 +9,9 @@ import requests
 import time
 import yaml
 
+timeout = 5 #? can be changed (seconds)
+sleep_const = 2 #? can be changed (seconds)
+
 def scrapeData(driver: webdriver, specs: dict = {}):
     specs['URL'] = driver.current_url
 
@@ -18,7 +21,7 @@ def scrapeData(driver: webdriver, specs: dict = {}):
     if r.status_code != 200:
         raise ValueError(r.status_code)
 
-    driver.implicitly_wait(10)
+    driver.implicitly_wait(0)
     price = driver.find_element(By.CLASS_NAME, 'css-11vbyw7.e1l3raf11')
     specs['Price'] = price.text.replace(',', '')
 
@@ -34,8 +37,10 @@ def scrapeData(driver: webdriver, specs: dict = {}):
             if key != '':
                 specs[key] = value
         else:
-            break #? optimize
+            break
 
+    driver.implicitly_wait(timeout)
+    
     return specs
 
 def getSelectors(driver) -> tuple:
@@ -46,9 +51,6 @@ def getSelectors(driver) -> tuple:
 def scrapeBrand(brand_filename: str, modelname: str = None, year: int = None, latest: bool = False):
     """brand_filename is the path to the brands links in Links folder"""
     brand = brand_filename.split('/')[-1].replace('.txt', '')
-
-    timeout = 5 #? can be changed (seconds)
-    sleep_const = 2 #? can be changed (seconds)
 
     # get links
     with open(brand_filename, 'r') as file:
@@ -112,8 +114,9 @@ def scrapeBrand(brand_filename: str, modelname: str = None, year: int = None, la
 
                 if latest and y < len(years)-1:
                     # skip to latest year if latest param is true
-                    y += 1
-                    continue
+                    y = len(years)-1
+                    # y += 1
+                    # continue
                 elif year != None and int(years[y].text) != year:
                     # only scrape specified year if year is defined
                     y += 1
