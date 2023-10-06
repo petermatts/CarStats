@@ -69,7 +69,6 @@ def scrapeBrand(brand_filename: str, modelname: str = None, year: int = None, la
             u += 1
             continue
 
-
         opts = webdriver.ChromeOptions()
         opts.add_argument('start-maximized')
         opts.add_argument('--ignore-certificate-errors')
@@ -212,6 +211,12 @@ def scrapeBrand(brand_filename: str, modelname: str = None, year: int = None, la
         debug['link_idx'] = u
         updateDebugFile(debug_path, debug)
 
+    # clear out text values in debug before returning success
+    debug['year_text'] = ''
+    debug['style_text'] = ''
+    debug['trim_text'] = ''
+    updateDebugFile(debug_path, debug)
+
     return 1 # success :)
 
 
@@ -265,11 +270,6 @@ def makeFile(path: str, ext: str = '') -> bool:
         if not os.path.isdir(d):
             os.mkdir(d)
         os.chdir(d)
-
-    # check if path already exists
-    # if os.path.isfile(dirs[-1]):
-    #     os.chdir(cwd)
-    #     return False
     
     if ext.lower() == 'json':
         with open(dirs[-1], 'w') as file:
@@ -369,8 +369,10 @@ def driver():
                 if sys.argv[1].lower() != 'ram' and re.search("-\d{4}", model) and not re.search("(\d{4}|SILVERADO|SIERRA)-\d{4}", model):
                     model = model[:-5]
 
-            result = scrapeBrand(path, modelname=model, year=year, latest=latest)
-            if result < 0:
+            result = 0
+            while result <= 0:
+                result = scrapeBrand(path, modelname=model, year=year, latest=latest)
+                
                 if result == -1:
                     print("Bad link encountered, skipping")
                     time.sleep(5)
@@ -387,8 +389,26 @@ def driver():
                     print("Selenium ElementClickInterceptedException encountered, waiting 30s before retrying")
                     time.sleep(30)
 
-                #! change to an iterative approach instead of recursion?
-                driver() # recursive call until successful completion of scrapping
+            # result = scrapeBrand(path, modelname=model, year=year, latest=latest)
+            # if result < 0:
+            #     if result == -1:
+            #         print("Bad link encountered, skipping")
+            #         time.sleep(5)
+            #     elif result == -2:
+            #         print("Request timeout encountered, waiting 2m before retrying")
+            #         time.sleep(120)
+            #     elif result == -3:
+            #         print("Selenium timeout encountered, waiting 2m before retrying")
+            #         time.sleep(120)
+            #     elif result == -4:
+            #         print("Selenium NoSuchElementException encountered, waiting 10s before retrying")
+            #         time.sleep(10)
+            #     elif result == -5:
+            #         print("Selenium ElementClickInterceptedException encountered, waiting 30s before retrying")
+            #         time.sleep(30)
+
+            #     #! change to an iterative approach instead of recursion?
+            #     driver() # recursive call until successful completion of scrapping
         else:
             if sys.argv[1] != "--help":
                 print('Invalid Brand Arguement. Valid Arguments are:')
