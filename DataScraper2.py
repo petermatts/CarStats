@@ -1,7 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException, ElementClickInterceptedException, NoSuchElementException
-import datetime
 import os
 import re
 import sys
@@ -22,7 +21,12 @@ def scrapeData(driver: webdriver, specs: dict = {}):
         raise ValueError(r.status_code)
 
     driver.implicitly_wait(0)
-    price = driver.find_element(By.CLASS_NAME, 'css-11vbyw7.e1l3raf11')
+
+    # Note: price is under one of the following styles, if getting a bunch of no such element errors, switch which one is commented out
+    # price = driver.find_element(By.CLASS_NAME, 'css-11vbyw7.e1l3raf11')
+    price = driver.find_element(By.CLASS_NAME, 'css-1xre4z6.e1l3raf11')
+
+
     specs['Price'] = price.text.replace(',', '')
 
     data = driver.find_elements(By.CLASS_NAME, 'css-1ajawdl.eqxeor30')
@@ -388,27 +392,6 @@ def driver():
                 elif result == -5:
                     print("Selenium ElementClickInterceptedException encountered, waiting 30s before retrying")
                     time.sleep(30)
-
-            # result = scrapeBrand(path, modelname=model, year=year, latest=latest)
-            # if result < 0:
-            #     if result == -1:
-            #         print("Bad link encountered, skipping")
-            #         time.sleep(5)
-            #     elif result == -2:
-            #         print("Request timeout encountered, waiting 2m before retrying")
-            #         time.sleep(120)
-            #     elif result == -3:
-            #         print("Selenium timeout encountered, waiting 2m before retrying")
-            #         time.sleep(120)
-            #     elif result == -4:
-            #         print("Selenium NoSuchElementException encountered, waiting 10s before retrying")
-            #         time.sleep(10)
-            #     elif result == -5:
-            #         print("Selenium ElementClickInterceptedException encountered, waiting 30s before retrying")
-            #         time.sleep(30)
-
-            #     #! change to an iterative approach instead of recursion?
-            #     driver() # recursive call until successful completion of scrapping
         else:
             if sys.argv[1] != "--help":
                 print('Invalid Brand Arguement. Valid Arguments are:')
