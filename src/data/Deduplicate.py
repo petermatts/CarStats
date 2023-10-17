@@ -62,8 +62,7 @@ if __name__ == '__main__':
         if sys.argv[1].lower() == 'detect':
             deduplicate(verbose=verbose)
         elif sys.argv[1].lower() == 'fix':
-            # deduplicate(remove=True, verbose=verbose)
-            pass
+            deduplicate(remove=True, verbose=verbose)
         elif sys.argv[1].lower() == '--help':
             msg = "\tdetect       = find duplicate YAML data entries\n"
             msg += "\tfix          = find and remove duplicate YAML data entries\n"

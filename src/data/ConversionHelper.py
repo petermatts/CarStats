@@ -9,7 +9,13 @@ def KeyMap(webspecs: dict[str, str]) -> dict[str, str]:
     """Map specs dict for YAML -> JSON datafile conversion"""
 
     specs = {}
-    isElectric = lambda: webspecs['Engine Type and Required Fuel'] == 'Electric'
+
+    if 'Engine Type and Required Fuel' not in webspecs.keys():
+        print('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
+        print(webspecs['URL'])
+        return webspecs
+
+    isElectric = webspecs['Engine Type and Required Fuel'] == 'Electric'
 
     def EngineAndGas(k: str = '', v: str = ''):
         if isElectric:
@@ -54,10 +60,10 @@ def KeyMap(webspecs: dict[str, str]) -> dict[str, str]:
 
     def Torque(k: str = '', v: str = ''):
         hp = v.split(' @ ')
-        if len(hp) >= 1 and not isElectric:
-            return {'Max Horsepower': hp[0], 'Max Horsepower RPM': hp[1]}
+        if len(hp) > 1 and not isElectric:
+            return {'Max Torque': hp[0], 'Max Torque RPM': hp[1]}
         else:
-            return {'Max Horsepower': hp[0]}
+            return {'Max Torque': hp[0]}
 
     def MPG(k: str = '', v: str = ''):
         fe = v.replace('N/A', '').split('/')

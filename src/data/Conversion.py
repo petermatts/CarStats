@@ -19,6 +19,7 @@ def YAML_TO_JSON():
 
     brands = os.listdir()
     for b in brands:
+        # print("Converting", b)
         os.chdir(b)
         if not os.path.exists('../../JSON/' + b):
             os.mkdir('../../JSON/' + b)
@@ -60,6 +61,7 @@ def JSON_TO_CSV():
 
     brands = os.listdir()
     for b in brands:
+        # print("Converting", b)
         os.chdir(b)
         if not os.path.exists('../../CSV/' + b):
             os.mkdir('../../CSV/' + b)
@@ -99,12 +101,13 @@ def JSON_TO_CSV():
 
 def Gather_Keys() -> list[str]:
     """"Helper for JSON_TO_CSV"""
-    print("Gathering keys...", end='\r')
+    print("Gathering keys from...")
     keys = set()
     os.chdir('../../Data/JSON')
 
     brands = os.listdir()
     for b in brands:
+        print(b)
         os.chdir(b)
         years = os.listdir()
         
@@ -127,6 +130,7 @@ def Gather_Keys() -> list[str]:
     os.chdir(cwd)
     return list(keys)
 
+#??? write a clean up function before converting ???
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
