@@ -1,168 +1,99 @@
 # Script to gather a set of all values in (parameter) specified columns of the data CSV files 
 
+import json
 import os
 import sys
 
-# TODO make this adaptable to only check within a brand.
-# ../Data/Brand/Brand.csv or ../Data/AllData.csv
+# Collects data from JSON
 
-def collect_attr(attr: int, idx = -1):
-    file_path = '../Data/AllData.csv'
-    if idx >= 0:
-        cwd = os.getcwd()
-        os.chdir('../Data')
-        brands = []
-        for i in os.listdir():
-            if os.path.isdir(i):
-                brands.append(i)
-        os.chdir(cwd)
+def _getBrands():
+    cwd = os.getcwd()
+    os.chdir("../Data/JSON")
+    brands = os.listdir()
+    os.chdir(cwd)
+    return brands
 
-        # print(brands)
-        file_path = '../Data/' + brands[idx] + '/' + brands[idx] + '.csv'
-
-    file = open(file_path, 'r')
-    lines = file.readlines()
-    file.close()
-
-    data = []
-    header = lines[0].split(',')[attr]
-    for i in lines[1:]:
-        data.append(i.rstrip().split(',')[attr])
-
-    collection = list(set(data))
-
-    collection.sort() # feel free to comment this out if you please
+def _getAttrs():
+    with open("../Docs/Base.txt") as f:
+        attributes = f.readlines()
     
-    print(header)
-    print(collection)
+    for a in range(len(attributes)):
+        attributes[a] = attributes[a].strip()
+
+    return attributes
+
+def gatherBrand(attr: str):
+    """Gathers all data amoungst attribute. Function run within brand directory"""
+    values = set()
+    
+    years = os.listdir()
+    for y in years:
+        os.chdir(y)
+        models = os.listdir()
+        for m in models:
+            with open(m, 'r') as f:
+                data = json.load(f)
+
+            for d in data:
+                v = d.get(attr, None)
+                if v != None:
+                    values.add(v)
+        os.chdir('..')
+    return values
+
+def getAttr(attr: str, brand: str = None):
+    cwd = os.getcwd()
+    os.chdir("../Data/JSON")
+    values = set()
+
+    if brand != None:
+        os.chdir(brand)
+        values = gatherBrand(attr)
+    else:
+        brands = os.listdir()
+        values = set()
+        for b in brands:
+            os.chdir(b)
+            values.union(gatherBrand(attr))
+            os.chdir('..')
+
+    os.chdir(cwd)
+    return values
 
 def run():
-    curr_dir = os.getcwd()
-    os.chdir('../Data')
-    brands = []
-    for i in os.listdir():
-        if os.path.isdir(i):
-            brands.append(i)
-    os.chdir(curr_dir)
+    args = sys.argv[1:]
 
-    if len(sys.argv) < 3:
-        raise ValueError("Missing Arguments")
+    brands = _getBrands()
+    attrs = _getAttrs()
     
-    
-    attr = sys.argv[1]
-    brand = sys.argv[2]
-    bad_attr_arg = False
-    bad_brand_arg = False
-    try:
-        brand = int(brand)
-    except:
-        try:
-            brand = brands.index(brand)
-        except:
-            bad_brand_arg = True
-           
-    if bad_brand_arg:
-        msg = "Acceptable values: " + str(brands) + "\nOr indexes [0,"+  str(len(brands)-1) + "]"
-        # raise ValueError("Incorrect brand string.\n", msg)
-        print("Incorrect brand string.")
-        print(msg)
+    if len(args) == 1:
+        print("Warning, action not recommented - gathering attribute values for all brands")
+        attr = args[0]
+        if attr in brands:
+            print("Missing attribute")
+        elif attr not in attrs:
+            print("Invalid attribute")
+            return
+        
+        return getAttr(attr)
+    elif len(args) == 2:
+        brand = args[0]
+        attr = args[1]
+        if attr not in attrs:
+            print("Invalid attribute")
+            return
+        if brand not in brands:
+            print("Invalid brand")
+            return
+        
+        return getAttr(attr, brand)
+    else:
+        print("Wrong number of arguments")
         return
-
-    try:
-        attr = int(attr)
-    except:
-        try:
-            attr = attrs.index(attr)
-        except:
-            bad_attr_arg = True
-
-    if bad_attr_arg:
-        msg = "Acceptable values: " + str(attrs) + "\nOr indexes [0," + str(len(attrs)-1) + "]"
-        # raise ValueError("Incorrect attribute string.\n", msg)
-        print("Incorrect attribute string.")
-        print(msg)
-        return
-            
-
-
-    # use excel file to find index of brand
-    # collect_attr(attribute col number, brand index number)
-    # collect_attr(6, 0)
-    collect_attr(attr, brand)
 
 if __name__ == '__main__':
-    """
-        Index : Attribute
-        0     : Year
-        1     : Brand
-        2     : Model
-        3     : Trim
-        4     : Price
-        5     : EPA Class
-        6     : Engine
-        7     : Turbos
-        8     : Fuel
-        9     : Displacement (liters)
-        10    : Max Horsepower
-        11    : Max Horsepwer RPM
-        12    : Max Torque
-        13    : Max Torque RPM
-        14    : Transmission
-        15    : Transmission Speeds
-        16    : MPG (combined)
-        17    : MPG (city)
-        18    : MPG (highway)
-        19    : MPGe (combined)
-        20    : MPGe (city)
-        21    : MPGe (highway)
-        22    : Fuel Cap. (Gal)
-        23    : Length (in)
-        24    : Width no mirrors (in)
-        25    : Wheelbase (in)
-        26    : Seating Cap
-        27    : Passenger Space (cu ft)
-        28    : Trunk Space (cu ft)
-        29    : Turn Radius (ft)
-        30    : Weight (lbs)
-        31    : Max Towing (lbs)
-        32    : URL
-    """
-
-    attrs = [
-        "Year",
-        "Brand",
-        "Model",
-        "Trim",
-        "Price",
-        "EPA Class",
-        "Engine",
-        "Turbos",
-        "Fuel",
-        "Displacement (liters)",
-        "Max Horsepower",
-        "Max Horsepwer RPM",
-        "Max Torque",
-        "Max Torque RPM",
-        "Transmission",
-        "Transmission Speeds",
-        "MPG (combined)",
-        "MPG (city)",
-        "MPG (highway)",
-        "MPGe (combined)",
-        "MPGe (city)",
-        "MPGe (highway)",
-        "Fuel Cap. (Gal)",
-        "Length (in)",
-        "Width no mirrors (in)",
-        "Wheelbase (in)",
-        "Seating Cap",
-        "Passenger Space (cu ft)",
-        "Trunk Space (cu ft)",
-        "Turn Radius (ft)",
-        "Weight (lbs)",
-        "Max Towing (lbs)",
-        "URL"
-    ]
-
-    run()
-
+   result = run()
+   if result != None:
+        result = list(result)
+        result.sort()
+        print(result)

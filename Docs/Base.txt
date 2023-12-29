@@ -1,128 +1,144 @@
-Second Gear Ratio (:1)
-Liftover Height (inches)
-Cargo Space/Area Length Behind Third Row (inches)
-Front Shoulder Room (inches)
-Cargo Space/Area Behind Third Row (cubic feet)
-Front Shock Absorber Diameter (mm)
-Bolt Pattern
-First Gear Ratio (:1)
+Year
+Brand
+Model
+Trim
+Price
+EPA Class
+Engine
+Engine Order Code
+Maximum Engine Speed (rpm)
+Engine Oil Cooler
+Turbo
+Fuel
+Displacement (Liters)
+Max Horsepower
+Max Horsepower RPM
+Max Torque
+Max Torque RPM
+Transmission
+Transmission Type
+Transmission Speeds
+Transmission Manufacturer
+Transmission Order Code
+Drivetrain
+MPG (city)
+MPG (highway)
+MPG (combined)
+MPGe (city)
+MPGe (highway)
+MPGe (combined)
+Fuel Capacity (Gallons)
+Range city/highway (miles)
+Length (inches)
+Body Length
 Width without mirrors (inches)
+Wheelbase (inches)
+First Gear Ratio (:1)
+Second Gear Ratio (:1)
+Third Gear Ratio (:1)
+Fourth Gear Ratio (:1)
+Fifth Gear Ratio (:1)
+Sixth Gear Ratio (:1)
+Seventh Gear Ratio (:1)
+Eighth Gear Ratio (:1)
+Ninth Gear Ratio (:1)
+Tenth Gear Ratio (:1)
+Reverse Ratio (:1)
+Steering Type
+Steering Ratio (:1)
+Transfer Case Gear Ratio low (:1)
+Transfer Case Gear Ratio high (:1)
+Axle Ratio - Low Rear (:1)
+Final Drive Axle Ratio (:1)
 Cargo Bed Height (inches)
 Front Hip Room (inches)
-Brake Type
-Displacement (Liters)
-Front Gross Axle Weight Rating (pounds)
-Eighth Gear Ratio (:1)
-Cold Cranking Amps @ 0° F (2nd)
+Front Shoulder Room (inches)
+Front Shock Absorber Diameter (mm)
 Passenger Space (cubic feet)
-Front Wheel Material
-Cargo Bed Width Between Wheelhousings (inches)
-Cargo Space/Area Behind Second Row (cubic feet)
-Max Torque
-EPA Greenhouse Gas Score
-Seventh Gear Ratio (:1)
-Rear Door Opening Height (inches)
+Cargo Space/Area (cubic feet)
+Front Head Room (inches)
+Front Leg Room (inches)
+Second Row Head Room (inches)
+Second Row Leg Room (inches)
+Second Row Hip Room (inches)
+Second Row Shoulder Room (inches)
+Third Row Head Room (inches)
+Third Row Leg Room (inches)
+Third Row Hip Room (inches)
+Third Row Shoulder Room (inches)
+Fourth Row Head Room (inches)
+Fourth Row Leg Room (inches)
+Fourth Row Hip Room (inches)
+Fourth Row Shoulder Room (inches)
+Fifth Row Head Room (inches)
+Fifth Row Leg Room (inches)
 Fifth Row Hip Room (inches)
-Fourth Gear Ratio (:1)
+Fifth Row Shoulder Room (inches)
+Cargo Space/Area with Rear Seat Up
+Cargo Space/Area with Rear Seat Down
+Cargo Space/Area Length Behind First Row (inches)
+Cargo Space/Area Behind Second Row (cubic feet)
+Cargo Space/Area Length Behind Second Row (inches)
+Cargo Space/Area Behind Third Row (cubic feet)
+Cargo Space/Area Length Behind Third Row (inches)
+Cargo Space/Area Width at Beltline (inches)
+Cargo Space/Area Behind Fourth Row (cubic feet)
+Cargo Bed Width Between Wheelhousings (inches)
+EPA Greenhouse Gas Score
+Rear Door Opening Height (inches)
 Curb Weight
-Transmission Speeds
 Front Track Width (inches)
-Tenth Gear Ratio (:1)
-Drivetrain
 Front Wheel Size (inches)
 Clutch Size
-Cargo Space/Area with Rear Seat Up
-Body Length
-Max Horsepower RPM
-Length (inches)
-Trim
-Engine Order Code
-Fuel Capacity (Gallons)
-Model
+Front Wheel Material
+Bolt Pattern
+Liftover Height (inches)
+Brake Type
+Front Gross Axle Weight Rating (pounds)
+Cold Cranking Amps @ 0ï¿½ F (2nd)
 Transfer Case Model
 Fuel System
-Third Row Head Room (inches)
 Turns lock to lock
-Cargo Space/Area (cubic feet)
 Rear Suspension Type
-MPGe (city)
 Trunk Space (cubic feet)
-EPA Class
-Price
 Front Brake Rotors diameter x thickness (inches)
 Cargo Bed Width at Floor (inches)
-Wheelbase (inches)
-Front Head Room (inches)
-Fifth Gear Ratio (:1)
 Spare Tire Size
 Turning Diameter / Radius curb to curb (feet)
-MPGe (highway)
 Maximum Trailer Weight weight distributing hitch (pounds)
 Rear Wheel Material
-Cargo Space/Area Length Behind First Row (inches)
 Maximum Payload Capacity (pounds)
-Reverse Ratio (:1)
 Rear Brake Rotors diameter x thickness (inches)
-Transfer Case Gear Ratio high (:1)
-Transfer Case Gear Ratio low (:1)
-Final Drive Axle Ratio (:1)
 Towing Capacity
 Gross Vehicle Weight Rating (pounds)
-Cold Cranking Amps @ 0° F
-Transmission Type
+Cold Cranking Amps @ 0ï¿½ F
 Rear Door Opening Width (inches)
 As Spec'd Payload Capacity (pounds)
-Fifth Row Shoulder Room (inches)
-Second Row Hip Room (inches)
 Ground Clearance Front
-Fuel
 Spare Wheel Material
-Third Gear Ratio (:1)
 Cargo Bed Width @ Top Rear
 Turning Diameter / Radius wall to wall (feet)
 Cooling System Capacity (quarts)
 Cargo Bed Length (inches)
-Third Row Shoulder Room (inches)
 Maximum Trailer Weight dead weight hitch (pounds)
-Axle Ratio - Low Rear (:1)
 Ext'd Cab Cargo Space/Size
-Ninth Gear Ratio (:1)
-Fifth Row Head Room (inches)
 Spare Wheel Size (inches)
 Rear Shock Absorber Diameter (mm)
-Transmission
-Fifth Row Leg Room (inches)
-Third Row Leg Room (inches)
-Steering Ratio (:1)
-Front Leg Room (inches)
 Cargo Space/Area Length @ Floor to Console
 Front Tire Size
-Year
-Fourth Row Shoulder Room (inches)
 Maximum Alternator Capacity (amps)
-Engine Oil Cooler
 Height (inches)
 CO2 Emissions 15K mi/year (tons)
-MPG (highway)
-MPGe (combined)
 Cargo Space/Area Behind Front Row (cubic feet)
 Total Weight (pounds)
 Maximum Tongue Weight dead weight hitch (pounds)
 Rear Gross Axle Weight Rating (pounds)
 Seating Capacity
-Second Row Shoulder Room (inches)
 Rear Track Width (inches)
-Turbo
-Brand
-Max Torque RPM
-Cargo Space/Area Width at Beltline (inches)
 Total Option Weight (pounds)
 Turning Diameter /Radius wall to wall (feet)
 Anti-Lock-Braking System
-Third Row Hip Room (inches)
 Weight (lbs)
-Fourth Row Head Room (inches)
-Cargo Space/Area Length Behind Second Row (inches)
 URL
 Rear Wheel Size (inches)
 Style
@@ -130,27 +146,11 @@ Rear Anti-Roll Bar Diameter (inches)
 Payload Weight Front
 Torque Converter
 Rear Tire Size
-Engine
 Maximum Tongue Weight weight distributing hitch (pounds)
-Cargo Space/Area Behind Fourth Row (cubic feet)
-Range city/highway (miles)
-Second Row Head Room (inches)
-Cargo Space/Area with Rear Seat Down
-MPG (city)
-Transmission Manufacturer
-Steering Type
-Fourth Row Leg Room (inches)
-Transmission Order Code
 Minimum Ground Clearance (inches)
 Aux Fuel Tank Capacity (gallons)
 Rear Drums diameter x width (inches)
-MPG (combined)
-Max Horsepower
 Body Weight
 Front Anti-Roll Bar Diameter (inches)
-Maximum Engine Speed (rpm)
 Front Suspension Type
-Second Row Leg Room (inches)
-Sixth Gear Ratio (:1)
-Fourth Row Hip Room (inches)
 Trailer Weight
