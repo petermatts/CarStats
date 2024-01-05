@@ -10,15 +10,19 @@ import yaml
 import sys
 
 from ConversionHelper import KeyMap
-# from Duplicates import remove_yaml_duplicates
 
 cwd = os.getcwd()
 
-def YAML_TO_JSON():
+def YAML_TO_JSON(brand = None):
+    if not os.path.exists('../../Data/JSON'):
+        os.mkdir('../../Data/JSON')
+
     os.chdir('../../Data/YAML')
 
     brands = os.listdir()
     for b in brands:
+        if brand != None and brand != b:
+            continue
         # print("Converting", b)
         os.chdir(b)
         if not os.path.exists('../../JSON/' + b):
@@ -39,8 +43,6 @@ def YAML_TO_JSON():
                 fname = m.split('.')[0] + '.json' # change to JSON file name
                 fname = '../../../JSON/' + b + '/' + y + '/' + fname 
 
-                # todo filter duplicates in data - see Duplicates.py and git issue #47
-
                 # data is a list of dicts
                 for d in range(len(data)):
                     data[d] = KeyMap(data[d]) # process data
@@ -53,7 +55,11 @@ def YAML_TO_JSON():
             os.chdir('..')
         os.chdir('..')
 
-def JSON_TO_CSV():
+
+def JSON_TO_CSV(brand = None):
+    if not os.path.exists('../../Data/CSV'):
+        os.mkdir('../../Data/CSV')
+
     with open('../../Docs/Base.csv', 'r') as f:
         header = f.readlines()[0]
 
@@ -61,6 +67,8 @@ def JSON_TO_CSV():
 
     brands = os.listdir()
     for b in brands:
+        if brand != None and brand != b:
+            continue
         # print("Converting", b)
         os.chdir(b)
         if not os.path.exists('../../CSV/' + b):
@@ -86,12 +94,13 @@ def JSON_TO_CSV():
                     line = ''
                     for h in header.rstrip().split(','):
                         attr = d.get(h, '')
-                        if attr.lower() not in ['na', 'n/a']:
+                        # TODO intercept and make corrections here
+                        if attr is not None and attr.lower() not in ['na', 'n/a']:
                             line += attr
                         line += ','
                     lines.append(line[:-1] + '\n') # remove last comma and add newline
 
-                print(fname)
+                print(fname[len('../../../CSV/'):])
                 with open(fname, 'w') as f:
                     f.writelines(lines)
 
@@ -133,11 +142,19 @@ def Gather_Keys() -> list[str]:
 #??? write a clean up function before converting ???
 
 if __name__ == '__main__':
+    cwd = os.getcwd()
+    os.chdir('../../Data/YAML')
+    brands = list(map(lambda x: x.lower(), os.listdir()))
+    os.chdir(cwd)
+
+    brand = None
     if len(sys.argv) > 1:
+        if len(sys.argv) > 2 and sys.argv[2].lower() in brands:
+            brand = sys.argv[2]
         if sys.argv[1].lower() in ['yaml-json', 'yaml2json']:
-            YAML_TO_JSON()
+            YAML_TO_JSON(brand)
         elif sys.argv[1].lower() in ['json-csv', 'json2csv']:
-            JSON_TO_CSV()
+            JSON_TO_CSV(brand)
         else:
             print("Error Invalid Arg:", sys.argv[1])
     else:

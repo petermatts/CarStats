@@ -11,7 +11,6 @@ def KeyMap(webspecs: dict[str, str]) -> dict[str, str]:
     specs = {}
 
     if 'Engine Type and Required Fuel' not in webspecs.keys():
-        print('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
         print(webspecs['URL'])
         return webspecs
 
@@ -98,7 +97,7 @@ def KeyMap(webspecs: dict[str, str]) -> dict[str, str]:
         'Displacement (liters/cubic inches)': lambda k, v: {'Displacement (Liters)': v.split('/')[0].replace('L', '').strip()},
         'Maximum Horsepower @ RPM': Horsepower,
         'Maximum Torque @ RPM': Torque,
-        'Transmission Description': lambda k, v: {'Transmission': v.split(' ')[0]}, #? change
+        'Transmission Description': lambda k, v: {'Transmission': v.replace('Transmission', '').replace('w/OD').strip()}, #? change
         'Number of Transmission Speeds': lambda k, v: {'Transmission Speeds': v},
         'EPA Fuel Economy combined/city/highway (mpg)': MPG,
         'EPA Fuel Economy Equivalent (for hybrid and electric vehicles) combined/city/highway (MPGe)': MPG,
