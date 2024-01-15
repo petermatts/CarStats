@@ -9,6 +9,10 @@ import json
 import yaml
 import sys
 
+# if os.getcwd() + '/../' not in sys.path:
+    # sys.path.append(os.getcwd() + '/../')
+
+# from Correction import Correction
 from ConversionHelper import KeyMap
 
 cwd = os.getcwd()
@@ -92,9 +96,9 @@ def JSON_TO_CSV(brand = None):
                 lines = [header]
                 for d in data:
                     line = ''
+                    # TODO intercept and make corrections here
                     for h in header.rstrip().split(','):
                         attr = d.get(h, '')
-                        # TODO intercept and make corrections here
                         if attr is not None and attr.lower() not in ['na', 'n/a']:
                             line += attr
                         line += ','
