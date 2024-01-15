@@ -63,42 +63,40 @@ def checkLink(url: str, L: list):
 
 
 def no_code_links():
-    os.chdir('../Data')
+    os.chdir('../Data/CSV')
 
-    links = []
-    for d in os.listdir():
-        if os.path.isdir(d):
-            os.chdir(d)
-            print(os.getcwd())
-            for y in os.listdir():
-                if os.path.isdir(y):
-                    os.chdir(y)
+    links = ['URL Link,File Location,Line#\n']
 
-                    for f in os.listdir():
-                        file = open(f, 'r')
-                        lines = file.readlines()
-                        file.close() 
+    brands = os.listdir()
+    for b in brands:
+        os.chdir(b)
+        years = os.listdir()
+        for y in years:
+            os.chdir(y)
+            models = os.listdir()
+            for m in models:
+                print(" "*100, end='\r')
+                print(b + '/' + y + '/' + m, end='\r')
+                with open(m, 'r') as f:
+                    lines = f.readlines()
 
-                        idx = lines[0].split(",").index("URL")
+                idx = lines[0].rstrip().split(",").index("URL")
 
-                        for i in range(1, len(lines)):
-                            temp = lines[i].split(",")
-                            if not re.search("\d{6}$", temp[idx]) and temp[idx] != "":
-                                links.append(temp[idx] + '\n')
-                            # if temp[idx] == "":
-                            # if temp[idx].isdecimal():
-                                # print(os.getcwd())
-                    os.chdir('../')
+                for i in range(1, len(lines)):
+                    temp = lines[i].split(",")
+                    if not re.search("\d{6}$", temp[idx]) and temp[idx] != "":
+                        links.append(temp[idx].strip() + ',' + b + '/' + y + '/' + m + ',' + str(i+1) + '\n')
+
             os.chdir('../')
-
-    os.chdir('../')
+        os.chdir('../')
+    
+    os.chdir('../../')
     if not os.path.isdir('Log'):
         os.mkdir('Log')
     os.chdir('Log')
 
-    f = open("IncompleteLinks.txt", "w")
-    f.writelines(links)
-    f.close()
+    with open("IncompleteLinks.csv", "w") as f:
+        f.writelines(links)
 
 
 def fix():

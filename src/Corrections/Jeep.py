@@ -336,7 +336,6 @@ class Jeep_Corrections(Correction_Template):
 				case "URL":
 					pass #Implement this if necessary
 				case _:
-					# default case
-					raise ValueError("No matching attribute for " + k)
+					pass # default case
 
 		return result

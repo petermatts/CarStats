@@ -167,8 +167,7 @@ def makeHelpers():
 
             data += [
                 '\t\t\t\tcase _:\n',
-                '\t\t\t\t\t# default case\n',
-                '\t\t\t\t\traise ValueError("No matching attribute for " + k)\n',
+                '\t\t\t\t\tpass # default case\n',
                 '\n',
                 '\t\treturn result\n'
             ]

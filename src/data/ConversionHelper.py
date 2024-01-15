@@ -97,7 +97,7 @@ def KeyMap(webspecs: dict[str, str]) -> dict[str, str]:
         'Displacement (liters/cubic inches)': lambda k, v: {'Displacement (Liters)': v.split('/')[0].replace('L', '').strip()},
         'Maximum Horsepower @ RPM': Horsepower,
         'Maximum Torque @ RPM': Torque,
-        'Transmission Description': lambda k, v: {'Transmission': v.replace('Transmission', '').replace('w/OD').strip()}, #? change
+        'Transmission Description': lambda k, v: {'Transmission': v.replace('Transmission', '').replace('w/OD', '').strip()}, #? change
         'Number of Transmission Speeds': lambda k, v: {'Transmission Speeds': v},
         'EPA Fuel Economy combined/city/highway (mpg)': MPG,
         'EPA Fuel Economy Equivalent (for hybrid and electric vehicles) combined/city/highway (MPGe)': MPG,
@@ -117,7 +117,7 @@ def KeyMap(webspecs: dict[str, str]) -> dict[str, str]:
 
     for key in webspecs.keys():
         addition = switch.get(key, default)
-        specs.update(addition(k = key, v = webspecs[key]))
+        specs.update(addition(k = key, v = webspecs[key].replace(',', '')))
 
     return specs
 

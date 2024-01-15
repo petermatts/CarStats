@@ -9,10 +9,10 @@ import json
 import yaml
 import sys
 
-# if os.getcwd() + '/../' not in sys.path:
-    # sys.path.append(os.getcwd() + '/../')
+if os.getcwd() + '/../' not in sys.path:
+    sys.path.append(os.getcwd() + '/../')
 
-# from Correction import Correction
+from Correction import Correction
 from ConversionHelper import KeyMap
 
 cwd = os.getcwd()
@@ -27,7 +27,7 @@ def YAML_TO_JSON(brand = None):
     for b in brands:
         if brand != None and brand != b:
             continue
-        # print("Converting", b)
+
         os.chdir(b)
         if not os.path.exists('../../JSON/' + b):
             os.mkdir('../../JSON/' + b)
@@ -61,6 +61,8 @@ def YAML_TO_JSON(brand = None):
 
 
 def JSON_TO_CSV(brand = None):
+    C = Correction()
+
     if not os.path.exists('../../Data/CSV'):
         os.mkdir('../../Data/CSV')
 
@@ -71,9 +73,11 @@ def JSON_TO_CSV(brand = None):
 
     brands = os.listdir()
     for b in brands:
+        B = b.replace('-', '')
+
         if brand != None and brand != b:
             continue
-        # print("Converting", b)
+
         os.chdir(b)
         if not os.path.exists('../../CSV/' + b):
             os.mkdir('../../CSV/' + b)
@@ -94,9 +98,11 @@ def JSON_TO_CSV(brand = None):
                 fname = '../../../CSV/' + b + '/' + y + '/' + fname
 
                 lines = [header]
-                for d in data:
+                for D in data:
                     line = ''
-                    # TODO intercept and make corrections here
+
+                    d = C.fix(D, B) # intercept and make corrections here
+
                     for h in header.rstrip().split(','):
                         attr = d.get(h, '')
                         if attr is not None and attr.lower() not in ['na', 'n/a']:
