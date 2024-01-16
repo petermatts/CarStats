@@ -134,7 +134,7 @@ def makeHelpers():
     def makeCorrectionHelperFiles():
         for b in BRANDS:
             data = [
-                '# Automatically generated file - DO NOT EDIT\n',
+                '# Automatically generated file template\n',
                 '\n',
                 'import os\n',
                 'import sys\n',

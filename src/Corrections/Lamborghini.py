@@ -1,4 +1,4 @@
-# Automatically generated file - DO NOT EDIT
+# Automatically generated file template
 
 import os
 import sys
