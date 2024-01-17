@@ -2,6 +2,7 @@
 
 import json
 import yaml
+import csv as CSV
 import os
 import sys
 
@@ -23,7 +24,7 @@ def _getAttrs():
 
     return attributes
 
-def gatherBrand(attr: str, yam: bool):
+def gatherBrand(attr: str, yam: bool, csv: bool):
     """Gathers all data amoungst attribute. Function run within brand directory"""
     values = set()
     
@@ -35,6 +36,11 @@ def gatherBrand(attr: str, yam: bool):
             with open(m, 'r') as f:
                 if yam:
                     data = yaml.safe_load(f)
+                elif csv:
+                    reader = CSV.DictReader(f)
+                    data = list()
+                    for row in reader:
+                        data.append(row)
                 else:
                     data = json.load(f)
 
@@ -45,23 +51,25 @@ def gatherBrand(attr: str, yam: bool):
         os.chdir('..')
     return values
 
-def getAttr(attr: str, brand: str = None, yam: bool = False):
+def getAttr(attr: str, brand: str = None, yam: bool = False, csv: bool = False):
     cwd = os.getcwd()
     if yam:
         os.chdir("../Data/YAML")
+    elif csv:
+        os.chdir("../Data/CSV")
     else:
         os.chdir("../Data/JSON")
     values = set()
 
     if brand != None:
         os.chdir(brand)
-        values = gatherBrand(attr, yam)
+        values = gatherBrand(attr, yam, csv)
     else:
         brands = os.listdir()
         values = set()
         for b in brands:
             os.chdir(b)
-            values.union(gatherBrand(attr, yam))
+            values.union(gatherBrand(attr, yam, csv))
             os.chdir('..')
 
     os.chdir(cwd)
@@ -80,6 +88,8 @@ def run():
     attrs = _getAttrs()
     
     yam = "yaml" in map(lambda x: x.lower(), args)
+    csv = "csv" in map(lambda x: x.lower(), args)
+    assert(not (yam and csv))
 
     if len(args) >= 2:
         brand = args[0]
@@ -91,17 +101,18 @@ def run():
             print("Invalid brand")
             return
         
-        return getAttr(attr, brand=brand, yam=yam)
+        return getAttr(attr, brand=brand, yam=yam, csv=csv)
     elif len(args) >= 1:
         print("Warning, action not recommented - gathering attribute values for all brands")
         attr = args[0]
         if attr in brands:
             print("Missing attribute")
+            return
         elif not yam and attr not in attrs:
             print("Invalid attribute")
             return
         
-        return getAttr(attr, yam=yam)
+        return getAttr(attr, yam=yam, csv=csv)
     else:
         print("Wrong number of arguments")
         return

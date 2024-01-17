@@ -30,11 +30,22 @@ class Acura_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "ilx":	result[k] = "ILX"
+						case "integra": result[k] = "Integra"
+						case "mdx": result[k] = "MDX"
+						case "nsx": result[k] = "NSX"
+						case "rdx": result[k] = "RDX"
+						case "rl": result[k] = "RL"
+						case "rlx": result[k] = "RLX"
+						case "tl": result[k] = "TL"
+						case "tlx": result[k] = "TLX"
+						case "tsx": result[k] = "TSX"
+						case "zdx": result[k] = "ZDX"
 				case "Style":
-					pass #Implement this if necessary
+					result[k] = result[k].replace(result["Brand"], "").strip()
 				case "Trim":
-					pass #Implement this if necessary
+					result[k] = result[k].replace(result["Model"], "").replace("with ", "w/").replace("and", "&").strip()
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":

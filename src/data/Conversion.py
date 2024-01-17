@@ -105,7 +105,7 @@ def JSON_TO_CSV(brand = None):
 
                     for h in header.rstrip().split(','):
                         attr = d.get(h, '')
-                        if attr is not None and attr.lower() not in ['na', 'n/a']:
+                        if attr is not None and attr.lower() not in ['na', 'n/a', '-TBD-', '-tbd-']:
                             line += attr
                         line += ','
                     lines.append(line[:-1] + '\n') # remove last comma and add newline
