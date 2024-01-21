@@ -117,7 +117,9 @@ class LandRover_Corrections(Correction_Template):
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
 					pass #Implement this if necessary
-				case "Range city/highway (miles)":
+				case "Range City (Miles)":
+					pass #Implement this if necessary
+				case "Range Highway (Miles)":
 					pass #Implement this if necessary
 				case "Aux Fuel Tank Capacity (gallons)":
 					pass #Implement this if necessary

@@ -53,7 +53,8 @@
         "MPGe (highway)": true,
         "MPGe (combined)": true,
         "Fuel Capacity (Gallons)": true,
-        "Range city/highway (miles)": true,
+        "Range City (Miles)": false,
+        "Range Highway (Miles)": false,
         "Aux Fuel Tank Capacity (gallons)": false,
         "EPA Greenhouse Gas Score": false,
         "CO2 Emissions 15K mi/year (tons)": false

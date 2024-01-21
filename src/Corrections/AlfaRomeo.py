@@ -28,13 +28,28 @@ class AlfaRomeo_Corrections(Correction_Template):
 				case "Year":
 					pass #Implement this if necessary
 				case "Brand":
-					pass #Implement this if necessary
+					result[k] = result[k].replace("-", " ")
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "4c":
+							result[k] = "4C"
+						case "guilia":
+							result[k] = "Guilia"
+						case "guilia-quadrifoglio":
+							result[k] = "Guilia Quadrifoglio"
+						case "stelvio":
+							result[k] = "Stelvio"
+						case "stelvio-quadrifoglio":
+							result[k] = "Stelvio Quadrifoglio"
+						case "tonale":
+							result[k] = "Tonale"
 				case "Style":
-					pass #Implement this if necessary
+					result[k] = result[k].replace("Alfa Romeo ", "")
 				case "Trim":
-					pass #Implement this if necessary
+					temp = result[k]
+					temp = temp.replace(result["Model"], "")
+					temp = temp.replace("Coupe Coupe", "Coupe").replace("Spider Spider", "Spider").replace("Cpe", "Coupe")
+					result[k] = temp.strip()
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -117,7 +132,9 @@ class AlfaRomeo_Corrections(Correction_Template):
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
 					pass #Implement this if necessary
-				case "Range city/highway (miles)":
+				case "Range City (Miles)":
+					pass #Implement this if necessary
+				case "Range Highway (Miles)":
 					pass #Implement this if necessary
 				case "Aux Fuel Tank Capacity (gallons)":
 					pass #Implement this if necessary

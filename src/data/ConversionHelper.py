@@ -87,6 +87,17 @@ def KeyMap(webspecs: dict[str, str]) -> dict[str, str]:
         except:
             return {}
         
+    def Range(k: str = '', v: str = ''):
+        r = v.split(' / ')
+        if len(r) > 1:
+            return {
+                "Range City (Miles)": r[0].replace('N/A', ""),
+                "Range Highway (Miles)": r[1].replace('N/A', "")
+            }
+        else:
+            return {}
+
+        
     def default(k: str = '', v: str = ''):
         return {k: v}
 
@@ -112,6 +123,7 @@ def KeyMap(webspecs: dict[str, str]) -> dict[str, str]:
         'Turning Diameter / Radius, curb to curb (feet)': TurnRad,
         'Base Curb Weight (pounds)': lambda k, v: {'Weight (lbs)': v},
         'Maximum Towing Capacity (pounds)': lambda k, v: {'Towing Capacity': v},
+        'Range city/highway (miles)': Range,
         # Add as necessary
     }
 

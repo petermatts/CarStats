@@ -28,13 +28,42 @@ class AstonMartin_Corrections(Correction_Template):
 				case "Year":
 					pass #Implement this if necessary
 				case "Brand":
-					pass #Implement this if necessary
+					result[k] = result[k].replace("-", " ")
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "db11":
+							result[k] = "DB11"
+						case "db12":
+							result[k] = "DB12"
+						case "db9-gt":
+							result[k] = "DB9 GT"
+						case "dbs":
+							result[k] = "DBS"
+						case "dbx":
+							result[k] = "DBX"
+						case "rapide":
+							result[k] = "Rapide"
+						case "vanquish":
+							result[k] = "Vanquish"
+						case"vantage":
+							result[k] = "Vantage"
+						case "virage":
+							result[k] = "Virage"
 				case "Style":
-					pass #Implement this if necessary
+					temp = result[k]
+					temp = temp.replace("2024", "")
+					temp = temp.replace(result["Brand"], "")
+					temp = temp.replace(result["Model"], "")
+					temp = temp.replace("roadster", "Roadster")
+					temp = temp.replace("V-8", "V8")
+					# temp = temp.replace(result["Engine"], "")
+					result[k] = temp.strip()
 				case "Trim":
-					pass #Implement this if necessary
+					temp = result[k]
+					temp = temp.replace("Cpe", "Coupe")
+					temp = temp.replace(result["Model"] + " ", "")
+					temp = temp.replace("DB9", "")
+					result[k] = temp.strip()
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -117,7 +146,9 @@ class AstonMartin_Corrections(Correction_Template):
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
 					pass #Implement this if necessary
-				case "Range city/highway (miles)":
+				case "Range City (Miles)":
+					pass #Implement this if necessary
+				case "Range Highway (Miles)":
 					pass #Implement this if necessary
 				case "Aux Fuel Tank Capacity (gallons)":
 					pass #Implement this if necessary

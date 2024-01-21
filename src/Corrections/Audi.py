@@ -30,13 +30,100 @@ class Audi_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "a3":
+							result[k] = "A3"
+						case "a3-sportback-e-tron":
+							result[k] = "A3 Sportback e-tron"
+						case "a4":
+							result[k] = "A4"
+						case "a4-allroad-quattro":
+							result[k] = "A4 Allroad Quattro"
+						case "a5":
+							result[k] = "A5"
+						case "a5-sportback":
+							result[k] = "A5 Sportback"
+						case "a6":
+							result[k] = "A6"
+						case "a6-allroad":
+							result[k] = "A6 Allroad"
+						case "a7":
+							result[k] = "A7"
+						case "a8":
+							result[k] = "A8"
+						case "e-tron-gt":
+							result[k] = "e-tron GT"
+						case "q3":
+							result[k] = "Q3"
+						case "q4":
+							result[k] = "Q4"
+						case "q4-e-tron":
+							result[k] = "Q4 e-tron"
+						case "q5":
+							result[k] = "Q5"
+						case "q7":
+							result[k] = "Q7"
+						case "q8":
+							result[k] = "Q8"
+						case "q8-e-tron":
+							result[k] = "Q8 e-tron"
+						case "r8":
+							result[k] = "R8"
+						case "rs-q8":
+							result[k] = "RSQ8"
+						case "rs3":
+							result[k] = "RS3"
+						case "rs4":
+							result[k] = "RS4"
+						case "rs5":
+							result[k] = "RS5"
+						case "rs5-sportback":
+							result[k] = "RS5 Sportback"
+						case "rs6-avant":
+							result[k] = "RS6 Avant"
+						case "rs7":
+							result[k] = "RS7"
+						case "s3":
+							result[k] = "S3"
+						case "s4":
+							result[k] = "S4"
+						case "s5":
+							result[k] = "S5"
+						case "s5-sportback":
+							result[k] = "S5 Sportback"
+						case "s6":
+							result[k] = "S6"
+						case "s7":
+							result[k] = "S7"
+						case "s8":
+							result[k] = "S8"
+						case "sq5":
+							result[k] = "SQ5"
+						case "sq7":
+							result[k] = "SQ7"
+						case "sq8":
+							result[k] = "SQ8"
+						case "sq8-e-tron":
+							result[k] = "SQ8 e-tron"
+						case "tt-rs":
+							result[k] = "TT RS"
+						case "tt-tts":
+							if "TTS" in result["Style"]:
+								result[k] = "TTS"
+							else:
+								result[k] = "TT"
 				case "Style":
 					pass #Implement this if necessary
 				case "Trim":
-					pass #Implement this if necessary
+					temp = result[k]
+					temp = temp.replace(result["Model"], "")
+					temp = temp.replace("A4 allroad", "").replace("RS Q8", "").replace("e-tron", "")
+					temp = temp.replace("quattro", "Quattro").replace("AWD", "")
+					temp = temp.replace("Auto", "").replace("Manual", "")
+					result[k] = temp.replace("  ", " ").strip()
 				case "Drivetrain":
-					pass #Implement this if necessary
+					if result[k] == "A":
+						result[k] = "AWD"
 				case "EPA Class":
 					pass #Implement this if necessary
 				case "Engine":
@@ -70,7 +157,10 @@ class Audi_Corrections(Correction_Template):
 				case "Cold Cranking Amps @ 0� F (2nd)":
 					pass #Implement this if necessary
 				case "Transmission":
-					pass #Implement this if necessary
+					if result[k] == "Automatic w/manual shift" or result[k] == "Automatic w/Manual Shift":
+						result[k] = "Automatic w/Manual"
+					elif result[k] == "Automatic CVT":
+						result[k] = "CVT Automatic" # reverse order maybe?
 				case "Transmission Type":
 					pass #Implement this if necessary
 				case "Transmission Speeds":
@@ -116,8 +206,11 @@ class Audi_Corrections(Correction_Template):
 				case "MPGe (combined)":
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
+					if result[k].upper() != "NA":
+						result[k] = str(round(float(result[k]), 1))
+				case "Range City (Miles)":
 					pass #Implement this if necessary
-				case "Range city/highway (miles)":
+				case "Range Highway (Miles)":
 					pass #Implement this if necessary
 				case "Aux Fuel Tank Capacity (gallons)":
 					pass #Implement this if necessary
