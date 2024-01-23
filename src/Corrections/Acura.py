@@ -2,6 +2,7 @@
 
 import os
 import sys
+import re
 
 if os.getcwd() + "/../" not in sys.path:
 	sys.path.append(os.getcwd() + "/../")
@@ -127,7 +128,8 @@ class Acura_Corrections(Correction_Template):
 				case "MPGe (combined)":
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
-					pass #Implement this if necessary
+					if result[k].upper() != "NA":
+						result[k] = str(round(float(result[k]), 1))
 				case "Range City (Miles)":
 					pass #Implement this if necessary
 				case "Range Highway (Miles)":

@@ -2,6 +2,7 @@
 
 import os
 import sys
+import re
 
 if os.getcwd() + "/../" not in sys.path:
 	sys.path.append(os.getcwd() + "/../")
@@ -30,11 +31,35 @@ class Bentley_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "arnage":
+							result[k] = "Arnage"
+						case "azure":
+							result[k] = "Azure"
+						case "bentayga":
+							result[k] = "Bentayga"
+						case "brooklands":
+							result[k] = "Brooklands"
+						case "continental-gt":
+							result[k] = "Continental GT"
+						case "flying-spur":
+							result[k] = "Flying Spur"
+						case "mulsanne":
+							result[k] = "Mulsanne"
+						case "mulsanne-speed":
+							result[k] = "Mulsanne Speed"
 				case "Style":
-					pass #Implement this if necessary
+					temp = result[k]
+					temp = temp.replace(result["Brand"], "").replace(result["Model"], "")
+					temp = temp.replace("hybrid", "Hybrid")
+					temp = temp.replace("convertible", "Convertible").replace("coupe", "Coupe")
+					result[k] = temp.strip()
 				case "Trim":
-					pass #Implement this if necessary
+					temp = result[k]
+					temp = temp.replace(result["Model"], "")
+					temp = temp.replace("Conv", "Convertible").replace("Cpe", "Coupe")
+					temp = temp.replace("Continental", "")
+					result[k] = temp.strip()
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -116,7 +141,8 @@ class Bentley_Corrections(Correction_Template):
 				case "MPGe (combined)":
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
-					pass #Implement this if necessary
+					if result[k].upper() != "NA":
+						result[k] = str(round(float(result[k]), 1))
 				case "Range City (Miles)":
 					pass #Implement this if necessary
 				case "Range Highway (Miles)":

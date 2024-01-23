@@ -138,6 +138,7 @@ def makeHelpers():
                 '\n',
                 'import os\n',
                 'import sys\n',
+                'import re\n',
                 '\n',
                 'if os.getcwd() + "/../" not in sys.path:\n',
                 '\tsys.path.append(os.getcwd() + "/../")\n',

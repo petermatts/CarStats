@@ -2,6 +2,7 @@
 
 import os
 import sys
+import re
 
 if os.getcwd() + "/../" not in sys.path:
 	sys.path.append(os.getcwd() + "/../")
@@ -30,11 +31,103 @@ class BMW_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "1-series":
+							result[k] = "1 Series"
+						case "2-series":
+							result[k] = "2 Series"
+						case "2-series-gran-coupe":
+							result[k] = "2 Series Gran Coupe"
+						case "3-series":
+							result[k] = "3 Series"
+						case "3-series":
+							result[k] = "3 Series Wagon"
+						case "4-series":
+							result[k] = "4 Series"
+						case "4-series-gran-coupe":
+							result[k] = "4 Series Gran Coupe"
+						case "5-series":
+							result[k] = "5 Series"
+						case "6-series":
+							result[k] = "6 Series"
+						case "6-series-gran-turismo":
+							result[k] = "6 Series Gran Turismo"
+						case "7-series":
+							result[k] = "7 Series"
+						case "8-series":
+							result[k] = "8 Series"
+						case "8-series-gran-coupe":
+							result[k] = "8 Series Gran Coupe"
+						case "ix":
+							result[k] = "iX"
+						case "m2":
+							result[k] = "M2"
+						case "m3":
+							result[k] = "M3"
+						case "m4":
+							result[k] = "M4"
+						case "m5":
+							result[k] = "M5"
+						case "m6":
+							result[k] = "M6"
+						case "m6-gran-coupe":
+							result[k] = "M6 Gran Coupe"
+						case "m8":
+							result[k] = "M8"
+						case "m8-gran-coupe":
+							result[k] = "M8 Gran Coupe"
+						case "x1":
+							result[k] = "X1"
+						case "x2":
+							result[k] = "X2"
+						case "x3":
+							result[k] = "X3"
+						case "x3-m":
+							result[k] = "X3 M"
+						case "x4":
+							result[k] = "X4"
+						case "x4-m":
+							result[k] = "X4 M"
+						case "x5":
+							result[k] = "X5"
+						case "x5-m":
+							result[k] = "X5 M"
+						case "x6":
+							result[k] = "X6"
+						case "x6-m":
+							result[k] = "X6 M"
+						case "x7":
+							result[k] = "X7"
+						case "x8":
+							result[k] = "X8"
+						case "xm":
+							result[k] = "XM"
+						case "z4":
+							result[k] = "Z4"
+						case "m5-2023":
+							result[k] = "M5"
 				case "Style":
-					pass #Implement this if necessary
+					temp = result[k]
+					temp = temp.replace(result["Brand"], "").replace(result["Model"], "").replace("XM", "")
+					temp = re.sub(r"\d-(S|s)eries", "", temp)
+					temp = temp.replace("sedan", "Sedan").replace("convertible", "Convertible").replace("coupe", "Coupe").replace("roadster", "Roadster")
+					temp = re.sub(r"(P|p)lug-(I|i)n (H|h)ybrid", "PHEV", temp)
+					temp = re.sub(r"M?\d{2,3}(e|i)", "", temp)
+					temp = temp.replace("sports wagon", "Sports Wagon")
+					result[k] = temp.strip()
 				case "Trim":
-					pass #Implement this if necessary
+					temp = result[k]
+					# temp = temp.replace(result["Model"], "")
+					temp = re.sub(r"(P|p)lug-(I|i)n (H|h)ybrid", "PHEV", temp)
+					temp = temp.replace("Sports Activity Vehicle", "SAV")
+					temp = temp.replace("M Models", "")
+					if "xDrive" in temp and "xDrive " not in temp:
+						temp = temp.replace("xDrive", "xDrive ").replace("AWD", "")
+					if "sDrive" in temp and "sDrive " not in temp:
+						temp = temp.replace("sDrive", "sDrive ").replace("RWD", "")
+					if "eDrive" in temp and "eDrive " not in temp:
+						temp = temp.replace("eDrive", "eDrive ")
+					result[k] = temp.strip()
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -116,7 +209,8 @@ class BMW_Corrections(Correction_Template):
 				case "MPGe (combined)":
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
-					pass #Implement this if necessary
+					if result[k].upper() != "NA":
+						result[k] = str(round(float(result[k]), 1))
 				case "Range City (Miles)":
 					pass #Implement this if necessary
 				case "Range Highway (Miles)":
