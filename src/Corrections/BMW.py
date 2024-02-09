@@ -34,30 +34,20 @@ class BMW_Corrections(Correction_Template):
 					match result[k]:
 						case "1-series":
 							result[k] = "1 Series"
-						case "2-series":
+						case "2-series"|"2-series-gran-coupe":
 							result[k] = "2 Series"
-						case "2-series-gran-coupe":
-							result[k] = "2 Series Gran Coupe"
-						case "3-series":
+						case "3-series"|"3-series-wagon":
 							result[k] = "3 Series"
-						case "3-series":
-							result[k] = "3 Series Wagon"
-						case "4-series":
+						case "4-series"|"4-series-gran-coupe":
 							result[k] = "4 Series"
-						case "4-series-gran-coupe":
-							result[k] = "4 Series Gran Coupe"
 						case "5-series":
 							result[k] = "5 Series"
-						case "6-series":
+						case "6-series"|"6-series-gran-turismo":
 							result[k] = "6 Series"
-						case "6-series-gran-turismo":
-							result[k] = "6 Series Gran Turismo"
 						case "7-series":
 							result[k] = "7 Series"
-						case "8-series":
+						case "8-series"|"8-series-gran-coupe":
 							result[k] = "8 Series"
-						case "8-series-gran-coupe":
-							result[k] = "8 Series Gran Coupe"
 						case "ix":
 							result[k] = "iX"
 						case "m2":
@@ -68,14 +58,10 @@ class BMW_Corrections(Correction_Template):
 							result[k] = "M4"
 						case "m5":
 							result[k] = "M5"
-						case "m6":
+						case "m6"|"m6-gran-coupe":
 							result[k] = "M6"
-						case "m6-gran-coupe":
-							result[k] = "M6 Gran Coupe"
-						case "m8":
+						case "m8"|"m8-gran-coupe":
 							result[k] = "M8"
-						case "m8-gran-coupe":
-							result[k] = "M8 Gran Coupe"
 						case "x1":
 							result[k] = "X1"
 						case "x2":
@@ -107,27 +93,40 @@ class BMW_Corrections(Correction_Template):
 						case "m5-2023":
 							result[k] = "M5"
 				case "Style":
-					temp = result[k]
-					temp = temp.replace(result["Brand"], "").replace(result["Model"], "").replace("XM", "")
-					temp = re.sub(r"\d-(S|s)eries", "", temp)
-					temp = temp.replace("sedan", "Sedan").replace("convertible", "Convertible").replace("coupe", "Coupe").replace("roadster", "Roadster")
-					temp = re.sub(r"(P|p)lug-(I|i)n (H|h)ybrid", "PHEV", temp)
-					temp = re.sub(r"M?\d{2,3}(e|i)", "", temp)
-					temp = temp.replace("sports wagon", "Sports Wagon")
-					result[k] = temp.strip()
+					result[k] = re.sub(r"(P|p)lug-(I|i)n (H|h)ybrid", "PHEV", result[k])
+
+					if "Gran Coupe" in result[k]:
+						result[k] = "Gran Coupe"
+					elif "coupe" in result[k].lower():
+						result[k] = "Coupe"
+					elif "Gran Turismo" in result[k]:
+						result[k] = "Gran Turismo"
+					elif "wagon" in result[k].lower():
+						result[k] = "Wagon"
+					elif "sedan" in result[k].lower():
+						result[k] = "Sedan"
+					elif "roadster" in result[k].lower():
+						result[k] = "Roadster"
+					elif "PHEV" in result[k]:
+						result[k] = "PHEV"
+					elif "ActiveHybrid" in result[k]:
+						result[k] = "ActiveHybrid"
+					elif "ALPINA" in result[k].upper():
+						result[k] = "ALPINA"
+					elif "convertible" in result[k].lower():
+						result[k] = "Convertible"
+					elif "Label Red" in result[k]:
+						result[k] = "Label Red"
+					else:
+						result[k] = ""
 				case "Trim":
-					temp = result[k]
-					# temp = temp.replace(result["Model"], "")
-					temp = re.sub(r"(P|p)lug-(I|i)n (H|h)ybrid", "PHEV", temp)
-					temp = temp.replace("Sports Activity Vehicle", "SAV")
-					temp = temp.replace("M Models", "")
-					if "xDrive" in temp and "xDrive " not in temp:
-						temp = temp.replace("xDrive", "xDrive ").replace("AWD", "")
-					if "sDrive" in temp and "sDrive " not in temp:
-						temp = temp.replace("sDrive", "sDrive ").replace("RWD", "")
-					if "eDrive" in temp and "eDrive " not in temp:
-						temp = temp.replace("eDrive", "eDrive ")
-					result[k] = temp.strip()
+					find = re.search("(M?\d{2,3}\w{0,2})|(X?B\d)", result[k])
+					if find is not None:
+						t = result[k][find.span()[0]:find.span()[1]]
+						# t = re.sub(r"(x|s|e)Drive", "", t)
+						result[k] = t
+					else:
+						result[k] = ""
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -163,7 +162,9 @@ class BMW_Corrections(Correction_Template):
 				case "Cold Cranking Amps @ 0� F (2nd)":
 					pass #Implement this if necessary
 				case "Transmission":
-					pass #Implement this if necessary
+					result[k] = re.sub(r" (S|s)hift", "", result[k])
+					result[k] = result[k].replace("automatic", "Automatic")
+					result[k] = result[k].replace("manual", "Manual")
 				case "Transmission Type":
 					pass #Implement this if necessary
 				case "Transmission Speeds":

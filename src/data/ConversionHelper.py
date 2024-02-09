@@ -97,6 +97,13 @@ def KeyMap(webspecs: dict[str, str]) -> dict[str, str]:
         else:
             return {}
 
+    def urlChecker(k: str = '', v: str = ''):
+        parsed = v.split('/')
+        model = parsed[4]
+        if re.search("-\d{4}$", model) and not re.search("(\d{4}|SILVERADO|SIERRA)-\d{4}$", model):
+            model = model[:-5] # remove possible "-{year}" at the end of the model
+        parsed[4] = model
+        return {k: '/'.join(parsed)}
         
     def default(k: str = '', v: str = ''):
         return {k: v}
@@ -125,6 +132,7 @@ def KeyMap(webspecs: dict[str, str]) -> dict[str, str]:
         'Maximum Towing Capacity (pounds)': lambda k, v: {'Towing Capacity': v},
         'Range city/highway (miles)': Range,
         # Add as necessary
+        'URL': urlChecker # TODO uncomment
     }
 
     for key in webspecs.keys():

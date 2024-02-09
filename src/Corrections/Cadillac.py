@@ -32,11 +32,85 @@ class Cadillac_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "ats":
+							result[k] = "ATS"
+						case "ats-v":
+							result[k] = "ATS-V"
+						case "ct4":
+							result[k] = "CT4"
+						case "ct4-v-blackwing":
+							result[k] = "CT4-V Blackwing"
+						case "ct5":
+							result[k] = "CT5"
+						case "ct5-v-blackwing":
+							result[k] = "CT5-V Blackwing"
+						case "ct6":
+							result[k] = "CT6"
+						case "cts":
+							result[k] = "CTS"
+						case "cts-v":
+							result[k] = "CTS-V"
+						case "dts":
+							result[k] = "DTS"
+						case "elr":
+							result[k] = "ELR"
+						case "escalade-escalade-esv-2023" | "escalade-escalade-esv":
+							# if "ESV" in result["Style"].upper():
+							# 	result[k] = "Escalade ESV"
+							# else:
+							# 	result[k] = "Escalade"
+							result[k] = "Escalade"
+						case "escalade-ext":
+							result[k] = "Escalade EXT"
+						case "lyriq":
+							result[k] = "Lyriq"
+						case "srx":
+							result[k] = "SRX"
+						case "sts":
+							result[k] = "STS"
+						case "xlr":
+							result[k] = "XLR"
+						case "xt4":
+							result[k] = "XT4"
+						case "xt5":
+							result[k] = "XT5"
+						case "xt6":
+							result[k] = "XT6"
+						case "xts":
+							result[k] = "XTS"
 				case "Style":
-					pass #Implement this if necessary
+					temp = result[k]
+					# weird ones here
+					temp = temp.replace("CT4 V", "CT4-V")
+					temp = temp.replace("Backwing", "Blackwing")
+
+					temp = temp.replace(result["Brand"], "").replace(result["Model"], "")
+					temp = temp.replace("-", " ")
+					temp = temp.replace("plug in hybrid", "PHEV")
+					temp = temp.replace("hybrid", "Hybrid")
+					temp = temp.replace("sedan", "Sedan").replace("wagon", "Wagon").replace("coupe", "Coupe")
+
+					result[k] = temp.strip()
 				case "Trim":
-					pass #Implement this if necessary
+					if "Premium" in result[k] and "Luxury" in result[k] and "Platinum" in result[k]:
+						result[k] = "Premium Platinum Luxury"
+					elif "Sport" in result[k] and "Platform" in result[k]:
+						result[k] = "Sport Platform"
+					elif "Premium" in result[k] and "Luxury" in result[k]:
+						result[k] = "Premium Luxury"
+					elif "Luxury" in result[k]:
+						result[k] = "Luxury"
+					elif "Performance" in result[k]:
+						result[k] = "Performance"
+					elif "Premium" in result[k]:
+						result[k] = "Premium"
+					elif "Platinum" in result[k]:
+						result[k] = "Platinum"
+					elif "Sport" in result[k]:
+						result[k] = "Sport"
+					else:
+						result[k] = "" #? or base?
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -72,7 +146,10 @@ class Cadillac_Corrections(Correction_Template):
 				case "Cold Cranking Amps @ 0� F (2nd)":
 					pass #Implement this if necessary
 				case "Transmission":
-					pass #Implement this if necessary
+					result[k] = re.sub(r" (S|s)hift", "", result[k])
+					result[k] = re.sub(r"Continuously Variable Ratio", "CVT", result[k])
+					result[k] = result[k].replace("automatic", "Automatic")
+					result[k] = result[k].replace("manual", "Manual")
 				case "Transmission Type":
 					pass #Implement this if necessary
 				case "Transmission Speeds":
@@ -118,7 +195,8 @@ class Cadillac_Corrections(Correction_Template):
 				case "MPGe (combined)":
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
-					pass #Implement this if necessary
+					if result[k].upper() != "NA":
+						result[k] = str(round(float(result[k]), 1))
 				case "Range City (Miles)":
 					pass #Implement this if necessary
 				case "Range Highway (Miles)":

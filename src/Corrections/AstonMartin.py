@@ -37,7 +37,7 @@ class AstonMartin_Corrections(Correction_Template):
 						case "db12":
 							result[k] = "DB12"
 						case "db9-gt":
-							result[k] = "DB9 GT"
+							result[k] = "DB9" #? DB9 GT
 						case "dbs":
 							result[k] = "DBS"
 						case "dbx":
@@ -51,20 +51,49 @@ class AstonMartin_Corrections(Correction_Template):
 						case "virage":
 							result[k] = "Virage"
 				case "Style":
-					temp = result[k]
-					temp = temp.replace("2024", "")
+					temp = re.sub(r"V-?\d{1,2}","", result[k])
+					temp = temp.replace("2014", "")
 					temp = temp.replace(result["Brand"], "")
 					temp = temp.replace(result["Model"], "")
+					temp = temp.replace("coupe", "Coupe").replace("convertible", "Convertible")
 					temp = temp.replace("roadster", "Roadster")
-					temp = temp.replace("V-8", "V8")
-					# temp = temp.replace(result["Engine"], "")
+					
 					result[k] = temp.strip()
 				case "Trim":
-					temp = result[k]
-					temp = temp.replace("Cpe", "Coupe")
-					temp = temp.replace(result["Model"] + " ", "")
-					temp = temp.replace("DB9", "")
-					result[k] = temp.strip()
+					if "Man" in result[k] or "Manual" in result[k]:
+						if "N420" in result[k]:
+							result[k] = "Manual N420"
+						else:
+							result[k] = "Manual"
+					elif "Sportshift" in result[k]:
+						if "N420" in result[k]:
+							result[k] = "Sportshift N420"
+						elif "Sportshift S" in result[k]:
+							result[k] = "Sportshift S"
+						else:
+							result[k] = "Sportshift"
+					elif "Shadow Edition" in result[k]:
+						result[k] = "Shadow Edition"
+					elif "Carbon Edition" in result[k]:
+						result[k] = "Carbon Edition"
+					elif "OHMSS Edition" in result[k]:
+						result[k] = "OHMSS Edition"
+					elif "F1 Edition" in result[k]:
+						result[k] = "F1 Edition" #?
+					elif "Tag Heuer Edition" in result[k]:
+						result[k] = "Tag Heuer Edition"
+					elif "Bond Edition" in result[k]:
+						result[k] = "Bond Edition"
+					elif "Luxury" in result[k]:
+						result[k] = "Luxury"
+					elif "Ultimate" in result[k]:
+						result[k] = "Ultimate"
+					elif "AMR" in result[k]:
+						result[k] = "AMR"
+					elif "GT" in result[k]:
+						result[k] = "GT"
+					else:
+						result[k] = ""
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -100,7 +129,10 @@ class AstonMartin_Corrections(Correction_Template):
 				case "Cold Cranking Amps @ 0� F (2nd)":
 					pass #Implement this if necessary
 				case "Transmission":
-					pass #Implement this if necessary
+					result[k] = re.sub(r" (S|s)hift", "", result[k])
+					result[k] = re.sub(r"Continuously Variable Ratio", "CVT", result[k])
+					result[k] = result[k].replace("automatic", "Automatic")
+					result[k] = result[k].replace("manual", "Manual")
 				case "Transmission Type":
 					pass #Implement this if necessary
 				case "Transmission Speeds":

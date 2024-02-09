@@ -31,11 +31,62 @@ class Chrysler_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "300-srt":
+							result[k] = "300 SRT"
+						case "aspen":
+							result[k] = "Aspen"
+						case "pacifica":
+							result[k] = "Pacifica"
+						case "pt-cruiser":
+							result[k] = "PT Cruiser"
+						case "sebring":
+							result[k] = "Sebring"
+						case "town-country":
+							result[k] = "Town & Country"
+						case "voyager":
+							result[k] = "Voyager"
 				case "Style":
-					pass #Implement this if necessary
+					if "sedan" in result[k]:
+						result[k] = "Sedan"
+					elif "wagon" in result[k]:
+						result[k] = "Wagon"
+					elif "convertible" in result[k]:
+						result[k] = "Convertible"
+					elif "plug-in hybrid" in result[k]:
+						result[k] = "PHEV"
+					elif "Hybrid" in result[k] or "hybrid" in result[k]:
+						result[k] = "Hybrid"
+					else:
+						result[k] = ""
 				case "Trim":
-					pass #Implement this if necessary
+					# check for editions
+					edition = ""
+					if "John Varvatos Limited Edition" in result[k]:
+						edition = "John Varvatos Limited Edition"
+					elif "John Varvatos Luxury Edition" in result[k]:
+						edition = "John Varvatos Luxury Edition"
+					elif "Alloy Edition" in result[k]:
+						edition = "Alloy Edition"
+					elif "Uptown Edition" in result[k]:
+						edition = "Uptown Edition"
+					elif "Launch Edition" in result[k]:
+						edition = "Launch Edition"
+					elif "Anniversary Edition" in result[k]:
+						edition = "Anniversary Edition"
+					elif "30th Anniversary" in result[k]:
+						edition = "30th Anniversary"
+					elif "35th Anniversary" in result[k]:
+						edition = "35th Anniversary"
+					
+					t = re.search(r"((Platinum|\d{3}\w|Luxury|Limited|Touring|Executive|Pinnacle) ?)+", result[k])
+					if t is not None:
+						trim = result[k][t.span()[0]:t.span()[1]].rstrip()
+						if edition!= "":
+							trim += " " + edition
+					else:
+						trim = edition
+					result[k] = trim
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -71,7 +122,10 @@ class Chrysler_Corrections(Correction_Template):
 				case "Cold Cranking Amps @ 0� F (2nd)":
 					pass #Implement this if necessary
 				case "Transmission":
-					pass #Implement this if necessary
+					result[k] = re.sub(r" (S|s)hift", "", result[k])
+					result[k] = re.sub(r"Continuously Variable Ratio", "CVT", result[k])
+					result[k] = result[k].replace("automatic", "Automatic")
+					result[k] = result[k].replace("manual", "Manual")
 				case "Transmission Type":
 					pass #Implement this if necessary
 				case "Transmission Speeds":
@@ -117,7 +171,8 @@ class Chrysler_Corrections(Correction_Template):
 				case "MPGe (combined)":
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
-					pass #Implement this if necessary
+					if result[k].upper() != "NA":
+						result[k] = str(round(float(result[k]), 1))
 				case "Range City (Miles)":
 					pass #Implement this if necessary
 				case "Range Highway (Miles)":

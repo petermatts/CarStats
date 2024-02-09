@@ -31,11 +31,143 @@ class Chevrolet_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "avalanche":
+							result[k] = "Avalanche"
+						case "aveo":
+							result[k] = "Aveo"
+						case "blazer":
+							result[k] = "Blazer"
+						case "blazer-ev":
+							result[k] = "Blazer EV"
+						case "bolt-euv":
+							result[k] = "Bolt EUV"
+						case "bolt-ev":
+							result[k] = "Bolt EV"
+						# case "camero"|"camaro-z-28"|"camero-zl1":
+						case "camaro":
+							result[k] = "Camero"
+						case "camaro-z-28":
+							result[k] = "Camaro Z 28"
+						case "camaro-zl1":
+							result[k] = "Camaro ZL1"
+						case "city-express":
+							result[k] = "City Express"
+						case "cobalt":
+							result[k] = "Cobalt"
+						case "colorado":
+							result[k] = "Colorado"
+						case "corvette":
+							result[k] = "Corvette"
+						case "corvette-e-ray":
+							result[k] = "Corvette E-Ray"
+						case "corvette-z06":
+							result[k] = "Corvette Z06"
+						case "corvette-zr1":
+							result[k] = "Corvette ZR1"
+						case "cruze":
+							result[k] = "Cruze"
+						case "equinox":
+							result[k] = "Equinox"
+						case "express":
+							result[k] = "Express"
+						case "hhr":
+							result[k] = "HHR"
+						case "impala":
+							result[k] = "Impala"
+						case "malibu":
+							result[k] = "Malibu"
+						case "silverado-1500"|"silverado-1500-zr2"|"silverado-2500hd-3500hd":
+							m = "Silverado"
+							if "1500" in result["Trim"]:
+								m += " 1500"
+							if "2500HD" in result["Trim"]:
+								m += " 2500HD"
+							if "3500HD" in result["Trim"]:
+								m += " 3500HD"
+							if "3500" in result["Trim"]:
+								m += " 3500"
+							if "4500" in result["Trim"]:
+								m += " 4500"
+							if "ZR2" in result["Trim"].upper():
+								m += " ZR2"
+							result[k] = m
+						case "sonic":
+							result[k] = "Sonic"
+						case "spark":
+							result[k] = "Spark"
+						case "spark-ev":
+							result[k] = "Spark EV"
+						case "ss":
+							result[k] = "SS"
+						case "suburban":
+							result[k] = "Suburban"
+						case "tahoe":
+							result[k] = "Tahoe"
+						case "trailblazer":
+							result[k] = "Trailblazer"
+						case "traverse":
+							result[k] = "Traverse"
+						case "trax":
+							result[k] = "Trax"
+						case "volt":
+							result[k] = "Volt"
+
 				case "Style":
-					pass #Implement this if necessary
+					find = re.search(r"((sedan|(C|c)onvertible|(C|c)oupe|hatchback|hybrid|targa|SS|Stingray|(passenger|cargo) van) ?)+", result[k])
+					if find is not None:
+						s = result[k][find.span()[0]:find.span()[1]]
+						s = ' '.join(list(map(lambda x: x.capitalize(), s.split(' '))))
+						result[k] = s.replace("Ss", "SS").rstrip()
+					else:
+						result[k] = ""
 				case "Trim":
-					pass #Implement this if necessary
+					if "Coupe" in result[k] and "Coupe" not in result["Style"]:
+						result["Style"] += "Coupe"
+					if "Cpe" in result[k] and "Coupe" not in result["Style"]:
+						result["Style"] += "Coupe"
+					if "Sdn" in result[k] and "Sedan" not in result["Style"]:
+						result["Style"] += "Sedan"
+					if "Convertible" in result[k] and "Convertible" not in result["Style"]:
+						result["Style"] += "Convertible"
+					if "hybrid" in result[k].lower() and "Hybrid" not in result["Style"]:
+						result["Style"] += "Hybrid"
+
+					if "Express" in result["Model"]:
+						find = re.search(r"Commercial|Cargo|Passenger", result[k])
+						typ = result[k][find.span()[0]:find.span()[1]]
+						if find is not None:
+							t = result[k].split(" ")
+							van = t.index(typ)
+							if van > 0:
+								result[k] = " ".join(t[van:])
+								result[k] = re.sub(r"(2WD|4WD|AWD|FWD|RWD) ", "", result[k])
+								result[k] = re.sub(r"(2|4|Rear|All)-Wheel Drive", "", result[k])
+							else:
+								result[k] = ""
+								
+					elif "Cab" in result["Trim"]:
+						t = result[k].split(" ")
+						cab = t.index("Cab")
+						if cab > 0:
+							result[k] = " ".join(t[cab-1:])
+							result[k] = re.sub(r"(2|4|Rear|All)-Wheel Drive ", "", result[k])
+						else:
+							result[k] = ""
+
+					else: # not a truck or van
+						t = re.search(r"(\d?(\dSS|LS|LTZ?|ZL|LZ|RST?|Premier|ACTIV|Z71)( |w\/)*\d?)+", result[k])
+						if t is not None:
+							trim = result[k][t.span()[0]:t.span()[1]]
+							if " w/" in trim:
+								trim = trim.split(" w/")[1]
+							elif " " in trim:
+								trim = trim.split(" ")[1]
+
+							result[k] = trim.rstrip()
+						else:
+							result[k] = ""
+
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -71,7 +203,9 @@ class Chevrolet_Corrections(Correction_Template):
 				case "Cold Cranking Amps @ 0� F (2nd)":
 					pass #Implement this if necessary
 				case "Transmission":
-					pass #Implement this if necessary
+					result[k] = re.sub(r"Continuously Variable( Ratio)?", "CVT", result[k])
+					result[k] = result[k].replace("automatic", "Automatic")
+					result[k] = result[k].replace("manual", "Manual")
 				case "Transmission Type":
 					pass #Implement this if necessary
 				case "Transmission Speeds":
@@ -117,7 +251,8 @@ class Chevrolet_Corrections(Correction_Template):
 				case "MPGe (combined)":
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
-					pass #Implement this if necessary
+					if result[k].upper() != "NA":
+						result[k] = str(round(float(result[k]), 1))
 				case "Range City (Miles)":
 					pass #Implement this if necessary
 				case "Range Highway (Miles)":

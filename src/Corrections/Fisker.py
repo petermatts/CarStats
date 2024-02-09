@@ -31,11 +31,22 @@ class Fisker_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "karma":
+							result[k] = "Karma"
+						case "ocean":
+							result[k] = "Ocean"
 				case "Style":
-					pass #Implement this if necessary
+					if "Sdn" in result["Trim"]:
+						result[k] = "Sedan"
+					else:
+						result[k] = ""
 				case "Trim":
-					pass #Implement this if necessary
+					t = re.search(r"(Eco(Chic|Sport|Standard)|Extreme|One|Sport|Ultra)", result[k])
+					if t is not None:
+						result[k] = result[k][t.span()[0]:t.span()[1]]
+					else:
+						result[k] = ""
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":

@@ -34,10 +34,10 @@ class AlfaRomeo_Corrections(Correction_Template):
 					match result[k]:
 						case "4c":
 							result[k] = "4C"
-						case "guilia":
-							result[k] = "Guilia"
-						case "guilia-quadrifoglio":
-							result[k] = "Guilia Quadrifoglio"
+						case "giulia":
+							result[k] = "Giulia"
+						case "giulia-quadrifoglio":
+							result[k] = "Giulia Quadrifoglio"
 						case "stelvio":
 							result[k] = "Stelvio"
 						case "stelvio-quadrifoglio":
@@ -45,12 +45,36 @@ class AlfaRomeo_Corrections(Correction_Template):
 						case "tonale":
 							result[k] = "Tonale"
 				case "Style":
-					result[k] = result[k].replace("Alfa Romeo ", "")
-				case "Trim":
 					temp = result[k]
-					temp = temp.replace(result["Model"], "")
-					temp = temp.replace("Coupe Coupe", "Coupe").replace("Spider Spider", "Spider").replace("Cpe", "Coupe")
+					temp = temp.replace("Alfa Romeo ", "").replace(result["Model"], "")
 					result[k] = temp.strip()
+				case "Trim":
+					if "Ti Sport" in result[k]:
+						result[k] = "Ti Sport"
+					elif "Ti Lusso" in result[k]:
+						result[k] = "Ti Lusso"
+					elif "Ti" in result[k]:
+						result[k] = "Ti"
+					elif "Sport" in result[k]:
+						result[k] = "Sport"
+					elif "Lusso" in result[k]:
+						result[k] = "Lusso"
+					elif "Sprint" in result[k]:
+						result[k] = "Sprint"
+					elif "Veloce" in result[k]:
+						result[k] = "Veloce"
+					elif "Estrema" in result[k]:
+						result[k] = "Estrema"
+					elif "Competizione" in result[k]:
+						result[k] = "Competizione"
+					elif "100th Anniversary" in result[k]:
+						result[k] = "100th Anniversary"
+					elif "Coupe" in result[k] or "Cper" in result[k]:
+						result[k] = "Coupe"
+					elif "Spider" in result[k]:
+						result[k] = "Spider"
+					else:
+						result[k] = "Base"
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":

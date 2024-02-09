@@ -55,11 +55,29 @@ class Bentley_Corrections(Correction_Template):
 					temp = temp.replace("convertible", "Convertible").replace("coupe", "Coupe")
 					result[k] = temp.strip()
 				case "Trim":
-					temp = result[k]
-					temp = temp.replace(result["Model"], "")
-					temp = temp.replace("Conv", "Convertible").replace("Cpe", "Coupe")
-					temp = temp.replace("Continental", "")
-					result[k] = temp.strip()
+					if "Speed" in result[k]:
+						result[k] = "Speed"
+					elif "Azure" in result[k] and "First Edition" in result[k]:
+						result[k] = "Azure First Edition"					
+					elif "Azure" in result[k]:
+						result[k] = "Azure"
+					elif "First Edition" in result[k]:
+						result[k] = "First Edition"
+					elif "Activity Edition" in result[k]:
+						result[k] = "Activity Edition"
+					elif "Design Edition" in result[k]:
+						result[k] = "Design Edition"
+					elif "Oddysean Edition" in result[k]:
+						result[k] = "Oddysean Edition"
+					elif "Onyx Edition" in result[k]:
+						result[k] = "Onyx Edition"
+					elif "Mulliner":
+						result[k] = "Mulliner"
+					elif "Supersports" in result[k]:
+						result[k] = "Supersports"
+					else:
+						result[k] = ""
+					
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -95,7 +113,10 @@ class Bentley_Corrections(Correction_Template):
 				case "Cold Cranking Amps @ 0� F (2nd)":
 					pass #Implement this if necessary
 				case "Transmission":
-					pass #Implement this if necessary
+					result[k] = re.sub(r" (S|s)hift", "", result[k])
+					result[k] = re.sub(r"Continuously Variable Ratio", "CVT", result[k])
+					result[k] = result[k].replace("automatic", "Automatic")
+					result[k] = result[k].replace("manual", "Manual")
 				case "Transmission Type":
 					pass #Implement this if necessary
 				case "Transmission Speeds":

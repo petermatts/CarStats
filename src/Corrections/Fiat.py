@@ -31,11 +31,29 @@ class Fiat_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "124-spider":
+							result[k] = "124"
+						case "500":
+							if "500C" in result["Style"]:
+								result[k] = "500C"
+						case "500l":
+							result[k] = "500L"
+						case "500x":
+							result[k] = "500X"
 				case "Style":
-					pass #Implement this if necessary
+					if "Spider" in result[k]:
+						result[k] = "Spider"
+					else:
+						result[k] = ""
 				case "Trim":
-					pass #Implement this if necessary
+					result[k] = re.sub(r"(HB|Hatch)", "Hatchback", result[k])
+					t = re.search(r"((Abarth|Cattiva|Cabrio|Classica|Elaborazione|Lusso|Lounge|Turbo|Easy|(Urbana|GQ|Blue Sky|1957|120th Anniversary|Red Top) (Edition)|Urbana|Sport|Trekking|Plus|Gucci|Retro|Pop|Hatchback|Yacht Club Capri|BATTERY ELECTRIC) ?)+", result[k])
+					if t is not None:
+						trim = result[k][t.span()[0]:t.span()[1]].rstrip()
+						result[k] = trim
+					else:
+						result[k] = ""
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -117,7 +135,8 @@ class Fiat_Corrections(Correction_Template):
 				case "MPGe (combined)":
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
-					pass #Implement this if necessary
+					if result[k].upper() != "NA":
+						result[k] = str(round(float(result[k]), 1))
 				case "Range City (Miles)":
 					pass #Implement this if necessary
 				case "Range Highway (Miles)":

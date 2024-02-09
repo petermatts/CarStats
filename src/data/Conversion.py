@@ -151,7 +151,7 @@ def Gather_Keys() -> list[str]:
 
 #??? write a clean up function before converting ???
 
-if __name__ == '__main__':
+def driver():
     cwd = os.getcwd()
     os.chdir('../../Data/YAML')
     brands = list(map(lambda x: x.lower(), os.listdir()))
@@ -159,8 +159,12 @@ if __name__ == '__main__':
 
     brand = None
     if len(sys.argv) > 1:
-        if len(sys.argv) > 2 and sys.argv[2].lower() in brands:
-            brand = sys.argv[2]
+        if len(sys.argv) > 2:
+            if sys.argv[2].lower() in brands:
+                brand = sys.argv[2]
+            else:
+                print("Invalid Brand:", sys.argv[2])
+                return
         if sys.argv[1].lower() in ['yaml-json', 'yaml2json']:
             YAML_TO_JSON(brand)
         elif sys.argv[1].lower() in ['json-csv', 'json2csv']:
@@ -170,3 +174,7 @@ if __name__ == '__main__':
     else:
         print("Error No Args. Expected one of:\n")
         print("YAML to JSON:\n\tyaml-json\n\tyaml2json\n\nJSON to CSV:\n\tjson-csv\n\tjson2csv")
+
+
+if __name__ == '__main__':
+    driver()

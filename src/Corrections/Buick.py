@@ -31,11 +31,46 @@ class Buick_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "cascada":
+							result[k] = "Cascada"
+						case "enclave":
+							result[k] = "Enclave"
+						case "encore":
+							result[k] = "Encore"
+						case "encore-gx":
+							result[k] = "Encore GX"
+						case "envision":
+							result[k] = "Envision"
+						case "envista":
+							result[k] = "Envista"
+						case "lacrosse":
+							result[k] = "LaCrosse"
+						case "lucerne":
+							result[k] = "Lucerne"
+						case "regal-tourx":
+							result[k] = "Regal TourX"
+						case "verano":
+							result[k] = "Verano"
 				case "Style":
-					pass #Implement this if necessary
+					temp = result[k]
+					temp = temp.replace(result["Brand"], "")
+					temp = temp.replace(result["Model"], "")
+					temp = temp.replace("/", "")
+					result[k] = temp.strip()
 				case "Trim":
-					pass #Implement this if necessary
+					result["Style"] += " "
+					if "conv" in result[k].lower():
+						result["Style"] += "Convertible"
+					elif "sdn" in result[k].lower():
+						result["Style"] += "Sedan"
+					result["Style"] = result["Style"].rstrip()
+			
+					find = re.search(r"(Essence|(Premium|Preferred)( (I|l|\d)+)?|Avenir|Sport Touring|Touring|Super|Convenience)|([A-Z](X|S)[A-Z]?(-\d)?)", result[k])
+					if find is not None:
+						result[k] = result[k][find.span()[0]:find.span()[1]]
+					else:
+						result[k] = "Base"
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -71,7 +106,10 @@ class Buick_Corrections(Correction_Template):
 				case "Cold Cranking Amps @ 0� F (2nd)":
 					pass #Implement this if necessary
 				case "Transmission":
-					pass #Implement this if necessary
+					result[k] = re.sub(r" (S|s)hift", "", result[k])
+					result[k] = re.sub(r"Continuously Variable Ratio", "CVT", result[k])
+					result[k] = result[k].replace("automatic", "Automatic")
+					result[k] = result[k].replace("manual", "Manual")
 				case "Transmission Type":
 					pass #Implement this if necessary
 				case "Transmission Speeds":
@@ -117,7 +155,8 @@ class Buick_Corrections(Correction_Template):
 				case "MPGe (combined)":
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
-					pass #Implement this if necessary
+					if result[k].upper() != "NA":
+						result[k] = str(round(float(result[k]), 1))
 				case "Range City (Miles)":
 					pass #Implement this if necessary
 				case "Range Highway (Miles)":

@@ -31,11 +31,66 @@ class Ferrari_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "296-gtb":
+							result[k] = "296"
+						case "488":
+							result[k] = "488"
+						case "599gtb-fiorano":
+							result[k] = "599GTB Fiorano"
+						case "812":
+							result[k] = "812"
+						case "california-t":
+							result[k] = "California"
+						case "f12berlinetta":
+							result[k] = "F12"
+						case "f430":
+							result[k] = "F430"
+						case "f8-tributo-spider":
+							result[k] = "F8"
+						case "ff":
+							result[k] = "FF"
+						case "gtc4lusso":
+							result[k] = "GTC4Lusso"
+						case "laferrari":
+							result[k] = "LaFerrari"
+						case "portofino":
+							result[k] = "Portofino"
+						case "roma":
+							result[k] = "Roma"
+						case "sf90-stradale":
+							result[k] = "SF90"
 				case "Style":
-					pass #Implement this if necessary
+					if "Tributo / Spider" in result[k] or "Tributo Spider" in result[k]:
+						if "tributo" in result["Trim"].lower():
+							result[k] = "Tributo"
+						elif "spider" in result["Trim"].lower():
+							result[k] = "Spider"
+						else:
+							result[k] = ""
+					else:
+						s = re.search(r"((Pista|GTS|Spider|GTB|Tributo|Scuderia|Competizione| T) ?)+", result[k])
+						if s is not None:
+							style = result[k][s.span()[0]:s.span()[1]].strip()
+							result[k] = style
+						else:
+							result[k] = ""
+
 				case "Trim":
-					pass #Implement this if necessary
+					result[k] = result[k].replace("Cpe", "Coupe")
+					result[k] = result[k].replace("Conv", "Convertible")
+					result[k] = result[k].replace("HB", "Hatchback")
+
+					t = re.search(r"((Coupe|Convertible|\d*M|Competizione|berlinetta|tdf|Hatchback) ?)+", result[k])
+					if t is not None:
+						trim = result[k][t.span()[0]:t.span()[1]].strip()
+						trim = trim.replace("berlinetta", "Berlinetta")
+						trim = trim.replace("tdf", "TDF")
+
+						result[k] = trim
+					else:
+						result[k] = ""
+
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -71,7 +126,8 @@ class Ferrari_Corrections(Correction_Template):
 				case "Cold Cranking Amps @ 0� F (2nd)":
 					pass #Implement this if necessary
 				case "Transmission":
-					pass #Implement this if necessary
+					result[k] = result[k].replace("automatic", "Automatic")
+					result[k] = result[k].replace("manual", "Manual")
 				case "Transmission Type":
 					pass #Implement this if necessary
 				case "Transmission Speeds":
@@ -117,7 +173,8 @@ class Ferrari_Corrections(Correction_Template):
 				case "MPGe (combined)":
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
-					pass #Implement this if necessary
+					if result[k].upper() != "NA":
+						result[k] = str(round(float(result[k]), 1))
 				case "Range City (Miles)":
 					pass #Implement this if necessary
 				case "Range Highway (Miles)":

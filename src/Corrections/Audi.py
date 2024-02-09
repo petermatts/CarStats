@@ -39,7 +39,7 @@ class Audi_Corrections(Correction_Template):
 						case "a4":
 							result[k] = "A4"
 						case "a4-allroad-quattro":
-							result[k] = "A4 Allroad Quattro"
+							result[k] = "A4 Allroad"
 						case "a5":
 							result[k] = "A5"
 						case "a5-sportback":
@@ -114,14 +114,34 @@ class Audi_Corrections(Correction_Template):
 							else:
 								result[k] = "TT"
 				case "Style":
-					pass #Implement this if necessary
-				case "Trim":
 					temp = result[k]
-					temp = temp.replace(result["Model"], "")
-					temp = temp.replace("A4 allroad", "").replace("RS Q8", "").replace("e-tron", "")
-					temp = temp.replace("quattro", "Quattro").replace("AWD", "")
-					temp = temp.replace("Auto", "").replace("Manual", "")
-					result[k] = temp.replace("  ", " ").strip()
+					temp = re.sub(r"\d.0T", "", temp)
+					temp = temp.replace(result["Brand"], "").replace(result["Model"], "")
+					temp = temp.replace("A4 allroad", "").replace("RS Q8", "").replace("RS 4", "")
+					temp = temp.replace("e-Tron", "").replace("e-tron", "").replace("coupe", "Coupe").replace("sedan", "Sedan")
+					temp = temp.replace("cabriolet", "Cabriolet").replace("roadster", "Roadster").replace("hybrid", "Hybrid")
+					temp = temp.replace("2020", "").replace("RS", "").replace("diesel", "")
+					result[k] = temp.replace("/", "").strip()
+				case "Trim":
+					num = ""
+					if "40" in result[k]:
+						num = " 40"
+					elif "45" in result[k]:
+						num = " 45"
+					elif "50" in result[k]:
+						num = " 50"
+					elif "55" in result[k]:
+						num = " 55"
+
+					if "Prestige" in result[k]:
+						result[k] = "Prestige" + num
+					elif "Premium Plus" in result[k]:
+						result[k] = "Premium Plus" + num
+					elif "Premium" in result[k]:
+						result[k] = "Premium" + num
+					else:
+						result[k] = ""
+
 				case "Drivetrain":
 					if result[k] == "A":
 						result[k] = "AWD"
@@ -158,10 +178,12 @@ class Audi_Corrections(Correction_Template):
 				case "Cold Cranking Amps @ 0� F (2nd)":
 					pass #Implement this if necessary
 				case "Transmission":
-					if result[k] == "Automatic w/manual shift" or result[k] == "Automatic w/Manual Shift":
-						result[k] = "Automatic w/Manual"
-					elif result[k] == "Automatic CVT":
+					if result[k] == "Automatic CVT":
 						result[k] = "CVT Automatic" # reverse order maybe?
+					result[k] = re.sub(r" (S|s)hift", "", result[k])
+					result[k] = re.sub(r"Continuously Variable Ratio", "CVT", result[k])
+					result[k] = result[k].replace("automatic", "Automatic")
+					result[k] = result[k].replace("manual", "Manual")
 				case "Transmission Type":
 					pass #Implement this if necessary
 				case "Transmission Speeds":

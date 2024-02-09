@@ -44,9 +44,24 @@ class Acura_Corrections(Correction_Template):
 						case "tsx": result[k] = "TSX"
 						case "zdx": result[k] = "ZDX"
 				case "Style":
-					result[k] = result[k].replace(result["Brand"], "").strip()
+					temp = result[k]
+					temp = temp.replace(result["Brand"], "").replace(result["Model"], "")
+					temp = temp.replace("hybrid", "Hybrid")
+					result[k] = temp.strip()
 				case "Trim":
-					result[k] = result[k].replace(result["Model"], "").replace("with ", "w/").replace("and", "&").strip()
+					# result[k] = result[k].replace(result["Model"], "").replace("with ", "w/").replace("and", "&").strip()
+					if "A-SPEC" in result[k].upper():
+						result[k] = "A-Spec"
+					elif "Advance" in result[k]:
+						result[k] = "Advance"
+					elif "Technology" in result[k]:
+						result[k] = "Technology"
+					elif "Performance" in result[k]:
+						result[k] = "Performance"
+					elif "Sport" in result[k]:
+						result[k] = "Sport"
+					else:
+						result[k] = "Base"
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -82,7 +97,10 @@ class Acura_Corrections(Correction_Template):
 				case "Cold Cranking Amps @ 0� F (2nd)":
 					pass #Implement this if necessary
 				case "Transmission":
-					pass #Implement this if necessary
+					result[k] = re.sub(r" (S|s)hift", "", result[k])
+					result[k] = re.sub(r"Continuously Variable Ratio", "CVT", result[k])
+					result[k] = result[k].replace("automatic", "Automatic")
+					result[k] = result[k].replace("manual", "Manual")
 				case "Transmission Type":
 					pass #Implement this if necessary
 				case "Transmission Speeds":

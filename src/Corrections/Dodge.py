@@ -31,11 +31,73 @@ class Dodge_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "avenger":
+							result[k] = "Avenger"
+						case "caliber":
+							result[k] = "Caliber"
+						case "challenger"|"challenger-srt-demon"|"challenger-srt-srt-hellcat":
+							result[k] = "Challenger"
+						case "charger"|"charger-srt-hellcat":
+							result[k] = "Charger"
+						case "dart":
+							result[k] = "Dart"
+						case "durango"|"durango-srt"|"durango-srt-hellcat":
+							result[k] = "Durango"
+						case "grand-caravan":
+							result[k] = "Grand Caravan"
+						case "hornet":
+							result[k] = "Hornet"
+						case "journey":
+							result[k] = "Journey"
+						case "magnum":
+							result[k] = "Magnum"
+						case "nitro":
+							result[k] = "Nitro"
+						case "viper":
+							result[k] = "Viper"
+
 				case "Style":
-					pass #Implement this if necessary
+					s = re.search(r"((SRT\d*|\d{3}|Demon|hybrid|R\/T|Hellcat) ?)+", result[k])
+					if s is not None:
+						style = result[k][s.span()[0]:s.span()[1]].rstrip()
+
+						if style != "SRT Hellcat" and "srt hellcat" in result["Trim"].lower():
+							style = "SRT Hellcat"
+						elif style == "hybrid":
+							style = "Hybrid"
+						elif style == "R/T" and "T/A" in result["Trim"]:
+							style = "T/A"
+						
+						result[k] = style
+					else:
+						if "R/T" in result["Trim"] or "Road/Track" in result["Trim"]:
+							result[k] = "R/T"
+						else:
+							result[k] = ""
+					pass
+
 				case "Trim":
-					pass #Implement this if necessary
+					space = ""
+					if len(result["Style"]) != 0:
+						space = " "
+					
+					result[k] = result[k].replace("Ann.", "Anniversary")
+					if "Sdn" in result[k]:
+						result["Style"] += space + "Sedan"
+					elif "Cpe" in result[k] or "Coupe" in result[k]:
+						result["Style"] += space + "Coupe"
+					elif "Wagon" in result[k] or "Wgn" in result[k]:
+						result["Style"] += space + "Wagon"
+					elif "Conv" in result[k]:
+						result["Style"] += space + "Convertible"
+
+					t = re.search(r"((Redeye|Wide(body)?|Jailbreak|Scat Pack|SXT|SLT|C\/V|GT(C|S)?|Plus|Premium|Express|Citadel|Orange|Sport|Shock|Hemi|Daytona|Crossroad|Platinum|Anodized|Adventurer|Detonator|Limited|Lux|Rallye|Shaker|Value|Crew|Core|ACR|SE| RT|Max|American|Hero|Heat|Launch|(30|35|50|100)th Anniversary|Edition|Appearance Group|Mainstreet) ?)+", result[k])
+					if t is not None:
+						trim = result[k][t.span()[0]:t.span()[1]].rstrip()
+						result[k] = trim
+					else:
+						result[k] = ""
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -71,7 +133,9 @@ class Dodge_Corrections(Correction_Template):
 				case "Cold Cranking Amps @ 0� F (2nd)":
 					pass #Implement this if necessary
 				case "Transmission":
-					pass #Implement this if necessary
+					result[k] = re.sub(r" (S|s)hift", "", result[k])
+					result[k] = result[k].replace("automatic", "Automatic")
+					result[k] = result[k].replace("manual", "Manual")
 				case "Transmission Type":
 					pass #Implement this if necessary
 				case "Transmission Speeds":
@@ -117,7 +181,8 @@ class Dodge_Corrections(Correction_Template):
 				case "MPGe (combined)":
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
-					pass #Implement this if necessary
+					if result[k].upper() != "NA":
+						result[k] = str(round(float(result[k]), 1))
 				case "Range City (Miles)":
 					pass #Implement this if necessary
 				case "Range Highway (Miles)":
