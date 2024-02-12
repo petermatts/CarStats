@@ -31,11 +31,26 @@ class Genesis_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "electrified-gv70"|"gv70":
+							result[k] = "GV70"
+						case "g70":
+							result[k] = "G70"
+						case "electrified-g80"|"g80":
+							result[k] = "G80"
+						case "g80":
+							result[k] = "G80"
+						case "g90":
+							result[k] = "G90"
+						case "gv60":
+							result[k] = "GV60"
 				case "Style":
-					pass #Implement this if necessary
+					if "Electrified" in result[k]:
+						result[k] = "Electrified"
+					elif "sedan":
+						result[k] = "Sedan"
 				case "Trim":
-					pass #Implement this if necessary
+					t = re.search(r"(Advanced|Sport|Design|Dynamic|(Launch) Edition|Ultimate|Premium|Performance|Prestige Signature)", result[k])
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -117,7 +132,8 @@ class Genesis_Corrections(Correction_Template):
 				case "MPGe (combined)":
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
-					pass #Implement this if necessary
+					if result[k].upper() != "NA":
+						result[k] = str(round(float(result[k]), 1))
 				case "Range City (Miles)":
 					pass #Implement this if necessary
 				case "Range Highway (Miles)":

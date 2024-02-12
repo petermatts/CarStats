@@ -31,11 +31,131 @@ class Ford_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "bronco"|"bronco-raptor"|"bronco-sport":
+							result[k] = "Bronco"
+						case "c-max":
+							result[k] = "C-MAX"
+						case "e-transit":
+							result[k] = "E-Transit"
+						case "ecosport":
+							result[k] = "EcoSport"
+						case "edge":
+							result[k] = "Edge"
+						case "escape":
+							result[k] = "Escape"
+						case "expedition-expedition-max":
+							result[k] = "Expedition"
+						case "explorer":
+							result[k] = "Explorer"
+						case "f-150"|"f-150-lightning"|"f-150-raptor":
+							result[k] = "F-150"
+						case "fiesta"|"fiesta-st":
+							result[k] = "Fiesta"
+						case "flex":
+							result[k] = "Flex"
+						case "focus"|"focus-electric"|"focus-rs"|"focus-st":
+							result[k] = "Focus"
+						case "fusion":
+							result[k] = "Fusion"
+						case "maverick":
+							result[k] = "Maverick"
+						case "mustang"|"mustang-mach-e"|"mustang-shelby-gt350-gt350r"|"mustang-shelby-gt500":
+							result[k] = "Mustang"
+						case "ranger"|"ranger-raptor":
+							result[k] = "Ranger"
+						case "super-duty":
+							result[k] = "Super Duty"
+						case "taurus"|"taurus-x":
+							result[k] = "Taurus"
+						case "transit"|"transit-connect":
+							result[k] = "Transit"
+
 				case "Style":
-					pass #Implement this if necessary
+					if "convertible" in result[k]:
+						result[k] = result[k].replace("convertible", "Convertible")
+					if "coupe" in result[k]:
+						result[k] = result[k].replace("coupe", "Coupe")
+					if "sedan" in result[k]:
+						result[k] = result[k].replace("sedan", "Sedan")
+					if "hatchback" in result[k]:
+						result[k] = result[k].replace("hatchback", "Hatchback")
+					if "plug-in hybrid" in result[k]:
+						result[k] = re.sub(r"(P|p)lug-(I|i)n (H|h)ybrid", "PHEV", result[k])
+					if "hybrid" in result[k]:
+						result[k] = result[k].replace("hybrid", "Hybrid")
+
+					if "Mach E" in result[k]:
+						result[k] = result[k].replace("Mach E", "Mach-E")
+
+					s = re.search(r"((Mach-E|GT|RS|ST|EL|Max|350|500|Boss 302|X|SHO|Sport|Energi|Connect|Shelby|Raptor|F-(2|3|4)50|Bullitt|Coupe|Convertible|Sedan|Wagon|Electric|PHEV|Hybrid) ?)+", result[k])
+					if s is not None:
+						style = result[k][s.span()[0]:s.span()[1]].rstrip()
+						style = style.replace("Connect Wagon", "Connect")
+						result[k] = style
+					else:
+						result[k] = ""
+
 				case "Trim":
-					pass #Implement this if necessary
+					if "EcoSport" in result[k]:
+						result[k] = result[k].replace("EcoSport", "")
+					if "LARIAT" in result[k]:
+						result[k] = result[k].replace("LARIAT", "Lariat")
+					if "SuperCab" in result[k]:
+						result[k] = result[k].replace("SuperCab", "Super Cab")
+					if "Reg Cab" in result[k]:
+						result[k] = result[k].replace("Reg Cab", "Regular Cab")
+					if "Sup Cab" in result[k]:
+						result[k] = result[k].replace("Sup Cab", "Super Cab")
+					if "SuperCrew" in result[k]:
+						result[k] = result[k].replace("SuperCrew", "Super Crew")
+					
+					if "Transit" in result["Model"]: # van
+						s = re.search(r"T-(1|2|3)50", result[k])
+						style = ""
+						if s is not None:
+							style = result[k][s.span()[0]:s.span()[1]].lstrip()
+							result["Style"] = result["Style"] + " " + style
+						
+						t = re.search(r"((Van|Crew|Wagon|Passenger|Cargo|Chassis) ?)+", result[k])
+						if t is not None:
+							trim = result[k][t.span()[0]:t.span()[1]].rstrip()
+							trim += result[k].split(trim)[1]
+							result[k] = trim
+							if style != "":
+								result[k] = re.sub(r"\s+", " ", result[k].replace(style, ""))
+						else:
+							result[k] = ""
+
+					elif "Cab" in result[k] or "Crew" in result[k]: # truck
+						s = re.search(r"F-(1|2|3|4)50", result[k])
+						style = ""
+						if s is not None:
+							style = result[k][s.span()[0]:s.span()[1]].lstrip()
+							result["Style"] = result["Style"] + " " + style
+
+						t = re.search(r"(XLT?|Platinum|King Ranch|Lariat|Limited)", result[k])
+						trim = ""
+						if t is not None:
+							trim = result[k][t.span()[0]:t.span()[1]]
+
+						temp = result[k].replace("Super Duty", "")
+						c = re.search(r"((Cab|Crew|Super|Regular|\w{3} Chassis) ?)+", temp)
+						if c is not None:
+							cab = temp[c.span()[0]:c.span()[1]]
+							cab = cab + (result[k].split(cab)[1]).replace(trim, "")
+							result[k] = trim + " " + re.sub(r"\s+", " ", re.sub(r"(2|4|A|R|F)WD", "", cab)).rstrip()
+							if style != "":
+								result[k] = re.sub(r"\s+", " ", result[k].replace(style, ""))
+						else:
+							result[k] = ""
+					else:
+						t = re.search(r"((SE(L|S)?|XLT|XLS|EL|Base|Limited|Sport|Advanced| S |ST(-| )Line|Active|Platinum|Titanium|Badlands|King Ranch|Eddie Bauer) ?)+", result[k])
+						if t is not None:
+							trim = result[k][t.span()[0]:t.span()[1]].strip()
+							result[k] = trim
+						else:
+							result[k] = ""
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -71,7 +191,10 @@ class Ford_Corrections(Correction_Template):
 				case "Cold Cranking Amps @ 0� F (2nd)":
 					pass #Implement this if necessary
 				case "Transmission":
-					pass #Implement this if necessary
+					result[k] = re.sub(r" (S|s)hift", "", result[k])
+					result[k] = re.sub(r"Continuously (V|v)ariable (R|r)atio", "CVT", result[k])
+					result[k] = result[k].replace("automatic", "Automatic")
+					result[k] = result[k].replace("manual", "Manual")
 				case "Transmission Type":
 					pass #Implement this if necessary
 				case "Transmission Speeds":
@@ -117,7 +240,8 @@ class Ford_Corrections(Correction_Template):
 				case "MPGe (combined)":
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
-					pass #Implement this if necessary
+					if result[k].upper() != "NA":
+						result[k] = str(round(float(result[k]), 1))
 				case "Range City (Miles)":
 					pass #Implement this if necessary
 				case "Range Highway (Miles)":

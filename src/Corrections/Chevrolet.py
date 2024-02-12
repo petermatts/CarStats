@@ -135,23 +135,25 @@ class Chevrolet_Corrections(Correction_Template):
 
 					if "Express" in result["Model"]:
 						find = re.search(r"Commercial|Cargo|Passenger", result[k])
-						typ = result[k][find.span()[0]:find.span()[1]]
 						if find is not None:
+							typ = result[k][find.span()[0]:find.span()[1]]
 							t = result[k].split(" ")
 							van = t.index(typ)
 							if van > 0:
 								result[k] = " ".join(t[van:])
-								result[k] = re.sub(r"(2WD|4WD|AWD|FWD|RWD) ", "", result[k])
+								result[k] = re.sub(r"((2|4|A|F|R)WD) ", "", result[k])
 								result[k] = re.sub(r"(2|4|Rear|All)-Wheel Drive", "", result[k])
 							else:
 								result[k] = ""
 								
-					elif "Cab" in result["Trim"]:
+					elif "Cab" in result[k]:
 						t = result[k].split(" ")
 						cab = t.index("Cab")
 						if cab > 0:
 							result[k] = " ".join(t[cab-1:])
 							result[k] = re.sub(r"(2|4|Rear|All)-Wheel Drive ", "", result[k])
+							result[k] = re.sub(r"(2|4|A|R|F)WD", "", result[k])
+							result[k] = re.sub(r"\s+", " ", result[k])
 						else:
 							result[k] = ""
 

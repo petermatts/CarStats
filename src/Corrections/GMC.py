@@ -31,11 +31,75 @@ class GMC_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "acadia":
+							result[k] = "Acadia"
+						case "canyon":
+							result[k] = "Canyon"
+						case "envoy":
+							result[k] = "Envoy"
+						case "hummer-ev"|"hummer-ev-suv":
+							result[k] = "Hummer EV"
+						case "savana":
+							result[k] = "Savana"
+						case "sierra-1500"|"sierra-2500hd-3500hd":
+							result[k] = "Sierra"
+						case "terrain":
+							result[k] = "Terrain"
+						case "yukon-yukon-xl":
+							result[k] = "Yukon"
 				case "Style":
-					pass #Implement this if necessary
+					result[k] = result[k].replace("hybrid", "Hybrid")
+					s = re.search(r"SUT|SUV|Hybrid|(1|2|3)500(HD)?", result[k])
+					if s is not None:
+						result[k] = result[k][s.span()[0]:s.span()[1]]
+					else:
+						result[k] = ""
 				case "Trim":
-					pass #Implement this if necessary
+					if result["Model"] in ["Sierra", "Canyon"] or (result["Model"] == "Hummer EV" and result["Style"] != "SUV"): # truck
+						if "Reg Cab" in result[k]:
+							result[k] = result[k].replace("Reg Cab", "Regular Cab")
+
+						t = result[k].split(" ")
+						cab = t.index("Cab")
+						if cab > 0:
+							result[k] = " ".join(t[cab-1:])
+							result[k] = re.sub(r"(2|4|Rear|All)- ?Wheel Drive ?", "", result[k])
+							result[k] = re.sub(r"(2|4|A|R|F)WD", "", result[k])
+							result[k] = re.sub(r"\s+", " ", result[k])
+						else:
+							result[k] = ""
+					elif result["Model"] == "Savana": # van
+						s = re.search(r"(1|2|3|4)500", result[k])
+						style = ""
+						if s is not None:
+							style = result[k][s.span()[0]:s.span()[1]]
+							result["Style"] = style
+
+						find = re.search(r"Commercial|Cargo|Passenger", result[k])
+						if find is not None:
+							typ = result[k][find.span()[0]:find.span()[1]]
+							t = result[k].split(" ")
+							van = t.index(typ)
+							if van > 0:
+								result[k] = " ".join(t[van:])
+								result[k] = re.sub(r"((2|4|A|F|R)WD) ", "", result[k])
+								result[k] = re.sub(r"(2|4|Rear|All)-Wheel Drive", "", result[k])
+								if style!= "":
+									result[k] = re.sub(style + " ", "", result[k])
+							else:
+								result[k] = ""
+					else:
+						t = re.search(r"((SL(E|T)?(-?\d)?|XL|Limited|Denali|Ultimate|(2|3)X|w\/(\d\w{2})) ?)+", result[k])
+						if t is not None:
+							result[k] = result[k][t.span()[0]:t.span()[1]].rstrip()
+							if " w/" in result[k]:
+								temp = result[k].split(" w/")
+								if temp[0] == temp[1]:
+									result[k] = temp[0]
+						else:
+							result[k] = ""
+					
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -117,7 +181,8 @@ class GMC_Corrections(Correction_Template):
 				case "MPGe (combined)":
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
-					pass #Implement this if necessary
+					if result[k].upper() != "NA":
+						result[k] = str(round(float(result[k]), 1))
 				case "Range City (Miles)":
 					pass #Implement this if necessary
 				case "Range Highway (Miles)":

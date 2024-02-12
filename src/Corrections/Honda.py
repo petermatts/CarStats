@@ -31,11 +31,63 @@ class Honda_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "accord":
+							result[k] = "Accord"
+						case "civic"|"civic-si"|"civic-type-r":
+							result[k] = "Civic"
+						case "clarity":
+							result[k] = "Clarity"
+						case "cr-v":
+							result[k] = "CR-V"
+						case "cr-z":
+							result[k] = "CR-Z"
+						case "element":
+							result[k] = "Element"
+						case "fit"|"fit-ev":
+							result[k] = "Fit"
+						case "hr-v":
+							result[k] = "HR-V"
+						case "insight":
+							result[k] = "Insight"
+						case "odyssey":
+							result[k] = "Odyssey"
+						case "passport":
+							result[k] = "Passport"
+						case "pilot":
+							result[k] = "Pilot"
+						case "ridgeline":
+							result[k] = "Ridgeline"
+						case "s2000":
+							result[k] = "S2000"
 				case "Style":
-					pass #Implement this if necessary
+					result[k] = re.sub(r"(P|p)lug-(I|i)n (H|h)ybrid", "PHEV", result[k])
+					result[k] = result[k].replace("hybrid", "Hybrid")
+					result[k] = result[k].replace("coupe", "Coupe")
+					result[k] = result[k].replace("sedan", "Sedan")
+					result[k] = result[k].replace("hatchback", "Hatchback")
+					result[k] = result[k].replace("fuel cell", "Fuel Cell")
+
+					s = re.search(r"(Crosstour|(Sedan )?Hybrid|PHEV|Coupe|Sedan|Hatchback|Si( (Sedan|Coupe))|Type R|EV|Fuel Cell|Electric)", result[k])
+					if s is not None:
+						style = result[k][s.span()[0]:s.span()[1]]
+						if style == "Sedan Hybrid":
+							result[k] = "Hybrid Sedan"
+						result[k] = style
+					else:
+						result[k] = ""
 				case "Trim":
-					pass #Implement this if necessary
+					if result["Model"] == "S2000":
+						if "CR" in result[k]:
+							result[k] = "CR"
+						else:
+							result[k] = ""
+					else:
+						t = re.search(r"((EX(-L)?|LX(-(S|P))?|Sport|Elite|Touring|SE|DX|GX|CR|HPT|RT(L|X|S)?(-(E|T)?)?|(Special|Limited) Edition) ?)+", result[k])
+						if t is not None:
+							result[k] = result[k][t.span()[0]:t.span()[1]].rstrip()
+						else:
+							result[k] = ""
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -71,7 +123,10 @@ class Honda_Corrections(Correction_Template):
 				case "Cold Cranking Amps @ 0� F (2nd)":
 					pass #Implement this if necessary
 				case "Transmission":
-					pass #Implement this if necessary
+					result[k] = re.sub(r" (S|s)hift", "", result[k])
+					result[k] = re.sub(r"Continuously (V|v)ariable( (R|r)atio)?", "CVT", result[k])
+					result[k] = result[k].replace("automatic", "Automatic")
+					result[k] = result[k].replace("manual", "Manual")
 				case "Transmission Type":
 					pass #Implement this if necessary
 				case "Transmission Speeds":
@@ -117,7 +172,8 @@ class Honda_Corrections(Correction_Template):
 				case "MPGe (combined)":
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
-					pass #Implement this if necessary
+					if result[k].upper() != "NA":
+						result[k] = str(round(float(result[k]), 1))
 				case "Range City (Miles)":
 					pass #Implement this if necessary
 				case "Range Highway (Miles)":
