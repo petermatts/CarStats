@@ -31,11 +31,27 @@ class Hummer_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "h3":
+							result[k] = "H3"
 				case "Style":
-					pass #Implement this if necessary
+					if "H3T" in result[k]:
+						result[k] = "T"
+					elif "H3X" in result["Trim"]:
+						result[k] = "X"
+					else:
+						result[k] = ""
+
+					if "SUV" in result["Trim"]:
+						result[k] += " SUV"
+
+					result[k] = result[k].strip()
 				case "Trim":
-					pass #Implement this if necessary
+					t = re.search(r"(Alpha( Leather)?|Adventure|Luxury)", result[k])
+					if t is not None:
+						result[k] = result[k][t.span()[0]:t.span()[1]]
+					else:
+						result[k] = ""
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -117,7 +133,8 @@ class Hummer_Corrections(Correction_Template):
 				case "MPGe (combined)":
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
-					pass #Implement this if necessary
+					if result[k].upper() != "NA":
+						result[k] = str(round(float(result[k]), 1))
 				case "Range City (Miles)":
 					pass #Implement this if necessary
 				case "Range Highway (Miles)":

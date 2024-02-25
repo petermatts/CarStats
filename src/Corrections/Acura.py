@@ -52,16 +52,12 @@ class Acura_Corrections(Correction_Template):
 					# result[k] = result[k].replace(result["Model"], "").replace("with ", "w/").replace("and", "&").strip()
 					if "A-SPEC" in result[k].upper():
 						result[k] = "A-Spec"
-					elif "Advance" in result[k]:
-						result[k] = "Advance"
-					elif "Technology" in result[k]:
-						result[k] = "Technology"
-					elif "Performance" in result[k]:
-						result[k] = "Performance"
-					elif "Sport" in result[k]:
-						result[k] = "Sport"
 					else:
-						result[k] = "Base"
+						t = re.search(r"((Advance|Technology|Performance|Sport|(PMC|Special) Edition) ?)+", result[k])
+						if t is not None:
+							result[k] = result[k][t.span()[0]:t.span()[1]].rstrip()
+						else:
+							result[k] = "Base"
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":

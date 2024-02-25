@@ -31,11 +31,56 @@ class Jaguar_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "e-pace":
+							result[k] = "E-Pace"
+						case "f-pace"|"f-pace-svr":
+							result[k] = "F-Pace"
+						case "f-type":
+							result[k] = "F-Type"
+						case "i-pace":
+							result[k] = "I-Pace"
+						case "xe":
+							result[k] = "XE"
+						case "xf"|"xf-sportbrake":
+							result[k] = "XF"
+						case "xj"|"xjr575":
+							m = re.search(r"XJ(R|L|\d( L)?)(\d{3})?", result['Trim'])
+							if m is not None:
+								result[k] = result['Trim'][m.span()[0]:m.span()[1]]
+							else:
+								result[k] = "XJ"
+						case "xk"|"xkr-xkr-s":
+							m = re.search(r"XKR(-S)?(\d{3})?", result['Trim'])
+							if m is not None:
+								result[k] = result['Trim'][m.span()[0]:m.span()[1]]
+							else:
+								result[k] = "XK"
+
 				case "Style":
-					pass #Implement this if necessary
+					result[k] = re.sub("convertible", "Convertible", result[k])
+					result[k] = re.sub("coupe", "Coupe", result[k])
+					result[k] = re.sub("roadster", "Roadster", result[k])
+
+					s = re.search(r"(SVR|Convertible|Coupe|Vanden Plas|Roadster|Sportbrake)", result[k])
+					if s is not None:
+						result[k] = result[k][s.span()[0]:s.span()[1]]
+					else:
+						if "Supersport" in result[k]:
+							s = re.search(r"(Supersport|Supercharged|Ultimate)", result['Trim'])
+							if s is not None:
+								result[k] = result['Trim'][s.span()[0]:s.span()[1]]
+						else:
+							result[k] = ""
 				case "Trim":
-					pass #Implement this if necessary
+					result[k] = re.sub("Sportbrake", "", result[k])
+
+					t = re.search(r"(((R-)?Sport|(R-)?Dynamic|Premium|Prestige|Portfolio|Touring|Luxury|SVR|H?SE|LWB| S |S$|SE$|P\d{3}|(Limited|British Design|Checkered Flag|First) ?(Edition)?|(75)th Anniversary) ?)+", result[k])
+					if t is not None:
+						result[k] = result[k][t.span()[0]:t.span()[1]].strip()
+					else:
+						result[k] = ""
+
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -71,7 +116,7 @@ class Jaguar_Corrections(Correction_Template):
 				case "Cold Cranking Amps @ 0� F (2nd)":
 					pass #Implement this if necessary
 				case "Transmission":
-					pass #Implement this if necessary
+					result[k] = re.sub(r" (S|s)hift", "", result[k])
 				case "Transmission Type":
 					pass #Implement this if necessary
 				case "Transmission Speeds":
@@ -117,7 +162,8 @@ class Jaguar_Corrections(Correction_Template):
 				case "MPGe (combined)":
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
-					pass #Implement this if necessary
+					if result[k].upper() != "NA":
+						result[k] = str(round(float(result[k]), 1))
 				case "Range City (Miles)":
 					pass #Implement this if necessary
 				case "Range Highway (Miles)":

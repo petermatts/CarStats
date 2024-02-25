@@ -31,11 +31,63 @@ class Kia_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "amanti":
+							result[k] = "Amanti"
+						case "borrego":
+							result[k] = "Borrego"
+						case "cadenza":
+							result[k] = "Cadenza"
+						case "carnival":
+							result[k] = "Carnival"
+						case "ev6":
+							result[k] = "EV6"
+						case "forte"|"forte-koup":
+							result[k] = "Forte"
+						case "k5":
+							result[k] = "K5"
+						case "k900":
+							result[k] = "K900"
+						case "niro"|"niro-ev":
+							result[k] = "Niro"
+						case "optima":
+							result[k] = "Optima"
+						case "rio":
+							result[k] = "Rio"
+						case "rondo":
+							result[k] = "Rondo"
+						case "sedona":
+							result[k] = "Sedona"
+						case "seltos":
+							result[k] = "Seltos"
+						case "sorento":
+							result[k] = "Sorento"
+						case "soul"|"soul-ev":
+							result[k] = "Soul"
+						case "spectra"|"spectra5":
+							result[k] = "Spectra"
+						case "sportage"|"sportage-hybrid":
+							result[k] = "Sportage"
+						case "telluride":
+							result[k] = "Telluride"
 				case "Style":
-					pass #Implement this if necessary
+					result[k] = re.sub("hatchback", "Hatchback", result[k])
+					result[k] = re.sub("Plug-In Hybrid", "PHEV", result[k])
+					result[k] = re.sub("sedan", "Sedan", result[k])
+					result[k] = re.sub("hybrid", "Hybrid", result[k])
+
+					s = re.search(r"PHEV|EV|Hatchback|Sedan|Turbo|Hybrid|GT", result[k])
+					if s is not None:
+						result[k] = result[k][s.span()[0]:s.span()[1]]
+					else:
+						result[k] = ""
+
 				case "Trim":
-					pass #Implement this if necessary
+					t = re.search(r"((EX|LXS?|FE|SXL?|Premium|Wind|Light|Luxury|Limited|Touring|Base| S |Prestige|Sport(age)?|Turbo|DCT|SWB|X-(Line|Pro)|Nightfall) ?)+", result[k])
+					if t is not None:
+						result[k] = result[k][t.span()[0]:t.span()[1]].strip()
+					else:
+						result[k] = ""
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -71,7 +123,8 @@ class Kia_Corrections(Correction_Template):
 				case "Cold Cranking Amps @ 0� F (2nd)":
 					pass #Implement this if necessary
 				case "Transmission":
-					pass #Implement this if necessary
+					result[k] = re.sub(r" (S|s)hift", "", result[k])
+					result[k] = result[k].replace("manual", "Manual")
 				case "Transmission Type":
 					pass #Implement this if necessary
 				case "Transmission Speeds":
@@ -117,7 +170,8 @@ class Kia_Corrections(Correction_Template):
 				case "MPGe (combined)":
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
-					pass #Implement this if necessary
+					if result[k].upper() != "NA":
+						result[k] = str(round(float(result[k]), 1))
 				case "Range City (Miles)":
 					pass #Implement this if necessary
 				case "Range Highway (Miles)":

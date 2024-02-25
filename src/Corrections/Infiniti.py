@@ -31,11 +31,94 @@ class Infiniti_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "ex":
+							if 'EX35' in result['Style']:
+								result[k] = "EX35"
+							elif 'EX37' in result['Style']:
+								result[k] = "EX37"
+							else:
+								result[k] = "EX"
+						case "g":
+							m = re.search(r"G\d\d", result['Trim'])
+							if m is not None:
+								result[k] = result['Trim'][m.span()[0]:m.span()[1]]
+							else:
+								result[k] = "G"
+						case "jx":
+							m = re.search(r"JX\d\d", result['Style'])
+							if m is not None:
+								result[k] = result['Style'][m.span()[0]:m.span()[1]]
+							else:
+								result[k] = "JX"
+						case "m":
+							m = re.search(r"M\d\d", result['Trim'])
+							if m is not None:
+								result[k] = result['Trim'][m.span()[0]:m.span()[1]]
+							else:
+								result[k] = "M"
+						case "q50"|"q50-red-sport-400":
+							result[k] = "Q50"
+						case "q60"|"q60-red-sport-400":
+							result[k] = "Q60"
+						case "q70":
+							result[k] = "Q70"
+						case "qx":
+							m = re.search(r"QX\d\d", result['Trim'])
+							if m is not None:
+								result[k] = result['Trim'][m.span()[0]:m.span()[1]]
+								result[k] = result[k].upper()
+							else:
+								result[k] = "QX"
+						case "qx30":
+							result[k] = "QX30"
+						case "qx40":
+							result[k] = "QX40"
+						case "qx50":
+							result[k] = "QX50"
+						case "qx55":
+							result[k] = "QX55"
+						case "qx60":
+							result[k] = "QX60"
+						case "qx70":
+							result[k] = "QX70"
+						case "qx80":
+							result[k] = "QX80"
 				case "Style":
-					pass #Implement this if necessary
+					result[k] = re.sub(r"convertible", "Convertible", result[k])
+					result[k] = re.sub(r"sedan", "Sedan", result[k])
+					result[k] = re.sub(r"coupe", "Coupe", result[k])
+					result[k] = re.sub(r"hybrid", "Hybrid", result[k])
+
+					s = re.search(r"(Sedan|Convertible|Hybrid|Coupe|Red Sport 400)", result[k])
+					if s is not None:
+						result[k] = result[k][s.span()[0]:s.span()[1]]
+					else:
+						result[k] = ""
+
 				case "Trim":
-					pass #Implement this if necessary
+					result[k] = re.sub(r"PREMIUM", "Premium", result[k])
+					result[k] = re.sub(r"PURE", "Pure", result[k])
+					result[k] = re.sub(r"LIMITED", "Limited", result[k])
+					result[k] = re.sub(r"SIGNATURE", "Signature", result[k])
+					result[k] = re.sub(r"EDITION", "Edition", result[k])
+					result[k] = re.sub(r"ESSENTIAL", "Essential", result[k])
+					result[k] = re.sub(r"LUXE", "Luxury", result[k])
+					result[k] = re.sub(r"SENSORY", "Sensory", result[k])
+					result[k] = re.sub(r"AUTOGRAPH", "Autograph", result[k])
+					result[k] = re.sub(r"SPORT", "Sport", result[k])
+					result[k] = re.sub(r"SELECT", "Select", result[k])
+
+					t = re.search(r"((Sport|Premium|Luxury|Pure|Autograph|Essential|Journey|Sensory|(Appearance|Signature)? ?Edition|Base) ?)+", result[k])
+					if t is not None:
+						temp = result[k][t.span()[0]:t.span()[1]]
+						if "sport" in temp.lower() and "red" in result[k].lower():
+							result[k] = ""
+						else:
+							result[k] = result[k][t.span()[0]:t.span()[1]]
+					else:
+						result[k] = ""
+
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -71,7 +154,10 @@ class Infiniti_Corrections(Correction_Template):
 				case "Cold Cranking Amps @ 0� F (2nd)":
 					pass #Implement this if necessary
 				case "Transmission":
-					pass #Implement this if necessary
+					result[k] = re.sub(r" (S|s)hift", "", result[k])
+					result[k] = re.sub(r"Continuously (V|v)ariable( (R|r)atio)?", "CVT", result[k])
+					result[k] = result[k].replace("automatic", "Automatic")
+					result[k] = result[k].replace("manual", "Manual")
 				case "Transmission Type":
 					pass #Implement this if necessary
 				case "Transmission Speeds":
@@ -117,7 +203,8 @@ class Infiniti_Corrections(Correction_Template):
 				case "MPGe (combined)":
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
-					pass #Implement this if necessary
+					if result[k].upper() != "NA":
+						result[k] = str(round(float(result[k]), 1))
 				case "Range City (Miles)":
 					pass #Implement this if necessary
 				case "Range Highway (Miles)":

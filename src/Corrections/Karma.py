@@ -31,11 +31,13 @@ class Karma_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "gs-6-revero-gt":
+							result[k] = "GS6 Revero GT"
 				case "Style":
-					pass #Implement this if necessary
+					result[k] = result['Trim'].replace("GS-6 ", "")
 				case "Trim":
-					pass #Implement this if necessary
+					result[k] = ""
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -117,7 +119,8 @@ class Karma_Corrections(Correction_Template):
 				case "MPGe (combined)":
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
-					pass #Implement this if necessary
+					if result[k].upper() != "NA":
+						result[k] = str(round(float(result[k]), 1))
 				case "Range City (Miles)":
 					pass #Implement this if necessary
 				case "Range Highway (Miles)":

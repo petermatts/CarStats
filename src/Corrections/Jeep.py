@@ -31,11 +31,43 @@ class Jeep_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "cherokee":
+							result[k] = "Cherokee"
+						case "commander":
+							result[k] = "Commander"
+						case "compass":
+							result[k] = "Compass"
+						case "gladiator":
+							result[k] = "Gladiator"
+						case "grand-cherokee"|"grand-cherokee-l"|"grand-cherokee-srt"|"grand-cherokee-trackhawk":
+							result[k] = "Grand Cherokee"
+						case "grand-wagoneer":
+							result[k] = "Grand Wagoneer"
+						case "liberty":
+							result[k] = "Liberty"
+						case "patriot":
+							result[k] = "Patriot"
+						case "renegade":
+							result[k] = "Renegade"
+						case "wagoneer":
+							result[k] = "Wagoneer"
+						case "wrangler":
+							result[k] = "Wrangler"
 				case "Style":
-					pass #Implement this if necessary
+					s = re.search(r"(Trailhawk|Trackhawk|PHEV|L$|J(K|L) (Unlimited)?|Rubicon 392|SRT\d?|Unlimited)", result[k])
+					if s is not None:
+						result[k] = result[k][s.span()[0]:s.span()[1]]
+					else:
+						result[k] = ""
 				case "Trim":
-					pass #Implement this if necessary
+					result[k] = re.sub("Lux", "Luxury", result[k])
+
+					t = re.search(r"((Sport( SE?)?|Deserthawk|High|Tide|Justice|Altitude|Latitude|Luxury|Elite|X |L |E |Reserve|RHD|Laredo|(Over|Up)land|North|Unlimited|Plus|Tech Connect|Limited|Backcountry|Carbide|Night|Winter|Arctic|Texas Trail|Chief|Recon|(Rocky|Smoky) Mountain|Black and Tan|Moab|Hard Rock|Call of Duty MW3|Obsidian|Summit|Golden Eagle|Willys|Wheeler|Rubicon|Farout|Sahara|Carb State|Alpine|Series I*|(30|70|75|80)th|\(RED\)|Orange|Sterling|Polar|Freedom|Edition|Anniversary) ?)+", result[k])
+					if t is not None:
+						result[k] = result[k][t.span()[0]:t.span()[1]].rstrip()
+					else:
+						result[k] = ""
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -71,7 +103,7 @@ class Jeep_Corrections(Correction_Template):
 				case "Cold Cranking Amps @ 0� F (2nd)":
 					pass #Implement this if necessary
 				case "Transmission":
-					pass #Implement this if necessary
+					result[k] = re.sub(r"Continuously (V|v)ariable( (R|r)atio)?", "CVT", result[k])
 				case "Transmission Type":
 					pass #Implement this if necessary
 				case "Transmission Speeds":
@@ -117,7 +149,8 @@ class Jeep_Corrections(Correction_Template):
 				case "MPGe (combined)":
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
-					pass #Implement this if necessary
+					if result[k].upper() != "NA":
+						result[k] = str(round(float(result[k]), 1))
 				case "Range City (Miles)":
 					pass #Implement this if necessary
 				case "Range Highway (Miles)":
