@@ -14,7 +14,7 @@ class Mazda_Corrections(Correction_Template):
 	Helper class for Mazda corrections
 	"""
 
-	def fix(self, data: dict) -> dict:
+	def fix(self, data: dict[str, str]) -> dict:
 		"""
 		Makes corrections to the data entry dict
 
@@ -31,11 +31,62 @@ class Mazda_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "cx-3":
+							result[k] = "CX-3"
+						case "cx-30":
+							result[k] = "CX-30"
+						case "cx-5":
+							result[k] = "CX-5"
+						case "cx-50":
+							result[k] = "CX-50"
+						case "cx-7":
+							result[k] = "CX-7"
+						case "cx-9":
+							result[k] = "CX-9"
+						case "cx-90"|"cx-90-hybrid":
+							result[k] = "CX-90"
+						case "mazda-2":
+							result[k] = "Mazda 2"
+						case "mazda-3":
+							result[k] = "Mazda 3"
+						case "mazda-5":
+							result[k] = "Mazda 5"
+						case "mazda-6":
+							result[k] = "Mazda 6"
+						case "mazdaspeed-3":
+							result[k] = "Mazdaspeed 3"
+						case "mx-30":
+							result[k] = "MX-30"
+						case "mx-5-miata":
+							result[k] = "Miata"
+						case "rx-8":
+							result[k] = "RX-8"
+						case "tribute":
+							result[k] = "Tribute"
 				case "Style":
-					pass #Implement this if necessary
+					result[k] = re.sub("sedan", "Sedan", result[k])
+					result[k] = re.sub("sport", "Sport", result[k])
+					result[k] = re.sub("hybrid", "Hybrid", result[k])
+
+					s = re.search(r"((Sports?|Wagon|Hatchback|Hybrid|RF|Sedan) ?)+", result[k])
+					if s is not None:
+						result[k] = result[k][s.span()[0]:s.span()[1]]
+					else:
+						result[k] = ""
+
+					if "conv" in result["Trim"].lower():
+						result[k] += (result[k] + " Convertible").lstrip()
+					
 				case "Trim":
-					pass #Implement this if necessary
+					result[k] = re.sub("Man ", "", result[k])
+					result[k] = re.sub("Auto ", "", result[k])
+
+					t = re.search(r"((Grand|Touring|Sport|Select|Premium|Preferred|Plus|Turbo|Signature|Reserve|SV|PHEV|PRHT|Hard Top|Value|Club|(S|s) |(Carbon|Meridian|Anniversary|Special|Launch|100th)( Edition)?) ?)+", result[k])
+					if t is not None:
+						result[k] = result[k][t.span()[0]:t.span()[1]]
+					else:
+						result[k] = ""
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -71,7 +122,9 @@ class Mazda_Corrections(Correction_Template):
 				case "Cold Cranking Amps @ 0� F (2nd)":
 					pass #Implement this if necessary
 				case "Transmission":
-					pass #Implement this if necessary
+					result[k] = re.sub(r" (S|s)hift", "", result[k])
+					result[k] = result[k].replace("automatic", "Automatic")
+					result[k] = result[k].replace("manual", "Manual")
 				case "Transmission Type":
 					pass #Implement this if necessary
 				case "Transmission Speeds":
@@ -117,7 +170,8 @@ class Mazda_Corrections(Correction_Template):
 				case "MPGe (combined)":
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
-					pass #Implement this if necessary
+					if result[k].upper() != "NA":
+						result[k] = str(round(float(result[k]), 1))
 				case "Range City (Miles)":
 					pass #Implement this if necessary
 				case "Range Highway (Miles)":

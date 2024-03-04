@@ -14,7 +14,7 @@ class Lincoln_Corrections(Correction_Template):
 	Helper class for Lincoln corrections
 	"""
 
-	def fix(self, data: dict) -> dict:
+	def fix(self, data: dict[str, str]) -> dict:
 		"""
 		Makes corrections to the data entry dict
 
@@ -31,11 +31,38 @@ class Lincoln_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "aviator":
+							result[k] = "Aviator"
+						case "continental":
+							result[k] = "Continental"
+						case "corsair":
+							result[k] = "Corsair"
+						case "mkc":
+							result[k] = "MKC"
+						case "mks":
+							result[k] = "MKS"
+						case "mkt":
+							result[k] = "MKT"
+						case "mkx":
+							result[k] = "MKX"
+						case "mkz":
+							result[k] = "MKZ"
+						case "nautilus"|"navigator-navigator-l":
+							result[k] = "Nautilus"
+						case "town-car":
+							result[k] = "Town Car"
 				case "Style":
-					pass #Implement this if necessary
+					if " L" in result[k]:
+						result[k] = "L"
+					elif "hybrid" in result[k]:
+						result[k] = "Hybrid"
 				case "Trim":
-					pass #Implement this if necessary
+					t = re.search(r"((Grand|Touring|Select|Standard|Reserve|Premiere?|EcoBoost|Black Label|Ultimate|Signature|Designer Series|Elite|I+\D) ?)+", result[k])
+					if t is not None:
+						result[k] = result[k][t.span()[0]:t.span()[1]].rstrip()
+					else:
+						result[k] = ""
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -71,7 +98,10 @@ class Lincoln_Corrections(Correction_Template):
 				case "Cold Cranking Amps @ 0� F (2nd)":
 					pass #Implement this if necessary
 				case "Transmission":
-					pass #Implement this if necessary
+					result[k] = re.sub(r" (S|s)hift", "", result[k])
+					result[k] = re.sub(r"Continuously (V|v)ariable( (R|r)atio)?", "CVT", result[k])
+					result[k] = result[k].replace("automatic", "Automatic")
+					result[k] = result[k].replace("manual", "Manual")
 				case "Transmission Type":
 					pass #Implement this if necessary
 				case "Transmission Speeds":
@@ -117,7 +147,8 @@ class Lincoln_Corrections(Correction_Template):
 				case "MPGe (combined)":
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
-					pass #Implement this if necessary
+					if result[k].upper() != "NA":
+						result[k] = str(round(float(result[k]), 1))
 				case "Range City (Miles)":
 					pass #Implement this if necessary
 				case "Range Highway (Miles)":

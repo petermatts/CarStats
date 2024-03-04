@@ -14,7 +14,7 @@ class MercedesMaybach_Corrections(Correction_Template):
 	Helper class for MercedesMaybach corrections
 	"""
 
-	def fix(self, data: dict) -> dict:
+	def fix(self, data: dict[str, str]) -> dict:
 		"""
 		Makes corrections to the data entry dict
 
@@ -31,11 +31,30 @@ class MercedesMaybach_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "57":
+							result[k] = "Maybach 57"
+						case "62":
+							result[k] = "Maybach 62"
+						case "gls600":
+							result[k] = "GLS600"
+						case "landaulet":
+							result[k] = "Landaulet"
+						case "s580-s680":
+							m = re.search(r"S ?(5|6)\d{2}", result['Trim'])
+							if m is not None:
+								result[k] = result['Trim'][m.span()[0]:m.span()[1]].replace()
+							else:
+								result[k] = ""
 				case "Style":
-					pass #Implement this if necessary
+					result[k] = ""
 				case "Trim":
-					pass #Implement this if necessary
+					result[k] = re.sub(r"Sdn", "Sedan", result[k])
+					t = re.search(r"Sedan|SUV", result[k])
+					if t is not None:
+						result[k] = result[k][t.span()[0]:t.span()[1]]
+					else:
+						result[k] = ""
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -117,7 +136,8 @@ class MercedesMaybach_Corrections(Correction_Template):
 				case "MPGe (combined)":
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
-					pass #Implement this if necessary
+					if result[k].upper() != "NA":
+						result[k] = str(round(float(result[k]), 1))
 				case "Range City (Miles)":
 					pass #Implement this if necessary
 				case "Range Highway (Miles)":

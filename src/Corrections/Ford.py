@@ -14,7 +14,7 @@ class Ford_Corrections(Correction_Template):
 	Helper class for Ford corrections
 	"""
 
-	def fix(self, data: dict) -> dict:
+	def fix(self, data: dict[str, str]) -> dict:
 		"""
 		Makes corrections to the data entry dict
 

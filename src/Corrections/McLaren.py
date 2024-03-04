@@ -14,7 +14,7 @@ class McLaren_Corrections(Correction_Template):
 	Helper class for McLaren corrections
 	"""
 
-	def fix(self, data: dict) -> dict:
+	def fix(self, data: dict[str, str]) -> dict:
 		"""
 		Makes corrections to the data entry dict
 
@@ -31,11 +31,38 @@ class McLaren_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "570s-570gt":
+							result[k] = "570GT" if "GT" in result['Style'] else "570S"
+						case "600lt":
+							result[k] = "600LT"
+						case "650s":
+							result[k] = "650S"
+							if "675LT" in result['Trim']:
+								result[k] = "675LT"
+						case "720s":
+							result[k] = "720S"
+						case "765lt":
+							result[k] = "765LT"
+						case "artura":
+							result[k] = "Artura"
+						case "mclaren-gt":
+							result[k] = "GT"
+						case "mp4-12c":
+							result[k] = "MP4 12C"
 				case "Style":
-					pass #Implement this if necessary
+					if "coupe" in result[k] or "Coupe" in result[k]:
+						result[k] = "Coupe"
+					elif "spider" in result[k] or "Spider" in result[k]:
+						result[k] = "Spider"
+					else:
+						result[k] = ""
 				case "Trim":
-					pass #Implement this if necessary
+					t = re.search(r"Performance|Luxury|TechLux|Vision", result[k])
+					if t is not None:
+						result[k] = result[k][t.span()[0]:t.span()[1]]
+					else:
+						result[k] = ""
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -117,7 +144,8 @@ class McLaren_Corrections(Correction_Template):
 				case "MPGe (combined)":
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
-					pass #Implement this if necessary
+					if result[k].upper() != "NA":
+						result[k] = str(round(float(result[k]), 1))
 				case "Range City (Miles)":
 					pass #Implement this if necessary
 				case "Range Highway (Miles)":

@@ -14,7 +14,7 @@ class Mercury_Corrections(Correction_Template):
 	Helper class for Mercury corrections
 	"""
 
-	def fix(self, data: dict) -> dict:
+	def fix(self, data: dict[str, str]) -> dict:
 		"""
 		Makes corrections to the data entry dict
 
@@ -31,11 +31,14 @@ class Mercury_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "mountaineer":
+							result[k] = "Mountaineer"
 				case "Style":
-					pass #Implement this if necessary
+					result[k] = ""
 				case "Trim":
-					pass #Implement this if necessary
+					if "Premier" in result[k]:
+						result[k] = "Premier"
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -117,7 +120,8 @@ class Mercury_Corrections(Correction_Template):
 				case "MPGe (combined)":
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
-					pass #Implement this if necessary
+					if result[k].upper() != "NA":
+						result[k] = str(round(float(result[k]), 1))
 				case "Range City (Miles)":
 					pass #Implement this if necessary
 				case "Range Highway (Miles)":

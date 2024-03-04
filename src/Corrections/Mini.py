@@ -14,7 +14,7 @@ class Mini_Corrections(Correction_Template):
 	Helper class for Mini corrections
 	"""
 
-	def fix(self, data: dict) -> dict:
+	def fix(self, data: dict[str, str]) -> dict:
 		"""
 		Makes corrections to the data entry dict
 
@@ -31,11 +31,31 @@ class Mini_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					# match result[k]:
+					# 	case "cooper-clubman-jcw"|"cooper-clubman-s":
+					# 		result[k] = "Cooper Clubman"
+					# 	case "cooper-countryman-jcw"|"cooper-countryman-s":
+					# 		result[k] = "Cooper Countryman"
+					# 	case "cooper-coupe"|"cooper-coupe-s-jcw"|"cooper-hardtop-convertible":
+					# 		result[k] = "Cooper"
+					result[k] = "Cooper"
 				case "Style":
-					pass #Implement this if necessary
+					result[k] = re.sub(r"(P|p)lug-(I|i)n (H|h)ybrid", "PHEV", result[k])
+					result[k] = result[k].replace("hybrid", "Hybrid")
+					
+					s = re.search(r"Hardtop|Convertible|Coupe|Electric|Hybrid", result[k])
+					if s is not None:
+						result[k] = result[k][s.span()[0]:s.span()[1]]
+					else:
+						result[k] = ""
 				case "Trim":
-					pass #Implement this if necessary
+					result[k] = result[k].replace("John Cooper Works ", "JCW ")
+
+					t = re.search(r"((Countryman|Clubman|Paceman|JCW|Oxford Edition|Classic|GP| SE?|E ) ?)+", result[k])
+					if t is not None:
+						result[k] = result[k][t.span()[0]:t.span()[1]].strip()
+					else:
+						result[k] = ""
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -117,7 +137,8 @@ class Mini_Corrections(Correction_Template):
 				case "MPGe (combined)":
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
-					pass #Implement this if necessary
+					if result[k].upper() != "NA":
+						result[k] = str(round(float(result[k]), 1))
 				case "Range City (Miles)":
 					pass #Implement this if necessary
 				case "Range Highway (Miles)":

@@ -14,7 +14,7 @@ class Lotus_Corrections(Correction_Template):
 	Helper class for Lotus corrections
 	"""
 
-	def fix(self, data: dict) -> dict:
+	def fix(self, data: dict[str, str]) -> dict:
 		"""
 		Makes corrections to the data entry dict
 
@@ -31,11 +31,35 @@ class Lotus_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "elise":
+							result[k] = "Elise"
+						case "emira":
+							result[k] = "Emira"
+						case "evora-gt":
+							result[k] = "Evora GT"
+						case "exige":
+							result[k] = "Exige"
 				case "Style":
-					pass #Implement this if necessary
+					s = re.search(r"GT|SC? \d{3}|S$", result[k])
+					if s is not None:
+						style = result[k][s.span()[0]:s.span()[1]]
+						if '/' in style:
+							t = re.search(r"SC? \d{3}", result[k])
+							if t is not None:
+								result[k] = result['Trim'][t.span()[0]:t.span()[1]]
+							else:
+								result[k] = ""
+						else:
+							result[k] = style
+					else:
+						result[k] = ""
 				case "Trim":
-					pass #Implement this if necessary
+					t = re.search(r"(First|California|72D Collector) Edition|Club Racer|400", result[k])
+					if t is not None:
+						result[k] = result[k][t.span()[0]:t.span()[1]]
+					else:
+						result[k] = ""
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -117,7 +141,8 @@ class Lotus_Corrections(Correction_Template):
 				case "MPGe (combined)":
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
-					pass #Implement this if necessary
+					if result[k].upper() != "NA":
+						result[k] = str(round(float(result[k]), 1))
 				case "Range City (Miles)":
 					pass #Implement this if necessary
 				case "Range Highway (Miles)":

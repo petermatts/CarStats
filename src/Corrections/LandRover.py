@@ -14,7 +14,7 @@ class LandRover_Corrections(Correction_Template):
 	Helper class for LandRover corrections
 	"""
 
-	def fix(self, data: dict) -> dict:
+	def fix(self, data: dict[str, str]) -> dict:
 		"""
 		Makes corrections to the data entry dict
 
@@ -31,11 +31,40 @@ class LandRover_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "defender":
+							result[k] = "Defender"
+						case "discovery"|"discovery-sport":
+							result[k] = "Discovery"
+						case "lr2":
+							result[k] = "LR2"
+						case "lr3":
+							result[k] = "LR3"
+						case "lr4":
+							result[k] = "LR4"
+						case "range-rover"|"range-rover-evoque"|"range-rover-sport"|"range-rover-sport-supercharged-svr"|"range-rover-velar":
+							result[k] = "Range Rover"
 				case "Style":
-					pass #Implement this if necessary
+					result[k] = re.sub(r"coupe", "Coupe", result[k])
+					result[k] = re.sub(r"convertible", "Convertible", result[k])
+
+					s = re.search(r"((90|110|130|Evoque|Coupe|Convertible|Velar|Sport|P400e|PRIMARY|Supercharged|SVR|/|SV) ?)+", result[k])
+					if s is not None:
+						style = result[k][s.span()[0]:s.span()[1]]
+						if '/' in style:
+							result[k] = "Sport " + ("Supercharged" if "Supercharged" in result['Trim'] else "SVR")
+						else:
+							result[k] = style
+
 				case "Trim":
-					pass #Implement this if necessary
+					result[k] = re.sub(r"LUX", "Luxury", result[k])
+
+					t = re.search(r"(((X|R)(-Dynamic)|X |X$|Dynamic|H?SE|LWB|HST|Sport|Turbo|Core|Luxury|Prestige|Premium|Long Wheelbase|Metropolis|LE|((75)th|Carpathian|First|Landmark|Limited|Silver) Edition|Fifty|S |S$|SWB|Autobiography|Pure|Plus|(P|D)\d{3}|Black|Holland|Westminster|Landmark) ?)+", result[k])
+					if t is not None:
+						result[k] = result[k][t.span()[0]:t.span()[1]]
+					else:
+						result[k] = ""
+
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -71,7 +100,7 @@ class LandRover_Corrections(Correction_Template):
 				case "Cold Cranking Amps @ 0� F (2nd)":
 					pass #Implement this if necessary
 				case "Transmission":
-					pass #Implement this if necessary
+					result[k] = re.sub(r" (S|s)hift", "", result[k])
 				case "Transmission Type":
 					pass #Implement this if necessary
 				case "Transmission Speeds":
@@ -117,7 +146,8 @@ class LandRover_Corrections(Correction_Template):
 				case "MPGe (combined)":
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
-					pass #Implement this if necessary
+					if result[k].upper() != "NA":
+						result[k] = str(round(float(result[k]), 1))
 				case "Range City (Miles)":
 					pass #Implement this if necessary
 				case "Range Highway (Miles)":

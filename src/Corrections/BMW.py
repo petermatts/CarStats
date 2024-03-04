@@ -14,7 +14,7 @@ class BMW_Corrections(Correction_Template):
 	Helper class for BMW corrections
 	"""
 
-	def fix(self, data: dict) -> dict:
+	def fix(self, data: dict[str, str]) -> dict:
 		"""
 		Makes corrections to the data entry dict
 
@@ -90,8 +90,6 @@ class BMW_Corrections(Correction_Template):
 							result[k] = "XM"
 						case "z4":
 							result[k] = "Z4"
-						case "m5-2023":
-							result[k] = "M5"
 				case "Style":
 					result[k] = re.sub(r"(P|p)lug-(I|i)n (H|h)ybrid", "PHEV", result[k])
 

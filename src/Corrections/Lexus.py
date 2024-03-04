@@ -14,7 +14,7 @@ class Lexus_Corrections(Correction_Template):
 	Helper class for Lexus corrections
 	"""
 
-	def fix(self, data: dict) -> dict:
+	def fix(self, data: dict[str, str]) -> dict:
 		"""
 		Makes corrections to the data entry dict
 
@@ -31,11 +31,76 @@ class Lexus_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "ct":
+							result[k] = "CT"
+						case "es":
+							result[k] = "ES"
+						case "gs":
+							result[k] = "GS"
+						case "gs-f":
+							result[k] = "GS F"
+						case "gx":
+							result[k] = "GX"
+						case "hs":
+							result[k] = "HS"
+						case "is":
+							result[k] = "IS"
+						case "is-f":
+							result[k] = "IS F"
+						case "lc":
+							result[k] = "LC"
+						case "lfa":
+							result[k] = "LFA"
+						case "ls":
+							result[k] = "LS"
+						case "lx":
+							result[k] = "LX"
+						case "nx":
+							result[k] = "NX"
+						case "rc":
+							result[k] = "RC"
+						case "rc-f":
+							result[k] = "RC F"
+						case "rx":
+							result[k] = "RX"
+						case "rz":
+							result[k] = "RZ"
+						case "sc":
+							result[k] = "SC"
+						case "ux":
+							result[k] = "UX"
 				case "Style":
-					pass #Implement this if necessary
+					result[k] = re.sub("sedan", "Sedan", result[k])
+					result[k] = re.sub("coupe", "Coupe", result[k])
+					result[k] = re.sub("hybrid", "Hybrid", result[k])
+					result[k] = re.sub("convertible", "Convertible", result[k])
+
+
+					m = re.search(r"\d{3}\w*\+?", result[k])
+					if m is not None:
+						mod = result[k][m.span()[0]:m.span()[1]]
+						if '/' in mod:
+							m_prime = re.search(r"\d{3}\w*\+?", result['Trim'])
+							if m_prime is not None:
+								result['Model'] += result[k][m.span()[0]:m.span()[1]]
+						else:
+							result['Model'] += mod
+
+					s = re.search(r"Sedan|Coupe|Convertible|Hybrid", result[k])
+					if s is not None:
+						result[k] = result[k][s.span()[0]:s.span()[1]]
+					else:
+						result[k] = ""
+
 				case "Trim":
-					pass #Implement this if necessary
+					result[k] = re.sub("SPORT", "Sport", result[k])
+
+					t = re.search(r"((Sport|Ultra|Luxury|Premium|F |Performance|Plus|Handling|Appearance|Turbo|Design|(Two|Three) Row|(Launch) Edition|(Inspiration) Series|(Crafted|Black) Line) ?)+", result[k])
+					if t is not None:
+						result[k] = result[k][t.span()[0]:t.span()[1]].rstrip()
+					else:
+						result[k] = ""
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -71,7 +136,10 @@ class Lexus_Corrections(Correction_Template):
 				case "Cold Cranking Amps @ 0� F (2nd)":
 					pass #Implement this if necessary
 				case "Transmission":
-					pass #Implement this if necessary
+					result[k] = re.sub(r" (S|s)hift", "", result[k])
+					result[k] = re.sub(r"Continuously (V|v)ariable( (R|r)atio)?", "CVT", result[k])
+					result[k] = result[k].replace("automatic", "Automatic")
+					result[k] = result[k].replace("manual", "Manual")
 				case "Transmission Type":
 					pass #Implement this if necessary
 				case "Transmission Speeds":
@@ -117,7 +185,8 @@ class Lexus_Corrections(Correction_Template):
 				case "MPGe (combined)":
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
-					pass #Implement this if necessary
+					if result[k].upper() != "NA":
+						result[k] = str(round(float(result[k]), 1))
 				case "Range City (Miles)":
 					pass #Implement this if necessary
 				case "Range Highway (Miles)":

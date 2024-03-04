@@ -11,7 +11,7 @@ def KeyMap(webspecs: dict[str, str]) -> dict[str, str]:
     specs = {}
 
     if 'Engine Type and Required Fuel' not in webspecs.keys():
-        print(webspecs['URL'])
+        # print(webspecs['URL'])
         return webspecs
 
     isElectric = webspecs['Engine Type and Required Fuel'] == 'Electric'
@@ -108,9 +108,16 @@ def KeyMap(webspecs: dict[str, str]) -> dict[str, str]:
     def default(k: str = '', v: str = ''):
         return {k: v}
 
+    def modelYearRemover(model):
+        if re.search("-20\d{2}$", model):
+            model = model[:-5] # remove possible "-{year}" at the end of the model
+        return model
+
     switch = {
+        'Price': lambda k, v: {k: '' if v.startswith('$0') else v},
+        'Model': lambda k, v: {k: modelYearRemover(v)},
         'EPA Classification': lambda k, v: {'EPA Class': v},
-        'Drivetrain': lambda k, v: {'Drivetrain': ''.join(list(filter(lambda c: c.isupper() or c.isdigit(), v)))},
+        'Drivetrain': lambda k, v: {'Drivetrain': ''.join(list(filter(lambda c: c.isupper() or c.isdigit(), re.sub(r"(F|f)our", "4", v))))},
         'Engine Type and Required Fuel': EngineAndGas,
         'Displacement (liters/cubic inches)': lambda k, v: {'Displacement (Liters)': v.split('/')[0].replace('L', '').strip()},
         'Maximum Horsepower @ RPM': Horsepower,
@@ -132,7 +139,7 @@ def KeyMap(webspecs: dict[str, str]) -> dict[str, str]:
         'Maximum Towing Capacity (pounds)': lambda k, v: {'Towing Capacity': v},
         'Range city/highway (miles)': Range,
         # Add as necessary
-        'URL': urlChecker # TODO uncomment
+        'URL': urlChecker
     }
 
     for key in webspecs.keys():

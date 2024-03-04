@@ -14,7 +14,7 @@ class MercedesAMG_Corrections(Correction_Template):
 	Helper class for MercedesAMG corrections
 	"""
 
-	def fix(self, data: dict) -> dict:
+	def fix(self, data: dict[str, str]) -> dict:
 		"""
 		Makes corrections to the data entry dict
 
@@ -31,11 +31,88 @@ class MercedesAMG_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "a35":
+							result[k] = "A35"
+						case "c43":
+							result[k] = "C43"
+						case "c63":
+							result[k] = "C63"
+						case "cla35-cla45":
+							result[k] = "CLA35" if "CLA35" in result['Style'] else "CLA45"
+						case "cls63-s-4matic":
+							result[k] = "CLS63"
+						case "e53":
+							result[k] = "E53" if "E53" in result['Style'] else "E63"
+						case "e63-s-4matic"|"e63-s-wagon":
+							result[k] = "E63"
+						case "eqe53"|"eqe53-suv":
+							m = re.search(r"EQE\d*", result['Style'])
+							if m is not None:
+								result[k] = result['Style'][m.span()[0]:m.span()[1]]
+							else:
+								result[k] = "EQE"
+						case "eqs53":
+							result[k] = "EQS"
+						case "g63":
+							result[k] = "G63"
+						case "gl63":
+							result[k] = "GL63"
+						case "gla35-gla45":
+							result[k] = "GLA45" if "GLA45" in result['Style'] else "GLA35"
+						case "glb35":
+							result[k] = "GLB35"
+						case "glc43-4matic-glc63-4matic"|"glc43-coupe-glc63-coupe":
+							result[k] = "GLC63" if "GLC63" in result['Style'] else "GLC43"
+						case "gle43-coupe-4matic-gle63-s-coupe-4matic":
+							result[k] = "GLE63" if "GLE63" in result['Style'] else "GLE43"
+						case "gle53-4matic-gle63-4matic":
+							m = re.search(r"GLE\d\d", result['Style'])
+							if m is not None:
+								result[k] = result['Style'][m.span()[0]:m.span()[1]]
+							else:
+								result[k] = "GLE"
+						case "gls63-4matic":
+							result[k] = "GLS63"
+						case "gt43-gt53-gt63"|"gt55-gt63":
+							m = re.search(r"(GT (S|C |R ))|GT\d*", result['Style'])
+							if m is not None and '/' not in result['Style']: #? remove the slash case
+								result[k] = result['Style'][m.span()[0]:m.span()[1]].replace(" ", "")
+							elif '/' in result['Style']:
+								if "GT S" in result['Style']:
+									result[k] = "GTS" 
+								elif "GT63 S" in result['Style']:
+									result[k] = "GT63S"
+							else:
+								result[k] = "GT"
+						case "s63":
+							result[k] = "S63"
+						case "sl43-sl55-sl63":
+							m = re.search(r"SL\d*", result['Style'])
+							if m is not None:
+								result[k] = result['Style'][m.span()[0]:m.span()[1]]
+							else:
+								result[k] = "SL"
+						case "slc43":
+							result[k] = "SLC43"
 				case "Style":
-					pass #Implement this if necessary
+					result[k] = re.sub("sedan", "Sedan", result[k])
+					result[k] = re.sub("coupe", "Coupe", result[k])
+					result[k] = re.sub("roadster", "Roadster", result[k])
+					result[k] = re.sub("cabriolet", "Cabriolet", result[k])
+
+					s = re.search(r"Sedan|Wagon|Roadster|Cabriolet|SUV", result[k])
+					if s is not None:
+						result[k] = result[k][s.span()[0]:s.span()[1]]
+					else:
+						result[k] = ""
+
 				case "Trim":
-					pass #Implement this if necessary
+					t = re.search(r"Black Series|4-Door|Squared| S |S-Model", result[k])
+					if t is not None:
+						result[k] = result[k][t.span()[0]:t.span()[1]].strip()
+					else:
+						result[k] = ""
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -117,7 +194,8 @@ class MercedesAMG_Corrections(Correction_Template):
 				case "MPGe (combined)":
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
-					pass #Implement this if necessary
+					if result[k].upper() != "NA":
+						result[k] = str(round(float(result[k]), 1))
 				case "Range City (Miles)":
 					pass #Implement this if necessary
 				case "Range Highway (Miles)":
