@@ -14,7 +14,7 @@ class Saturn_Corrections(Correction_Template):
 	Helper class for Saturn corrections
 	"""
 
-	def fix(self, data: dict) -> dict:
+	def fix(self, data: dict[str, str]) -> dict:
 		"""
 		Makes corrections to the data entry dict
 
@@ -31,11 +31,34 @@ class Saturn_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "aura":
+							result[k] = "Aura"
+						case "outlook":
+							result[k] = "Outlook"
+						case "sky":
+							result[k] = "Sky"
+						case "vue":
+							result[k] = "Vue"
 				case "Style":
-					pass #Implement this if necessary
+					result[k] = result[k].replace("hybrid", "Hybrid")
+					hybrid = ""
+					if "Hyrbid" in result[k]:
+						hybrid = "Hybrid"
+
+					if "Sedan" in result['Trim']:
+						result[k] = "Sedan " + hybrid
+					# elif "Sedan" in result['Trim']:
+					# 	result[k] = "Sedan " + hybrid
+					else:
+						result[k] = hybrid
+
 				case "Trim":
-					pass #Implement this if necessary
+					t = re.search(r"((XE|XR(-L)?|Premium|XV|SE|(Blue|Red|Green|Ruby)|Limited Edition|Line|Carbon|Flash) ?)+", result[k])
+					if t is not None:
+						result[k] = result[k][t.span()[0]:t.span()[1]].rstrip()
+					else:
+						result[k] = ""
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -117,7 +140,8 @@ class Saturn_Corrections(Correction_Template):
 				case "MPGe (combined)":
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
-					pass #Implement this if necessary
+					if result[k].upper() != "NA":
+						result[k] = str(round(float(result[k]), 1))
 				case "Range City (Miles)":
 					pass #Implement this if necessary
 				case "Range Highway (Miles)":

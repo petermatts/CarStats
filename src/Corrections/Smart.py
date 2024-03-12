@@ -14,7 +14,7 @@ class Smart_Corrections(Correction_Template):
 	Helper class for Smart corrections
 	"""
 
-	def fix(self, data: dict) -> dict:
+	def fix(self, data: dict[str, str]) -> dict:
 		"""
 		Makes corrections to the data entry dict
 
@@ -31,11 +31,35 @@ class Smart_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "eq-fortwo":
+							result[k] = "EQ Fortwo"
+						case "fortwo":
+							result[k] = "Fortwo"
 				case "Style":
-					pass #Implement this if necessary
+					result[k] = result[k].replace("hatchback", "Hatchback")
+					result[k] = result[k].replace("Cabrio", "Cabriolet")
+					s = re.search(r"((Electric Drive|Cabriolet|Hatchback) ?)+", result[k])
+					if s is not None:
+						result[k] = result[k][s.span()[0]:s.span()[1]].rstrip()
+					else:
+						result[k] = ""
+
+					if "Coupe" in result['Trim'] or "coupe" in result['Trim'] or "Cpe" in result['Trim']:
+						result[k] += " Coupe"
+						result[k] = result[k].lstrip()
 				case "Trim":
-					pass #Implement this if necessary
+					result[k] = result[k].replace("pure", "Pure")
+					result[k] = result[k].replace("prime", "Prime")
+					result[k] = result[k].replace("proxy", "Proxy")
+					result[k] = result[k].replace("passion", "Passion")
+					
+					t = re.search(r"((Brabus|Passion|Proxy|Pure|Prime) ?)+", result[k])
+					if t is not None:
+						result[k] = result[k][t.span()[0]:t.span()[1]].rstrip()
+					else:
+						result[k] = ""
+
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -71,7 +95,10 @@ class Smart_Corrections(Correction_Template):
 				case "Cold Cranking Amps @ 0� F (2nd)":
 					pass #Implement this if necessary
 				case "Transmission":
-					pass #Implement this if necessary
+					result[k] = re.sub(r" (S|s)hift", "", result[k])
+					result[k] = re.sub(r"Continuously (V|v)ariable( (R|r)atio)?", "CVT", result[k])
+					result[k] = result[k].replace("automatic", "Automatic")
+					result[k] = result[k].replace("manual", "Manual")
 				case "Transmission Type":
 					pass #Implement this if necessary
 				case "Transmission Speeds":
@@ -117,7 +144,8 @@ class Smart_Corrections(Correction_Template):
 				case "MPGe (combined)":
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
-					pass #Implement this if necessary
+					if result[k].upper() != "NA":
+						result[k] = str(round(float(result[k]), 1))
 				case "Range City (Miles)":
 					pass #Implement this if necessary
 				case "Range Highway (Miles)":

@@ -14,7 +14,7 @@ class Saab_Corrections(Correction_Template):
 	Helper class for Saab corrections
 	"""
 
-	def fix(self, data: dict) -> dict:
+	def fix(self, data: dict[str, str]) -> dict:
 		"""
 		Makes corrections to the data entry dict
 
@@ -31,11 +31,39 @@ class Saab_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "9-3":
+							result[k] = "9-3"
+						case "9-5":
+							result[k] = "9-5"
+						case "9-7x":
+							result[k] = "9-7X"
 				case "Style":
-					pass #Implement this if necessary
+					result[k] = result[k].replace("sedan", "Sedan")
+					result[k] = result[k].replace("coupe", "Coupe")
+					result[k] = result[k].replace("convertible", "Convertible")
+
+					s = re.search(r"Coupe|Sedan|Convetible", result[k])
+					if s is not None:
+						result[k] = result[k][s.span()[0]:s.span()[1]]
+					else:
+						if "Wagon" in result['Trim'] or "Wgn" in result['Trim']:
+							result[k] = "Wagon"
+						else:
+							result[k] = ""
 				case "Trim":
-					pass #Implement this if necessary
+					sport = ""
+					if "SportCombi" in result[k]:
+						sport = "SportCombi"
+					elif "Sport" in result[k]:
+						sport = "Sport"
+
+					t = re.search(r"((Comfort|Premium|Griffin|Aero|Turbo(\d|X)?|Independence) ?)+", result[k])
+					if t is not None:
+						result[k] = sport + " " + result[k][t.span()[0]:t.span()[1]].rstrip()
+						result[k] = result[k].strip()
+					else:
+						result[k] = sport
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -71,7 +99,10 @@ class Saab_Corrections(Correction_Template):
 				case "Cold Cranking Amps @ 0� F (2nd)":
 					pass #Implement this if necessary
 				case "Transmission":
-					pass #Implement this if necessary
+					result[k] = re.sub(r" (S|s)hift", "", result[k])
+					result[k] = re.sub(r"Continuously (V|v)ariable( (R|r)atio)?", "CVT", result[k])
+					result[k] = result[k].replace("automatic", "Automatic")
+					result[k] = result[k].replace("manual", "Manual")
 				case "Transmission Type":
 					pass #Implement this if necessary
 				case "Transmission Speeds":
@@ -117,7 +148,8 @@ class Saab_Corrections(Correction_Template):
 				case "MPGe (combined)":
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
-					pass #Implement this if necessary
+					if result[k].upper() != "NA":
+						result[k] = str(round(float(result[k]), 1))
 				case "Range City (Miles)":
 					pass #Implement this if necessary
 				case "Range Highway (Miles)":

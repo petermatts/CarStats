@@ -14,7 +14,7 @@ class RollsRoyce_Corrections(Correction_Template):
 	Helper class for RollsRoyce corrections
 	"""
 
-	def fix(self, data: dict) -> dict:
+	def fix(self, data: dict[str, str]) -> dict:
 		"""
 		Makes corrections to the data entry dict
 
@@ -31,11 +31,30 @@ class RollsRoyce_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "cullinan":
+							result[k] = "Cullinan"
+						case "dawn":
+							result[k] = "Dawn"
+						case "ghost":
+							result[k] = "Ghost"
+						case "phantom":
+							result[k] = "Phantom"
+						case "wraith":
+							result[k] = "Wraith"
 				case "Style":
-					pass #Implement this if necessary
+					if "Series II" in result[k]:
+						result[k] = "Series II"
+					else:
+						result[k] = ""
 				case "Trim":
-					pass #Implement this if necessary
+					result[k] = result[k].replace("Extended Wheelbase", "EWB")
+
+					t = re.search(r"((Black|Badge|Sport|Utility|Sedan|Coupe|Convertible|EWB) ?)+", result[k])
+					if t is not None:
+						result[k] = result[k][t.span()[0]:t.span()[1]].rstrip()
+					else:
+						result[k] = ""
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -117,7 +136,8 @@ class RollsRoyce_Corrections(Correction_Template):
 				case "MPGe (combined)":
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
-					pass #Implement this if necessary
+					if result[k].upper() != "NA":
+						result[k] = str(round(float(result[k]), 1))
 				case "Range City (Miles)":
 					pass #Implement this if necessary
 				case "Range Highway (Miles)":

@@ -14,7 +14,7 @@ class Nissan_Corrections(Correction_Template):
 	Helper class for Nissan corrections
 	"""
 
-	def fix(self, data: dict) -> dict:
+	def fix(self, data: dict[str, str]) -> dict:
 		"""
 		Makes corrections to the data entry dict
 
@@ -31,11 +31,117 @@ class Nissan_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "altima":
+							result[k] = "Altima"
+						case "ariya":
+							result[k] = "Ariya"
+						case "armada":
+							result[k] = "Armada"
+						case "cube":
+							result[k] = "Cube"
+						case "frontier":
+							result[k] = "Frontier"
+						case "gt-r":
+							result[k] = "GT-R"
+						case "juke"|"juke-nismo-nismo-rs":
+							result[k] = "Juke"
+						case "kicks":
+							result[k] = "Kicks"
+						case "leaf":
+							result[k] = "Leaf"
+						case "maxima":
+							result[k] = "Maxima"
+						case "murano":
+							result[k] = "Murano"
+						case "nv1500-2500-3500"|"nv200":
+							result[k] = "NV"
+						case "pathfinder":
+							result[k] = "Pathfinder"
+						case "rogue"|"rogue-sport":
+							result[k] = "Rogue"
+						case "sentra"|"sentra-nismo":
+							result[k] = "Sentra"
+						case "titan"|"titan-xd":
+							result[k] = "Titan"
+						case "versa"|"versa-note":
+							result[k] = "Versa"
+						case "z":
+							m = re.search(r"\d{3}Z", result['Trim'])
+							if m is not None:
+								result[k] = result['Trim'][m.span()[0]:m.span()[1]]
+							else:
+								result[k] = "Z"
+
 				case "Style":
-					pass #Implement this if necessary
+					result[k] = result[k].replace("hybrid", "Hybrid")
+					result[k] = result[k].replace("roadster", "Roadster")
+					result[k] = result[k].replace("coupe", "Coupe")
+					result[k] = result[k].replace("sedan", "Sedan")
+					result[k] = result[k].replace("hatchback", "Hatchback")
+					result[k] = result[k].replace("NISMO", "Nismo")
+
+					m = re.search(r"Hybrid|NISMO|Roadster|XD|Hatchback|CrossCabriolet", result[k])
+					if m is not None:
+						result[k] = result[k][m.span()[0]:m.span()[1]]
+					else:
+						if result['Model'] == 'NV':
+							if "1500" in result['Trim']:
+								result[k] = "1500"
+								if "HD" in result['Trim']:
+									result[k] += "HD"
+							elif "2500" in result['Trim']:
+								result[k] = "2500"
+								if "HD" in result['Trim']:
+									result[k] += "HD"
+							elif "3500" in result['Trim']:
+								result[k] = "3500"
+								if "HD" in result['Trim']:
+									result[k] += "HD"
+							if "200" in result['Trim']:
+								result[k] = "200"
+								if "HD" in result['Trim']:
+									result[k] += "HD"
+						result[k] = ""
+
 				case "Trim":
-					pass #Implement this if necessary
+					result[k] = re.sub(r"ENGAGE", "Engage", result[k])
+					result[k] = re.sub(r"EMPOWER", "Empower", result[k])
+					result[k] = re.sub(r"EVOLVE", "Evolve", result[k])
+					result[k] = re.sub(r"PLATINUM", "Platinum", result[k])
+					result[k] = re.sub(r"PREMIERE", "Premiere", result[k])
+					result[k] = re.sub(r"VENTURE", "Venture", result[k])
+
+					if result['Model'] in ['Titan', 'Frontier']:
+						result[k] = re.sub(r"((A|R|F|2|4)WD|\dx\d) ", "", result[k])
+						result[k] = re.sub(r"(Auto|Automatic) ?", "", result[k])
+						result[k] = re.sub(r"Manual ", "", result[k])
+						result[k] = re.sub(r"(S|L)WB ", "", result[k])
+						result[k] = re.sub(r"(I|V)\d ", "", result[k])
+
+						temp = result[k].split(' ')
+						idx = temp.index('Cab')
+						if idx != -1:
+							result[k] = (' '.join(temp[idx-1:])).strip()
+					elif result['Model'] == "NV":
+						ans = ""
+
+						roof = re.search(r"(Standard|High) Roof|Compact Cargo|Taxi", result[k])
+						if roof is not None:
+							ans = result[k][roof.span()[0]:roof.span()[1]]
+							ans = ans.strip()
+
+						t = re.search(r"SL| S | S$|SV|LE", result[k])
+						if t is not None:
+							ans += " " + result[k][t.span()[0]:t.span()[1]]
+
+						result[k] = ans.strip()
+					else:
+						t = re.search(r"((\+|LE|SE(-R)?|XE|FE|SL|SV|SR| S | S$|Plus|Sport|Tech|Grand|Touring|Platinum|Premium|Titanium|Enthusiast|Empower|Evolve|Premiere|Venture|Engage|Off Road|Krom|Base|(Special) Edition( ONE)?) ?)+", result[k])
+						if t is not None:
+							result[k] = result[k][t.span()[0]:t.span()[1]].strip()
+						else:
+							result[k] = ""
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -117,7 +223,8 @@ class Nissan_Corrections(Correction_Template):
 				case "MPGe (combined)":
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
-					pass #Implement this if necessary
+					if result[k].upper() != "NA":
+						result[k] = str(round(float(result[k]), 1))
 				case "Range City (Miles)":
 					pass #Implement this if necessary
 				case "Range Highway (Miles)":

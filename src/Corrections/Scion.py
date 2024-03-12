@@ -14,7 +14,7 @@ class Scion_Corrections(Correction_Template):
 	Helper class for Scion corrections
 	"""
 
-	def fix(self, data: dict) -> dict:
+	def fix(self, data: dict[str, str]) -> dict:
 		"""
 		Makes corrections to the data entry dict
 
@@ -31,11 +31,36 @@ class Scion_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "fr-s":
+							result[k] = "FR-S"
+						case "ia":
+							result[k] = "iA"
+						case "im":
+							result[k] = "iM"
+						case "tc":
+							result[k] = "tC"
+						case "xb":
+							result[k] = "xB"
+						case "xd":
+							result[k] = "xD"
 				case "Style":
-					pass #Implement this if necessary
+					if "HB" in result['Trim']:
+						result[k] = "Hatchback"
+					elif "Sdn" in result['Trim']:
+						result[k] = "Sedan"
+					elif "Cpe" in result['Trim']:
+						result[k] = "Coupe"
+					elif "Wgn" in result['Trim']:
+						result[k] = "Wagon"
+					else:
+						result[k] = ""
 				case "Trim":
-					pass #Implement this if necessary
+					t = re.search(r"((Release|(10 )?Series|\d+.0|Monogram) ?)+", result[k])
+					if t is not None:
+						result[k] = result[k][t.span()[0]:t.span()[1]].rstrip()
+					else:
+						result[k] = ""
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -71,7 +96,7 @@ class Scion_Corrections(Correction_Template):
 				case "Cold Cranking Amps @ 0� F (2nd)":
 					pass #Implement this if necessary
 				case "Transmission":
-					pass #Implement this if necessary
+					result[k] = re.sub(r" (S|s)hift", "", result[k])
 				case "Transmission Type":
 					pass #Implement this if necessary
 				case "Transmission Speeds":
@@ -117,7 +142,8 @@ class Scion_Corrections(Correction_Template):
 				case "MPGe (combined)":
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
-					pass #Implement this if necessary
+					if result[k].upper() != "NA":
+						result[k] = str(round(float(result[k]), 1))
 				case "Range City (Miles)":
 					pass #Implement this if necessary
 				case "Range Highway (Miles)":

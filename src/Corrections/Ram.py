@@ -14,7 +14,7 @@ class Ram_Corrections(Correction_Template):
 	Helper class for Ram corrections
 	"""
 
-	def fix(self, data: dict) -> dict:
+	def fix(self, data: dict[str, str]) -> dict:
 		"""
 		Makes corrections to the data entry dict
 
@@ -31,11 +31,47 @@ class Ram_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "1500":
+							result[k] = "1500"
+						case "1500-trx":
+							result[k] = "1500 TRX"
+						case "2500-3500":
+							if "2500" in result['Style']:
+								result[k] = "2500"
+							else:
+								result[k] = "3500"
+						case "promaster":
+							result[k] = "ProMaster"
+						case "promaster-city":
+							result[k] = "ProMaster City"
 				case "Style":
-					pass #Implement this if necessary
+					if "Classic" in result[k]:
+						result[k] = "Classic"
+					elif "Rebel" in result[k]:
+						result[k] = "Rebel"
+					else:
+						result[k] = ""
 				case "Trim":
-					pass #Implement this if necessary
+					if result['Model'] in ['ProMaster', 'ProMaster City']:
+						if "Van" in result[k]:
+							t = result[k].split(' ')
+							idx = t.index("Van")
+							result[k] = " ".join(t[idx-1:])
+						elif "Wagon" in result[k]:
+							t = result[k].split(' ')
+							idx = t.index("Wagon")
+							result[k] = " ".join(t[idx-1:])
+						elif "Cab" in result[k]:
+							t = result[k].split(' ')
+							idx = t.index("Cab")
+							result[k] = " ".join(t[idx-1:])
+						else:
+							result[k] = re.split(r"\d{4}", result[k])[1]
+					else:
+						result[k] = re.split(r"\d{4}", result[k])[1]
+
+					result[k] = result[k].strip()
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -117,7 +153,8 @@ class Ram_Corrections(Correction_Template):
 				case "MPGe (combined)":
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
-					pass #Implement this if necessary
+					if result[k].upper() != "NA":
+						result[k] = str(round(float(result[k]), 1))
 				case "Range City (Miles)":
 					pass #Implement this if necessary
 				case "Range Highway (Miles)":
