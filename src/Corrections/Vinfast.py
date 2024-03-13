@@ -14,7 +14,7 @@ class VinFast_Corrections(Correction_Template):
 	Helper class for VinFast corrections
 	"""
 
-	def fix(self, data: dict) -> dict:
+	def fix(self, data: dict[str, str]) -> dict:
 		"""
 		Makes corrections to the data entry dict
 
@@ -31,11 +31,21 @@ class VinFast_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "vf8":
+							result[k] = "VF8"
+						case "vf9":
+							result[k] = "VF9"
 				case "Style":
-					pass #Implement this if necessary
+					result[k] = ""
 				case "Trim":
-					pass #Implement this if necessary
+					result[k] = result[k].replace("AWD ", "")
+
+					t = re.search(r"((Eco|Plus|\d\d(\.\d)?|kWh) ?)+", result[k])
+					if t is not None:
+						result[k] = result[k][t.span()[0]:t.span()[1]]
+					else:
+						result[k] = ""
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -117,7 +127,8 @@ class VinFast_Corrections(Correction_Template):
 				case "MPGe (combined)":
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
-					pass #Implement this if necessary
+					if result[k].upper() != "NA":
+						result[k] = str(round(float(result[k]), 1))
 				case "Range City (Miles)":
 					pass #Implement this if necessary
 				case "Range Highway (Miles)":

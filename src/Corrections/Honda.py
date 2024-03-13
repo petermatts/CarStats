@@ -77,13 +77,21 @@ class Honda_Corrections(Correction_Template):
 					else:
 						result[k] = ""
 				case "Trim":
+					result[k] = re.sub(r"(and|with|&) ", "", result[k])
+					result[k] = re.sub(r"/", " ", result[k])
+					result[k] = re.sub(r"w/(o )?", "", result[k])
+					result[k] = re.sub(r"\w\d ", "", result[k])
+					result[k] = re.sub(r"(Auto(matic)?|Coupe|Sedan|Man(ual)?)|CVT ", "", result[k])
+					result[k] = result[k].replace("Navigation", "Nav")
+					result[k] = result[k].replace("Navi", "Nav")
+
 					if result["Model"] == "S2000":
 						if "CR" in result[k]:
 							result[k] = "CR"
 						else:
 							result[k] = ""
 					else:
-						t = re.search(r"((EX(-L)?|LX(-(S|P))?|Sport|Elite|Touring|SE|DX|GX|CR|HPT|RT(L|X|S)?(-(E|T)?)?|(Special|Limited) Edition) ?)+", result[k])
+						t = re.search(r"((EX(-L)?|LX(-(S|P))?|Sport(-L)?|Elite|Touring|SE|DX|GX|CR|SC|VP|RES|BSI|HPT|RT(L|X|S)?(-(E|T)?)?|Navigation|Honda Sensing|DVD Rear Entertainment|7 Passenger|Leather|(Special|Limited) Edition) ?)+", result[k])
 						if t is not None:
 							result[k] = result[k][t.span()[0]:t.span()[1]].rstrip()
 						else:

@@ -14,7 +14,7 @@ class Tesla_Corrections(Correction_Template):
 	Helper class for Tesla corrections
 	"""
 
-	def fix(self, data: dict) -> dict:
+	def fix(self, data: dict[str, str]) -> dict:
 		"""
 		Makes corrections to the data entry dict
 
@@ -31,11 +31,31 @@ class Tesla_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "model-3":
+							result[k] = "Model 3"
+						case "model-s":
+							result[k] = "Model S"
+						case "model-x":
+							result[k] = "Model X"
+						case "model-y":
+							result[k] = "Model Y"
+						case "roadster":
+							result[k] = "Roadster"
 				case "Style":
-					pass #Implement this if necessary
+					if "Conv" in result['Trim']:
+						result[k] = "Convertible"
+					elif "Sdn" in result['Trim']:
+						result[k] = "Sedan"
+					else:
+						result[k] = ""
 				case "Trim":
-					pass #Implement this if necessary
+					result[k] = result[k].replace("2016.5 ", "")
+					t = re.search(r"((Performance|Sport|Ludicrous Mode|Plaid\+?|Long|Range|Battery|Plus|Standard|Mid|Extended|P?\d{2,3}D?|kWh|Signature) ?)+", result[k])
+					if t is not None:
+						result[k] = result[k][t.span()[0]:t.span()[1]].rstrip()
+					else:
+						result[k] = "Base"
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":

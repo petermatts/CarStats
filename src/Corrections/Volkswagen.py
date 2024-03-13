@@ -14,7 +14,7 @@ class Volkswagen_Corrections(Correction_Template):
 	Helper class for Volkswagen corrections
 	"""
 
-	def fix(self, data: dict) -> dict:
+	def fix(self, data: dict[str, str]) -> dict:
 		"""
 		Makes corrections to the data entry dict
 
@@ -31,11 +31,74 @@ class Volkswagen_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "arteon":
+							result[k] = "Arteon"
+						case "atlas"|"atlas-cross-sport":
+							result[k] = "Atlas"
+						case "beetle"|"new-beetle":
+							result[k] = "Beetle"
+						case "cc":
+							result[k] = "CC"
+						case "eos":
+							result[k] = "Eos"
+						case "golf"|"golf-alltrack"|"golf-gta"|"golf-r"|"golf-sportwagen":
+							result[k] = "Golf"
+						case "id4":
+							result[k] = "ID.4"
+						case "jetta"|"jetta-gli":
+							result[k] = "Jetta"
+						case "passat":
+							result[k] = "Passat"
+						case "rabbit":
+							result[k] = "Rabbit"
+						case "routan":
+							result
+						case "taos":
+							result[k] = "Taos"
+						case "tiguan":
+							result[k] = "Tiguan"
+						case "touareg":
+							result[k] = "Touareg"
 				case "Style":
-					pass #Implement this if necessary
+					result[k] = result[k].replace("sedan", "Sedan")
+					result[k] = result[k].replace("hatchback", "Hatchback")
+					result[k] = result[k].replace("hybrid", "Hybrid")
+					result[k] = result[k].replace("convertible", "Convertible")
+					result[k] = result[k].replace("", "")
+
+					s = re.search(r"((Touareg2|Alltrack|New Beetle|Convertible|Hatchback|Hybrid|Sedan|GLI|GTI|TDI|Cross Sport|Dune|R-Line|SportWagen| R | R$|Wagon) ?)+", result[k])
+					if s is not None:
+						result[k] = result[k][s.span()[0]:s.span()[1]].rstrip()
+					else:
+						result[k] = ""
 				case "Trim":
-					pass #Implement this if necessary
+					if "Coupe" in result[k] or "Cpe" in result[k]:
+						result['Style'] += " Coupe"
+						result[k] = result[k].lstrip()
+
+					result[k] = result[k].replace("w/", "")
+					result[k] = result[k].replace("with ", "")
+					result[k] = result[k].replace(" & ", "/")
+					result[k] = result[k].replace("Lux", "Luxury")
+					result[k] = result[k].replace("Exec", "Executive")
+					result[k] = result[k].replace("Cross Sport", "")
+					result[k] = result[k].replace("Technology", "Tech")
+					result[k] = result[k].replace("Navigation", "Nav")
+					result[k] = result[k].replace("Navi", "Nav")
+					result[k] = result[k].replace("Sunroof", "Sun")
+					result[k] = result[k].replace("Sun", "Sunroof")
+					result[k] = result[k].replace("Tech", "Technology")
+					result[k] = result[k].replace("Nav", "Navigation")
+					result[k] = result[k].replace("SportWagen", "")
+					result[k] = re.sub(r"\d\.\d\w ", "", result[k])
+
+					t = re.search(r"((R?SEL?| S | S$| X$|Premium|Luxury|Limited|Executive|Triple|White|Appearance|Carbon|Convenience|Connectivity|DSG|DCC|V(S|R)6|S?ULEV|Sun\/?|Sound\/?|Navigation\/?|Technology\/?|Leather|Komfort|Wolfsburg|Autobahn|Plus|Sport|Classic|Black|Turbo|Launch|Peak|Standard|Performance|Fender|Final|Driver's|Edition|Denim|Coast|Entry|Dune|(20|35|40)th Anniversary) ?)+", result[k])
+					if t is not None:
+						result[k] = result[k][t.span()[0]:t.span()[1]].replace("/", " ").strip()
+					else:
+						result[k] = ""
+
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -71,7 +134,10 @@ class Volkswagen_Corrections(Correction_Template):
 				case "Cold Cranking Amps @ 0� F (2nd)":
 					pass #Implement this if necessary
 				case "Transmission":
-					pass #Implement this if necessary
+					result[k] = re.sub(r" (S|s)hift", "", result[k])
+					result[k] = re.sub(r"Continuously (V|v)ariable( (R|r)atio)?", "CVT", result[k])
+					result[k] = result[k].replace("automatic", "Automatic")
+					result[k] = result[k].replace("manual", "Manual")
 				case "Transmission Type":
 					pass #Implement this if necessary
 				case "Transmission Speeds":
@@ -117,7 +183,8 @@ class Volkswagen_Corrections(Correction_Template):
 				case "MPGe (combined)":
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
-					pass #Implement this if necessary
+					if result[k].upper() != "NA":
+						result[k] = str(round(float(result[k]), 1))
 				case "Range City (Miles)":
 					pass #Implement this if necessary
 				case "Range Highway (Miles)":

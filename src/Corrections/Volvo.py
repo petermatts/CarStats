@@ -14,7 +14,7 @@ class Volvo_Corrections(Correction_Template):
 	Helper class for Volvo corrections
 	"""
 
-	def fix(self, data: dict) -> dict:
+	def fix(self, data: dict[str, str]) -> dict:
 		"""
 		Makes corrections to the data entry dict
 
@@ -31,11 +31,58 @@ class Volvo_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "c30":
+							result[k] = "C30"
+						case "c40-recharge":
+							result[k] = "C40"
+						case "c70":
+							result[k] = "C70"
+						case "s40":
+							result[k] = "S40"
+						case "s60":
+							result[k] = "S60"
+						case "s80":
+							result[k] = "S80"
+						case "s90":
+							result[k] = "S90"
+						case "v50":
+							result[k] = "V50"
+						case "v60":
+							result[k] = "V60"
+						case "v70":
+							result[k] = "V70"
+						case "v90"|"v90-cross-country":
+							result[k] = "V90"
+						case "xc40"|"xc40-recharge":
+							result[k] = "XC40"
+						case "xc60":
+							result[k] = "XC60"
+						case "xc70":
+							result[k] = "XC70"
+						case "xc90":
+							result[k] = "XC90"
 				case "Style":
-					pass #Implement this if necessary
+					result[k] = result[k].replace("plug-in hybrid", "PHEV")
+					s = re.search(r"Recharge|Polestar|Cross Country|PHEV|R", result[k])
+					if s is not None:
+						result[k] = result[k][s.span()[0]:s.span()[1]]
+					else:
+						result[k] = ""
 				case "Trim":
-					pass #Implement this if necessary
+					result[k] = re.sub(r"(2|4|F|R|e?A)WD ", "", result[k])
+					result[k] = re.sub(r"(MT|AT) ", "", result[k])
+					result[k] = result[k].replace("w/", "")
+					result[k] = result[k].replace("/", " ")
+					result[k] = result[k].replace("PHEV ", "")
+					result[k] = result[k].replace("Snrf", "Sunroof")
+
+					t = re.search(r"((Platinum|(T|B|P)\d|\dP|Drive-E|R-Design|Premier|Plus|Turbo|Inscription|Engineered|Expression|Extended|3rd Row|Range|Ultimate|Sunroof|Moonroof|Bright|Theme|Black|Dark|Edition|Momentum|Pure|Electric|Twin|Core|Version 1.0) ?)+", result[k])
+					if t is not None:
+						result[k] = result[k][t.span()[0]:t.span()[1]].strip()
+					else:
+						result[k] = ""
+
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -71,7 +118,10 @@ class Volvo_Corrections(Correction_Template):
 				case "Cold Cranking Amps @ 0� F (2nd)":
 					pass #Implement this if necessary
 				case "Transmission":
-					pass #Implement this if necessary
+					result[k] = re.sub(r" (S|s)hift", "", result[k])
+					result[k] = re.sub(r"Continuously (V|v)ariable( (R|r)atio)?", "CVT", result[k])
+					result[k] = result[k].replace("automatic", "Automatic")
+					result[k] = result[k].replace("manual", "Manual")
 				case "Transmission Type":
 					pass #Implement this if necessary
 				case "Transmission Speeds":
@@ -117,7 +167,8 @@ class Volvo_Corrections(Correction_Template):
 				case "MPGe (combined)":
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
-					pass #Implement this if necessary
+					if result[k].upper() != "NA":
+						result[k] = str(round(float(result[k]), 1))
 				case "Range City (Miles)":
 					pass #Implement this if necessary
 				case "Range Highway (Miles)":

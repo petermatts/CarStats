@@ -14,7 +14,7 @@ class Toyota_Corrections(Correction_Template):
 	Helper class for Toyota corrections
 	"""
 
-	def fix(self, data: dict) -> dict:
+	def fix(self, data: dict[str, str]) -> dict:
 		"""
 		Makes corrections to the data entry dict
 
@@ -31,11 +31,89 @@ class Toyota_Corrections(Correction_Template):
 				case "Brand":
 					pass #Implement this if necessary
 				case "Model":
-					pass #Implement this if necessary
+					match result[k]:
+						case "4runner":
+							result[k] = "4Runner"
+						case "avalon":
+							result[k] = "Avalon"
+						case "bz4x":
+							result[k] = "bZ4X"
+						case "c-hr":
+							result[k] = "C-HR"
+						case "camry"|"camry-solara":
+							result[k] = "Camry"
+						case "corolla":
+							result[k] = "Corolla"
+						case "corolla-cross"|"corolla-cross-hybrid":
+							result[k] = "Corolla Cross"
+						case "crown":
+							result[k] = "Crown"
+						case "gr-86":
+							result[k] = "GR86"
+						case "gr-corolla":
+							result[k] = "GR Corolla"
+						case "grand-highlander":
+							result[k] = "Grand Highlander"
+						case "highlander":
+							result[k] = "Highlander"
+						case "land-cruiser":
+							result[k] = "Land Cruiser"
+						case "matrix":
+							result[k] = "Matrix"
+						case "mirai":
+							result[k] = "Mirai"
+						case "prius":
+							result[k] = "Prius"
+						case "prius-c":
+							result[k] = "Prius C"
+						case "prius-prime":
+							result[k] = "Prius Prime"
+						case "rav4"|"rav4-hybrid":
+							result[k] = "RAV4"
+						case "sequoia":
+							result[k] = "Sequoia"
+						case "sienna":
+							result[k] = "Sienna"
+						case "supra":
+							result[k] = "Supra"
+						case "tacoma":
+							result[k] = "Tacoma"
+						case "tundra"|"tundra-hybrid":
+							result[k] = "Tundra"
+						case "venza":
+							result[k] = "Venza"
+						case "yaris"|"yaris-ia":
+							result[k] = "Yaris"
 				case "Style":
-					pass #Implement this if necessary
+					result[k] = result[k].replace("coupe", "Coupe")
+					result[k] = result[k].replace("sedan", "Sedan")
+					result[k] = result[k].replace("plug-in", "PHEV")
+					result[k] = result[k].replace("hybrid", "Hybrid")
+					result[k] = result[k].replace("convertible", "Convertible")
+					result[k] = result[k].replace("hatchback", "Hatchback")
+
+					s = re.search(r"((Prime|Solara|iA|Coupe|Sedan|Convertible|PHEV|EV|Hybrid|(Hatch|Lift)back) ?)+", result[k])
+					if s is not None:
+						result[k] = result[k][s.span()[0]:s.span()[1]].rstrip()
+					else:
+						result[k] = ""
 				case "Trim":
-					pass #Implement this if necessary
+					result[k] = result[k].replace("w/", "")
+					result[k] = result[k].replace("-MT", "")
+					if result['Model'] in ['Tacoma', 'Tundra']:
+						result[k] = result[k].replace(result["Model"], "")
+						result[k] = result[k].replace("(Natl)", "")
+						result[k] = re.sub(r"(V|I)\d ", "", result[k])
+						result[k] = re.sub(r"\d\.\dL ", "", result[k])
+						result[k] = re.sub(r"(Auto(matic)?|Man(ual)?|AT|MT) ", "", result[k])
+						result[k] = re.sub(r"(F|A|R|2|4)WD ", "", result[k])
+						result[k] = result[k].strip()
+					else:
+						t = re.search(r"((GT|Touring|Limited|XRS|XLE|XSE|XL|XLS|SE|LE|LB| (L|S) |Base|Advanced|Two|Three|Plus|Nightshade|Premium|Platinum|Sport|TRD|Off Road|Infrared|Eco|Pro|SR5|L4|Core|Morizo|A91|Venture|Launch|Circuit|Hakone|Special|Broze|Edition|(10|20|45|50)th Anniversary|3rd Row) ?)+", result[k])
+						if t is not None:
+							result[k] = result[k][t.span()[0]:t.span()[1]].strip()
+						else:
+							result[k] = ""
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
@@ -71,7 +149,10 @@ class Toyota_Corrections(Correction_Template):
 				case "Cold Cranking Amps @ 0� F (2nd)":
 					pass #Implement this if necessary
 				case "Transmission":
-					pass #Implement this if necessary
+					result[k] = re.sub(r" (S|s)hift", "", result[k])
+					result[k] = re.sub(r"Continuously (V|v)ariable( (R|r)atio)?", "CVT", result[k])
+					result[k] = result[k].replace("automatic", "Automatic")
+					result[k] = result[k].replace("manual", "Manual")
 				case "Transmission Type":
 					pass #Implement this if necessary
 				case "Transmission Speeds":
@@ -117,7 +198,8 @@ class Toyota_Corrections(Correction_Template):
 				case "MPGe (combined)":
 					pass #Implement this if necessary
 				case "Fuel Capacity (Gallons)":
-					pass #Implement this if necessary
+					if result[k].upper() != "NA":
+						result[k] = str(round(float(result[k]), 1))
 				case "Range City (Miles)":
 					pass #Implement this if necessary
 				case "Range Highway (Miles)":
