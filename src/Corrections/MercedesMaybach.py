@@ -43,7 +43,7 @@ class MercedesMaybach_Corrections(Correction_Template):
 						case "s580-s680":
 							m = re.search(r"S ?(5|6)\d{2}", result['Trim'])
 							if m is not None:
-								result[k] = result['Trim'][m.span()[0]:m.span()[1]].replace()
+								result[k] = result['Trim'][m.span()[0]:m.span()[1]].replace(" ", "")
 							else:
 								result[k] = ""
 				case "Style":
