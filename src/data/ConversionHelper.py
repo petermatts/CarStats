@@ -26,7 +26,7 @@ def KeyMap(webspecs: dict[str, str]) -> dict[str, str]:
             result = {}
             if engine != None:
                 engine = v[engine.span()[0]:engine.span()[1]].replace('-', '')
-                result.update({'Engine': engine})
+                result.update({'Engine': engine.upper()})
                 
                 # check turbos
                 if "Twin Turbo" in v:
