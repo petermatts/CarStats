@@ -91,6 +91,12 @@ class Toyota_Corrections(Correction_Template):
 					result[k] = result[k].replace("hybrid", "Hybrid")
 					result[k] = result[k].replace("convertible", "Convertible")
 					result[k] = result[k].replace("hatchback", "Hatchback")
+					if "HB" in result['Trim']:
+						result[k] += ' Hatchback'
+						result[k] = result[k].lstrip()
+					if "Plug-In" in result['Trim']:
+						result[k] += ' PHEV'
+						result[k] = result[k].lstrip()
 
 					s = re.search(r"((Prime|Solara|iA|Coupe|Sedan|Convertible|PHEV|EV|Hybrid|(Hatch|Lift)back) ?)+", result[k])
 					if s is not None:
@@ -109,7 +115,7 @@ class Toyota_Corrections(Correction_Template):
 						result[k] = re.sub(r"(F|A|R|2|4)WD ", "", result[k])
 						result[k] = result[k].strip()
 					else:
-						t = re.search(r"((GT|Touring|Limited|XRS|XLE|XSE|XL|XLS|SE|LE|LB| (L|S) |Base|Advanced|Two|Three|Plus|Nightshade|Premium|Platinum|Sport|TRD|Off Road|Infrared|Eco|Pro|SR5|L4|Core|Morizo|A91|Venture|Launch|Circuit|Hakone|Special|Broze|Edition|(10|20|45|50)th Anniversary|3rd Row) ?)+", result[k])
+						t = re.search(r"((GT|Touring|Limited|XRS|XLE|XSE|XL|XLS|SE|LE|LB| (L|S) |Base|Advanced|Two|Three|Four|Five|Plus|Nightshade|Premium|Platinum|Sport|TRD|Off Road|Infrared|Eco|Pro|SR5|L4|Core|Morizo|A91|Venture|Launch|Circuit|Hakone|Special|Broze|Edition|(10|20|45|50)th Anniversary|3rd Row) ?)+", result[k])
 						if t is not None:
 							result[k] = result[k][t.span()[0]:t.span()[1]].strip()
 						else:
