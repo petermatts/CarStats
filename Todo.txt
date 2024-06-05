@@ -3,21 +3,16 @@
 - Phase 1 Set Up & Design : Done
 
 - Phase 2 Modifications/Revisions
-    - merge branch Scraper-v2.0 into main branch
-    - new correction scripts (git issue #35)
-    - more specific options for scraping (git issue #43):
-        - scrape latest year
-        - scrape all of a specific model
-        - both
-    - more options for data conversion (git issue #45)
+    - convert CLI-like files to use the argparser python package (git issue #66)
+    - Verify and test the updated scrape (for pulling latest specs by year, model, etc. and not everything)
+    - More corrections as needed (this can probably be moved to Phase 3)
 
-- Phase 3 Display
-    - use python sys module to allow command line args running scripts that alter/write data: git issue #29
-        - commented out sys import in many of the src scripts where this would be handy
+- Phase 3 Display (git issue #32)
     - Find way of displaying/comparing/filtering/sorting resulting data
+        - html (best bet)
+        - react?
         - Explore using matplotlib.pyplot to display specs
             - further explore interactability so that data rows can be sorted according to desired features
-        - html or react?
-    - Add 'custom' specs/stats like: git issue #23
+    - Add 'custom' specs/stats like: (git issue #23)
         - hp/ton
-    - potential more generic idea: allow for manual additions in general
+    - potential more generic idea: allow for manual additions in general, like user notes on a car if they are car shopping
