@@ -23,6 +23,7 @@ def scrapeData(driver: webdriver, specs: dict = {}):
     driver.implicitly_wait(0)
 
     # Note: price is under one of the following styles, if getting a bunch of no such element errors, switch which one is commented out
+    # todo automatically try one and if it fails try the other, if both fail return with error message 
     # price = driver.find_element(By.CLASS_NAME, 'css-11vbyw7.e1l3raf11')
     price = driver.find_element(By.CLASS_NAME, 'css-1xre4z6.e1l3raf11')
 
