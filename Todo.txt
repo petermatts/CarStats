@@ -3,7 +3,6 @@
 - Phase 1 Set Up & Design : Done
 
 - Phase 2 Modifications/Revisions
-    - convert CLI-like files to use the argparser python package (git issue #66)
     - Verify and test the updated scrape (for pulling latest specs by year, model, etc. and not everything)
     - More corrections as needed (this can probably be moved to Phase 3)
 
