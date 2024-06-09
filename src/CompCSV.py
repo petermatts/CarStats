@@ -1,7 +1,7 @@
 # compile CSVs into master CSV files
 
 import os
-import sys
+import argparse
 
 def AllData():
     base = open('../Docs/Base.csv', 'r')
@@ -65,5 +65,17 @@ def removeCompCSVs():
 
 
 if __name__ == '__main__':
-    AllData()
-    # removeCompCSVs()
+    parser = argparse.ArgumentParser()
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('--make', '--build', type=bool, nargs='?', const=True, default=False, help="Create the data compiled csv files")
+    group.add_argument('--remove', '--delete', '--clean', type=bool, nargs='?', const=True, default=False, help="Remove the data compiled csv files")
+
+    args = parser.parse_args()
+    print(args)
+
+    if args.make:
+        AllData()
+    elif args.remove:
+        removeCompCSVs()
+    else:
+        print("This should not happen")

@@ -224,7 +224,7 @@ https://www.caranddriver.com/dodge/charger/specs
 https://www.caranddriver.com/dodge/charger-srt-hellcat/specs
 https://www.caranddriver.com/dodge/dart/specs
 https://www.caranddriver.com/dodge/durango/specs
-https://www.caranddriver.com/dodge/durango-srt-2023/specs
+https://www.caranddriver.com/dodge/durango-srt/specs
 https://www.caranddriver.com/dodge/durango-srt-hellcat/specs
 https://www.caranddriver.com/dodge/grand-caravan/specs
 https://www.caranddriver.com/dodge/hornet/specs
@@ -232,7 +232,7 @@ https://www.caranddriver.com/dodge/journey/specs
 https://www.caranddriver.com/dodge/magnum/specs
 https://www.caranddriver.com/dodge/nitro/specs
 https://www.caranddriver.com/dodge/viper/specs
-https://www.caranddriver.com/ferrari/296-gtb-2023/specs
+https://www.caranddriver.com/ferrari/296-gtb/specs
 https://www.caranddriver.com/ferrari/488/specs
 https://www.caranddriver.com/ferrari/599gtb-fiorano/specs
 https://www.caranddriver.com/ferrari/812/specs

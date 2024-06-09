@@ -1,0 +1,148 @@
+Rear Brake Rotors diameter x thickness (inches)
+Maximum Payload Capacity (pounds)
+Base Curb Weight (pounds)
+Cargo Space/Area Length Behind First Row (inches)
+Brand
+Rear Shock Absorber Diameter (mm)
+Fourth Row Shoulder Room (inches)
+Maximum Tongue Weight weight distributing hitch (pounds)
+Cargo Bed Height (inches)
+Second Gear Ratio (:1)
+Rear Wheel Material
+Axle Ratio - Low Rear (:1)
+Steering Ratio (:1)
+Transmission Description
+Body Weight
+Length (inches)
+Cargo Space/Area Behind Fourth Row (cubic feet)
+Anti-Lock-Braking System
+Cold Cranking Amps @ 0° F
+Body Length
+Final Drive Axle Ratio (:1)
+Total Passenger Volume (cubic feet)
+Fourth Row Head Room (inches)
+Front Hip Room (inches)
+Transmission Manufacturer
+Passenger / Seating Capacity
+Second Row Head Room (inches)
+Cargo Space/Area Behind Front Row (cubic feet)
+Cargo Space/Area Length Behind Third Row (inches)
+Fourth Gear Ratio (:1)
+Turning Diameter / Radius wall to wall (feet)
+Seventh Gear Ratio (:1)
+Transfer Case Gear Ratio low (:1)
+Cargo Space/Area Behind Third Row (cubic feet)
+Rear Door Opening Width (inches)
+Maximum Trailer Weight dead weight hitch (pounds)
+EPA Classification
+Front Gross Axle Weight Rating (pounds)
+Cargo Space/Area with Rear Seat Down
+Tenth Gear Ratio (:1)
+Range city/highway (miles)
+Front Wheel Material
+Trim
+URL
+Turns lock to lock
+Third Row Shoulder Room (inches)
+Maximum Towing Capacity (pounds)
+Maximum Engine Speed (rpm)
+Price
+Rear Track Width (inches)
+Cargo Bed Length (inches)
+Total Weight (pounds)
+Transmission Type
+Fifth Gear Ratio (:1)
+Steering Type
+Torque Converter
+Cargo Bed Width at Floor (inches)
+Rear Wheel Size (inches)
+Cold Cranking Amps @ 0° F (2nd)
+Cooling System Capacity (quarts)
+Engine Type and Required Fuel
+Maximum Trailer Weight weight distributing hitch (pounds)
+Curb Weight
+Reverse Ratio (:1)
+Fifth Row Head Room (inches)
+Front Shoulder Room (inches)
+Front Leg Room (inches)
+Cargo Space/Area Length Behind Second Row (inches)
+Front Brake Rotors diameter x thickness (inches)
+Gross Vehicle Weight Rating (pounds)
+Fifth Row Shoulder Room (inches)
+Engine Order Code
+Turning Diameter / Radius curb to curb (feet)
+Second Row Leg Room (inches)
+Model
+Eighth Gear Ratio (:1)
+Rear Suspension Type
+Third Row Head Room (inches)
+Third Row Leg Room (inches)
+Front Anti-Roll Bar Diameter (inches)
+Fuel Capacity / Gas Tank Size
+Front Wheel Size (inches)
+Number of Transmission Speeds
+Rear Drums diameter x width (inches)
+Third Row Hip Room (inches)
+Front Tire Size
+Maximum Horsepower @ RPM
+Payload Weight Front
+Width without mirrors (inches)
+First Gear Ratio (:1)
+Fourth Row Leg Room (inches)
+Drivetrain
+Second Row Hip Room (inches)
+Bolt Pattern
+Cargo Bed Width @ Top Rear
+Cargo Bed Width Between Wheelhousings (inches)
+Brake Type
+Liftover Height (inches)
+Wheelbase (inches)
+Second Row Shoulder Room (inches)
+Turning Diameter /Radius wall to wall (feet)
+Displacement (liters/cubic inches)
+Rear Gross Axle Weight Rating (pounds)
+Transmission Order Code
+Transfer Case Gear Ratio high (:1)
+Maximum Torque @ RPM
+Minimum Ground Clearance (inches)
+EPA Greenhouse Gas Score
+Year
+Engine Oil Cooler
+Front Suspension Type
+Front Head Room (inches)
+EPA Fuel Economy Equivalent (for hybrid and electric vehicles) combined/city/highway (MPGe)
+Fuel System
+Spare Wheel Size (inches)
+Maximum Tongue Weight dead weight hitch (pounds)
+Cargo Space/Area Length @ Floor to Console
+Cargo Space/Area with Rear Seat Up
+Fourth Row Hip Room (inches)
+Style
+Front Shock Absorber Diameter (mm)
+Rear Anti-Roll Bar Diameter (inches)
+Clutch Size
+Maximum Alternator Capacity (amps)
+CO2 Emissions 15K mi/year (tons)
+Cargo Space/Area (cubic feet)
+Fifth Row Hip Room (inches)
+Cargo Space/Area Behind Second Row (cubic feet)
+Total Option Weight (pounds)
+Third Gear Ratio (:1)
+EPA Fuel Economy combined/city/highway (mpg)
+Fifth Row Leg Room (inches)
+Trunk Space (cubic feet)
+Rear Door Opening Height (inches)
+As Spec'd Payload Capacity (pounds)
+Aux Fuel Tank Capacity (gallons)
+Spare Tire Size
+Front Track Width (inches)
+Rear Tire Size
+Cargo Space/Area Width at Beltline (inches)
+Transfer Case Model
+Ground Clearance Front
+Ext'd Cab Cargo Space/Size
+Height (inches)
+Spare Wheel Material
+Ninth Gear Ratio (:1)
+Trailer Weight
+Sixth Gear Ratio (:1)

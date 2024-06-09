@@ -4,8 +4,8 @@ From the file AllBrandsAndModels.json, this script generates link summary files
 
 import json
 import os
-import sys
-import re
+import argparse
+# import re
 
 def generateSummaryTXT():
     os.chdir('../')
@@ -54,12 +54,15 @@ def makeAllLinksTXT():
 
 
 if __name__ == '__main__':
-    if len(sys.argv) > 1:
-        if sys.argv[1].lower() == 'all':
-            makeAllLinksTXT()
-        elif sys.argv[1].lower() == 'summary':
-            generateSummaryTXT()
-        else:
-            print("Invalid argument. Expected one of:\n\tall\n\tsummary")
+    parser = argparse.ArgumentParser()
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("-s", "--summary", nargs='?', const=True, default=False, help="Generate summary file AllBrandsAndModels.json (this must be run before -a|--all)")
+    group.add_argument("-a", "--all", nargs='?', const=True, default=False, help="Generate all brand link files and AllLinks.txt (this must be run after -s|--summary)")
+
+    args = parser.parse_args()
+    if args.all:
+        makeAllLinksTXT()
+    elif args.summary:
+        generateSummaryTXT()
     else:
-        print("Expected an argument:\n\tall\n\tsummary")
+        print("This should never happen")

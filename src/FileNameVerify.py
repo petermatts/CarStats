@@ -4,7 +4,7 @@ Script that corrects ill-formated YAML data file names and corrects them
 
 import os
 import re
-import sys
+import argparse
 
 def detect() -> list:
     flag = True
@@ -53,14 +53,17 @@ def fix():
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('-d', '--detect', type=bool, nargs='?', const=True, default=False, help="Detect files with name errors")
+    group.add_argument('-f', '--fix', type=bool, nargs='?', const=True, default=False, help="Fix files with name errors by renaming them to the proper name")
+    args = parser.parse_args()
+
     os.chdir('../Data/YAML')
 
-    if len(sys.argv) > 1:
-        if sys.argv[1].lower() == 'detect':
-            detect()
-        elif sys.argv[1].lower() == 'fix':
-            fix()
-        else:
-            print("Invalid argument. Expected one of:\n\tdetect\n\tfix")
+    if args.detect:
+        detect()
+    elif args.fix:
+        fix()
     else:
-        print("Expected an argument:\n\tdetect\n\tfix")    
+        print('This should never happen')  

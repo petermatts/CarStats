@@ -1,9 +1,9 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException, ElementClickInterceptedException, NoSuchElementException
+import argparse
 import os
 import re
-import sys
 import requests
 import time
 import yaml
@@ -302,16 +302,16 @@ def writeData(specs: dict[str, str]):
     print("\tDone!        ", end="\r")
 
 
-def driver():
+def driver(args: argparse.Namespace):
     """I hope anyone reading this can appreciate the pun that is this function name"""
 
-    def getBrandList():
+    def getBrandList() -> str:
         options = os.listdir('./Links')
         longest = 0
         for i in range(len(options)):
             options[i] = options[i][:-4]
             if len(options[i]) > longest:
-                    longest = len(options[i])
+                longest = len(options[i])
 
         brands = ''
         for i in range(len(options)):
@@ -319,12 +319,11 @@ def driver():
             brands += ' '*(longest - len(options[i]) + 2)
             if i % 5 == 4:
                 brands += '\n'
-        brands += '\n'
         return brands
 
-    def getModelList():
+    def getModelList(brand: str) -> str:
         # NOTE: precondition that --help flag must be supplied after brand
-        with open('./Links/'+sys.argv[1]+'.txt', 'r') as f:
+        with open('./Links/'+brand+'.txt', 'r') as f:
             lines = f.readlines()
 
         options = []
@@ -339,40 +338,35 @@ def driver():
         for i in range(len(options)):
             m = options[i]
 
-            if sys.argv[1].lower() != 'ram' and re.search("-\d{4}", m) and not re.search("(\d{4}|SILVERADO|SIERRA)-\d{4}", m):
+            if brand.lower() != 'ram' and re.search("-\d{4}", m) and not re.search("(\d{4}|SILVERADO|SIERRA)-\d{4}", m):
                 m = m[:-5] # remove possible "-{year}" at the end of the model
 
             models += m
             models += ' '*(longest - len(m) + 2)
             if i % 5 == 4:
                 models += '\n'
-        models += '\n'
         return models  
 
     brands = getBrandList()
 
     # get option parameters for scraper
-    model = None
-    year = None
-    latest = "--latest" in sys.argv
-    r = re.compile("--\d\d\d\d") # find year arguement
-    ys = list(filter(r.match, sys.argv))
-    if len(ys) == 1:
-        year = int(ys[0].split('-')[-1])
+    brand = args.brand
+    model = args.model
+    year = args.year
+    latest = args.latest
     # end option configuration
 
-    if len(sys.argv) > 1:
-        path = './Links/' + sys.argv[1] + '.txt'
+    if not args.list:
+        path = './Links/' + brand + '.txt'
 
         if os.path.isfile(path):
-            if len(sys.argv) > 2 and sys.argv[2] == "--help":
-                print("Here are all models of brand", sys.argv[1] + ":\n")
-                print(getModelList())
+            if args.show:
+                print("Here are all models of brand", brand + ":\n")
+                print(getModelList(brand))
                 return -1
-            elif len(sys.argv) > 2:
-                model = sys.argv[2]
-                if sys.argv[1].lower() != 'ram' and re.search("-\d{4}", model) and not re.search("(\d{4}|SILVERADO|SIERRA)-\d{4}", model):
-                    model = model[:-5]
+            # elif len(sys.argv) > 2:
+            #     if brand.lower() != 'ram' and re.search("-\d{4}", model) and not re.search("(\d{4}|SILVERADO|SIERRA)-\d{4}", model):
+            #         model = model[:-5]
 
             result = 0
             while result <= 0:
@@ -394,37 +388,36 @@ def driver():
                     print("Selenium ElementClickInterceptedException encountered, waiting 30s before retrying")
                     time.sleep(30)
         else:
-            if sys.argv[1] != "--help":
-                print('Invalid Brand Arguement. Valid Arguments are:')
             print(brands)
             return -1
     else:
-        print('\nNo Scrapping brand arguments. Expected one of\n')
+        print('\nValid Brand options\n')
         print(brands)
         return -1
 
     return 1
 
 
-"""
-    To run: `python Scraper2.py {brand} {model|--help} {--latest|--year}`
-
-    @param {brand} is REQUIRED
-    @param {model} is optional
-    @param {--help} is optional
-    @param {--latest} is optional
-    @param {--year} is optional (example --2024)
-
-    Important note: {model} and {--help} parameters cannot be used together
-    Important note: {--latest} and {--year} parameters cannot be used together
-"""
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    brand_group = parser.add_mutually_exclusive_group(required=True)
+    brand_group.add_argument('--brand', type=str, help="The car brand to scrape (required)")
+    brand_group.add_argument('--list', type=bool, nargs='?', const=True, default=False, help="Lists all valid brand options")
+
+    model_group = parser.add_mutually_exclusive_group()
+    model_group.add_argument('--model', type=str, help="The model to scrape")
+    model_group.add_argument('--show', type=bool, nargs='?', const=True, default=False, help="Show models options of brand listed")
+
+    year_group = parser.add_mutually_exclusive_group()
+    year_group.add_argument('--latest', type=bool, nargs='?', const=True, default=False, help="Scrape the latest year data for model is avaiable (cannot be used with --year flag)")
+    year_group.add_argument('--year', type=int, help="The year to scrape model data (cannot be used with --latest flag)")
+
     start = time.time()
 
     # scrape here
     # URL = 'https://www.caranddriver.com/honda/accord/specs'
     # scrapeByURL(URL)
-    status = driver()
+    status = driver(parser.parse_args())
 
     finish = time.time()
     runtime = finish-start

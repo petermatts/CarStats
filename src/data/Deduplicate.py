@@ -1,8 +1,7 @@
+import argparse
 import os
 import yaml
 from iteration_utilities import unique_everseen
-
-import sys
 
 cwd = os.getcwd()
 
@@ -57,22 +56,10 @@ def deduplicate(remove: bool = False, verbose: bool = False):
                 
 
 if __name__ == '__main__':
-    verbose = "--verbose" in sys.argv or "-v" in sys.argv
-    if len(sys.argv) > 1:
-        if sys.argv[1].lower() == 'detect':
-            deduplicate(verbose=verbose)
-        elif sys.argv[1].lower() == 'fix':
-            deduplicate(remove=True, verbose=verbose)
-        elif sys.argv[1].lower() == '--help':
-            msg = "\tdetect       = find duplicate YAML data entries\n"
-            msg += "\tfix          = find and remove duplicate YAML data entries\n"
-            msg += "\t-v|--verbose = print number of duplicates found (and removed) from every file that has duplicate"
-            print(msg)    
-        else:
-            print("Invalid argument. Expected one of:\n\tdetect\n\tfix")
-    else:
-        msg = "Expected an argument:\n"
-        msg += "\tdetect       = find duplicate YAML data entries\n"
-        msg += "\tfix          = find and remove duplicate YAML data entries\n"
-        msg += "\t-v|--verbose = print number of duplicates found (and removed) from every file that has duplicate"
-        print(msg)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-v', '--verbose', type=bool, nargs='?', const=True, default=False, help="Verbose deduplication print")
+    parser.add_argument('-r', '-f', '--remove', '--fix', type=bool, nargs='?', const=True, default=False, help="Remove duplicate datapoints. If this flag is not specified they will only be detected.")
+    args = parser.parse_args()
+    print(args)
+
+    deduplicate(remove=args.remove, verbose=args.verbose)

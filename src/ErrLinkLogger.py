@@ -2,11 +2,11 @@
 
 # https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
 
+import argparse
 import requests
 import time
 import os
 import re
-import sys
 
 # Traverse Links Directory
 def getLinks():
@@ -52,7 +52,7 @@ def checkLink(url: str, L: list):
         L.append(url.replace('/specs', '') + ',302,\n') # too many redirects
         return
     except requests.exceptions.ConnectionError:
-        print(url + " is thaving connection issues, sleeping for a minute then trying again", end='\r')
+        print(url + " is having connection issues, sleeping for a minute then trying again", end='\r')
         time.sleep(60)
         checkLink(url, L)
 
@@ -132,14 +132,19 @@ def fix():
 
 
 if __name__ == '__main__':
-    if len(sys.argv) > 1:
-        if sys.argv[1].lower() == 'code':
-            no_code_links()
-        elif sys.argv[1].lower() == 'check':
-            getLinks()
-        elif sys.argv[1].lower() == 'fix':
-            fix()
-        else:
-            print("Invalid arguement. Expected one of:\n\tcode\n\tcheck\n\tfix")
+    parser = argparse.ArgumentParser()
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('--code', type=bool, nargs='?', const=True, default=False, help="Gets links with no specs codes and logs them to Log/IncompleteLinks.csv")
+    group.add_argument('--check', type=bool, nargs='?', const=True, default=False, help="Compiles a list of all links with error code not 200 and logs them to Log/ErrorLinks.csv")
+    group.add_argument('--fix', type=bool, nargs='?', const=True, default=False, help="Reads in error corrected links from Log/ErrorLinks-Fix.csv (which maps the error link -1st col to a corrected link -3rd col) and fixes the links in the Links folder.")
+
+    args = parser.parse_args()
+
+    if args.code:
+        no_code_links()
+    elif args.check:
+        getLinks()
+    elif args.fix:
+        fix()
     else:
-        print("Missing argument. Expected one of:\n\tcode\n\tcheck\n\tfix")
+        print("This should not happen")

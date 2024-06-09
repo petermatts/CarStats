@@ -4,35 +4,76 @@ import json
 import yaml
 import csv as CSV
 import os
-import sys
+import argparse
 
 # Collects data from JSON
 
-def _getBrands():
+def _getBrands() -> list[str]:
     cwd = os.getcwd()
-    os.chdir("../Data/JSON")
+    os.chdir("../Data/YAML")
     brands = os.listdir()
     os.chdir(cwd)
     return brands
 
-def _getAttrs():
-    with open("../Docs/Base.txt") as f:
-        attributes = f.readlines()
-    
+def _getYears(brand: str) -> list[str]:
+    cwd = os.getcwd()
+    os.chdir("../Data/YAML/"+brand)
+    years = os.listdir()
+    os.chdir(cwd)
+    return years
+
+def _getModels(brand: str) -> list[str]:
+    cwd = os.getcwd()
+    os.chdir("../Data/YAML/"+brand)
+    years = os.listdir()
+    models = set()
+    for y in years:
+        for m in os.listdir(y):
+            models.add(m[:-5]) # chop of the .yaml
+    os.chdir(cwd)
+    models = list(models)
+    models.sort()
+    return models
+
+def _getAttrs(yaml: bool = None) -> list[str]:
+    if yaml:
+        with open("../Docs/BaseYAML.txt") as f:
+            attributes = f.readlines()
+    else:
+        with open("../Docs/Base.txt") as f:
+            attributes = f.readlines()
+        
     for a in range(len(attributes)):
         attributes[a] = attributes[a].strip()
 
     return attributes
 
-def gatherBrand(attr: str, yam: bool, csv: bool):
-    """Gathers all data amoungst attribute. Function run within brand directory"""
+def yearHasModel(brand: str, year: str, model: str) -> bool:
+    cwd = os.getcwd()
+    os.chdir("../Data/YAML/"+brand+"/"+year)
+    models = os.listdir()
+    for m in models:
+        if model == m.split(".")[0]:
+            os.chdir(cwd)
+            return True
+    os.chdir(cwd)
+    return False
+
+def gatherBrand(attr: str, yam: bool, csv: bool, year: int = None, model: str = None):
+    """Gathers all data amongst attribute. Function run within brand directory"""
     values = set()
     
     years = os.listdir()
     for y in years:
+        if year != None and int(y) != year:
+            continue
+
         os.chdir(y)
         models = os.listdir()
         for m in models:
+            if model != None and m.split('.')[0] != model:
+                continue
+
             with open(m, 'r') as f:
                 if yam:
                     data = yaml.safe_load(f)
@@ -51,7 +92,7 @@ def gatherBrand(attr: str, yam: bool, csv: bool):
         os.chdir('..')
     return values
 
-def getAttr(attr: str, brand: str = None, yam: bool = False, csv: bool = False):
+def getAttr(attr: str, brand: str = None, yam: bool = False, csv: bool = False, year: int = None, model: str = None) -> set:
     cwd = os.getcwd()
     if yam:
         os.chdir("../Data/YAML")
@@ -63,63 +104,76 @@ def getAttr(attr: str, brand: str = None, yam: bool = False, csv: bool = False):
 
     if brand != None:
         os.chdir(brand)
-        values = gatherBrand(attr, yam, csv)
+        values = gatherBrand(attr, yam, csv, year, model)
     else:
         brands = os.listdir()
         values = set()
         for b in brands:
             os.chdir(b)
-            values.union(gatherBrand(attr, yam, csv))
+            values = values.union(gatherBrand(attr, yam, csv, year, model))
             os.chdir('..')
 
     os.chdir(cwd)
     return values
 
+def getCLIstr(x: list[str], numPerRow: int = 5) -> str:
+    longest = len(max(x, key = len))
+
+    s = ''
+    for i in range(len(x)):
+        s += x[i]
+        s += ' '*(longest - len(x[i]) + 2)
+        if i % numPerRow == numPerRow - 1:
+            s += '\n'
+    return s
+
+
 """
 NOTE running with YAML you must supply raw feild key
-Below are exuivalent examples for each data save type
-Example JSON: python3 Collection.py Honda Transmission
-Example YAML: python3 Collection.py Honda "Transmission Description" YAML"
 """
-def run():
-    args = sys.argv[1:]
-
+def run(args: argparse.Namespace):
     brands = _getBrands()
-    attrs = _getAttrs()
-    
-    yam = "yaml" in map(lambda x: x.lower(), args)
-    csv = "csv" in map(lambda x: x.lower(), args)
-    assert(not (yam and csv))
+    attrs = _getAttrs(args.yaml)
 
-    if len(args) >= 2:
-        brand = args[0]
-        attr = args[1]
-        if not yam and attr not in attrs:
-            print("Invalid attribute")
-            return
-        if brand not in brands:
-            print("Invalid brand")
-            return
-        
-        return getAttr(attr, brand=brand, yam=yam, csv=csv)
-    elif len(args) >= 1:
-        print("Warning, action not recommented - gathering attribute values for all brands")
-        attr = args[0]
-        if attr in brands:
-            print("Missing attribute")
-            return
-        elif not yam and attr not in attrs:
-            print("Invalid attribute")
-            return
-        
-        return getAttr(attr, yam=yam, csv=csv)
-    else:
-        print("Wrong number of arguments")
+    if args.attr not in attrs:
+        print("Invalid attribute\n\nValid options are:\n\n" + getCLIstr(attrs, 2))
         return
+    
+    if args.brand != None:
+        if args.brand not in brands:
+            print("Invalid brand\n\nValid options are:\n\n" + getCLIstr(brands))
+            return
+        models = _getModels(args.brand)
+        years = _getYears(args.brand)
+        if args.model != None and args.model not in models:
+            print("Invalid model for " + args.brand + "\n\nValid options are:\n\n" + getCLIstr(models))
+            return
+        if args.year != None and str(args.year) not in years:
+            print("Invalid year for " + args.brand + "\n\nValid options are:\n\n" + getCLIstr(years))
+            return
+        if not yearHasModel(args.brand, str(args.year), args.model):
+            print("No data for " + args.brand + " " + str(args.year) + " " + args.model)
+            return
+    else:
+        print("Warning, action not recommended - gathering attribute values for all brands. This may take a bit...")
+    
+    print(os.getcwd())
+    return getAttr(args.attr, brand=args.brand, yam=args.yaml, csv=args.csv, year=args.year, model=args.model)
+
 
 if __name__ == '__main__':
-   result = run()
-   if result != None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-a', '--attr', '--attribute', required=True, type=str, help="The data attribute to collect (required). IMPORTANT: if --yaml flag is used you must use the raw attribute feild names")
+    parser.add_argument('-b', '--brand', type=str, help="The brand to collect data from")
+    parser.add_argument('-m', '--model', type=str, help="The model to collect data from")
+    parser.add_argument('-y', '--year', type=int, help="The year to collect data from")
+
+    dir_group = parser.add_mutually_exclusive_group()
+    dir_group.add_argument('--yaml', type=bool, nargs='?', const=True, default=False, help="Collect data from YAML data the folder is (default is JSON)")
+    dir_group.add_argument('--csv', type=bool, nargs='?', const=True, default=False, help="Collect data from CSV data the folder is (default is JSON)")
+
+    result = run(parser.parse_args())
+    if result != None:
         result = list(result)
         result.sort()
         print(result)

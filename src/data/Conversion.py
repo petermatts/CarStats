@@ -8,6 +8,7 @@ import os
 import json
 import yaml
 import sys
+import argparse
 
 if os.getcwd() + '/../' not in sys.path:
     sys.path.append(os.getcwd() + '/../')
@@ -17,7 +18,7 @@ from ConversionHelper import KeyMap
 
 cwd = os.getcwd()
 
-def YAML_TO_JSON(brand = None):
+def YAML_TO_JSON(brand: str = None):
     if not os.path.exists('../../Data/JSON'):
         os.mkdir('../../Data/JSON')
 
@@ -60,7 +61,7 @@ def YAML_TO_JSON(brand = None):
         os.chdir('..')
 
 
-def JSON_TO_CSV(brand = None):
+def JSON_TO_CSV(brand: str = None):
     C = Correction()
 
     if not os.path.exists('../../Data/CSV'):
@@ -118,11 +119,18 @@ def JSON_TO_CSV(brand = None):
         os.chdir('..')
 
 
-def Gather_Keys() -> list[str]:
-    """"Helper for JSON_TO_CSV"""
+def Gather_Keys(yamlfile: bool = False) -> list[str]:
+    """"
+    Helper for JSON_TO_CSV via base files
+
+    @Param yaml: boolean flag for gathering YAML file keys, defualt false (JSON)
+    """
     print("Gathering keys from...")
     keys = set()
-    os.chdir('../../Data/JSON')
+    if yamlfile:
+        os.chdir('../../Data/YAML')
+    else:
+        os.chdir('../../Data/JSON')
 
     brands = os.listdir()
     for b in brands:
@@ -136,7 +144,10 @@ def Gather_Keys() -> list[str]:
 
             for m in models:
                 with open(m, 'r') as f:
-                    data = yaml.safe_load(f)
+                    if yamlfile:
+                        data = yaml.safe_load(f)
+                    else:
+                        data = json.load(f)
 
                 for d in data:
                     keys = keys.union(d.keys())
@@ -151,30 +162,49 @@ def Gather_Keys() -> list[str]:
 
 #??? write a clean up function before converting ???
 
-def driver():
+def driver(args: argparse.Namespace):
     cwd = os.getcwd()
     os.chdir('../../Data/YAML')
     brands = list(map(lambda x: x.lower(), os.listdir()))
     os.chdir(cwd)
 
-    brand = None
-    if len(sys.argv) > 1:
-        if len(sys.argv) > 2:
-            if sys.argv[2].lower() in brands:
-                brand = sys.argv[2]
-            else:
-                print("Invalid Brand:", sys.argv[2])
-                return
-        if sys.argv[1].lower() in ['yaml-json', 'yaml2json']:
-            YAML_TO_JSON(brand)
-        elif sys.argv[1].lower() in ['json-csv', 'json2csv']:
-            JSON_TO_CSV(brand)
-        else:
-            print("Error Invalid Arg:", sys.argv[1])
+    print(args)
+
+    def getBrandList() -> str:
+        options = os.listdir('../../Links')
+        longest = 0
+        for i in range(len(options)):
+            options[i] = options[i][:-4]
+            if len(options[i]) > longest:
+                longest = len(options[i])
+
+        brands = ''
+        for i in range(len(options)):
+            brands += options[i]
+            brands += ' '*(longest - len(options[i]) + 2)
+            if i % 5 == 4:
+                brands += '\n'
+        os.chdir(cwd)
+        return brands
+
+    brand = args.brand
+    if brand not in brands and brand != None:
+        print("Invalid brand", brand, '\n\nValid brands are:\n\n' + getBrandList())
+        return
+
+    if args.yaml_json:
+        YAML_TO_JSON(brand)
+    elif args.json_csv:
+        JSON_TO_CSV(brand)
     else:
-        print("Error No Args. Expected one of:\n")
-        print("YAML to JSON:\n\tyaml-json\n\tyaml2json\n\nJSON to CSV:\n\tjson-csv\n\tjson2csv")
+        print("This should not happen")
 
 
 if __name__ == '__main__':
-    driver()
+    parser = argparse.ArgumentParser()
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('--yaml-json', '--yaml2json', type=bool, nargs='?', const=True, default=False, help="Converts YAML data files to JSON")
+    group.add_argument('--json-csv', '--json2csv', type=bool, nargs='?', const=True, default=False, help="Converts JSON data files to CSV")
+    parser.add_argument('--brand', type=str, help="Convert only the specified brand")
+
+    driver(parser.parse_args())
