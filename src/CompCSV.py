@@ -39,7 +39,7 @@ def AllData():
         brand_file.writelines(brand_lines)
         brand_file.close()
 
-        L += brand_lines
+        L += brand_lines[1:] # remove header
         os.chdir('../')
 
     # print(os.getcwd())

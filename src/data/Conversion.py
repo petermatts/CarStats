@@ -165,10 +165,8 @@ def Gather_Keys(yamlfile: bool = False) -> list[str]:
 def driver(args: argparse.Namespace):
     cwd = os.getcwd()
     os.chdir('../../Data/YAML')
-    brands = list(map(lambda x: x.lower(), os.listdir()))
+    brands = os.listdir()
     os.chdir(cwd)
-
-    print(args)
 
     def getBrandList() -> str:
         options = os.listdir('../../Links')

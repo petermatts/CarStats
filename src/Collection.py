@@ -118,6 +118,8 @@ def getAttr(attr: str, brand: str = None, yam: bool = False, csv: bool = False, 
 
 def getCLIstr(x: list[str], numPerRow: int = 5) -> str:
     longest = len(max(x, key = len))
+    if longest > 25:
+        numPerRow = 2
 
     s = ''
     for i in range(len(x)):
@@ -151,13 +153,12 @@ def run(args: argparse.Namespace):
         if args.year != None and str(args.year) not in years:
             print("Invalid year for " + args.brand + "\n\nValid options are:\n\n" + getCLIstr(years))
             return
-        if not yearHasModel(args.brand, str(args.year), args.model):
+        if args.year is not None and not yearHasModel(args.brand, str(args.year), args.model):
             print("No data for " + args.brand + " " + str(args.year) + " " + args.model)
             return
     else:
         print("Warning, action not recommended - gathering attribute values for all brands. This may take a bit...")
     
-    print(os.getcwd())
     return getAttr(args.attr, brand=args.brand, yam=args.yaml, csv=args.csv, year=args.year, model=args.model)
 
 

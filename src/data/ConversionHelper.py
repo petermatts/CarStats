@@ -53,16 +53,16 @@ def KeyMap(webspecs: dict[str, str]) -> dict[str, str]:
     def Horsepower(k: str = '', v: str = ''):
         hp = v.split(' @ ')
         if len(hp) > 1 and not isElectric:
-            return {'Max Horsepower': hp[0].replace(' combined', ''), 'Max Horsepower RPM': hp[1]}
+            return {'Max Horsepower': re.sub("(C|c)ombined", "", hp[0]).strip(), 'Max Horsepower RPM': hp[1]}
         else:
-            return {'Max Horsepower': hp[0].replace(' combined', '')}
+            return {'Max Horsepower': re.sub("(C|c)ombined", "", hp[0]).strip()}
 
     def Torque(k: str = '', v: str = ''):
         hp = v.split(' @ ')
         if len(hp) > 1 and not isElectric:
-            return {'Max Torque': hp[0], 'Max Torque RPM': hp[1]}
+            return {'Max Torque': re.sub("(C|c)ombined", "", hp[0]).strip(), 'Max Torque RPM': hp[1]}
         else:
-            return {'Max Torque': hp[0]}
+            return {'Max Torque': re.sub("(C|c)ombined", "", hp[0]).strip()}
 
     def MPG(k: str = '', v: str = ''):
         fe = v.replace('N/A', '').split('/')

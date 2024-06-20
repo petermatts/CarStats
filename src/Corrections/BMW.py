@@ -118,7 +118,7 @@ class BMW_Corrections(Correction_Template):
 					else:
 						result[k] = ""
 				case "Trim":
-					find = re.search("(M?\d{2,3}\w{0,2})|(X?B\d)", result[k])
+					find = re.search("(M?\d{2,3}\w{0,2})|(X?B\d)|CS|Competition", result[k])
 					if find is not None:
 						t = result[k][find.span()[0]:find.span()[1]]
 						# t = re.sub(r"(x|s|e)Drive", "", t)
