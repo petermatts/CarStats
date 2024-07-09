@@ -305,6 +305,8 @@ def writeData(specs: dict[str, str]):
 def driver(args: argparse.Namespace):
     """I hope anyone reading this can appreciate the pun that is this function name"""
 
+    #TODO implement --test case
+
     def getBrandList() -> str:
         options = os.listdir('./Links')
         longest = 0
@@ -411,6 +413,8 @@ if __name__ == "__main__":
     year_group = parser.add_mutually_exclusive_group()
     year_group.add_argument('--latest', type=bool, nargs='?', const=True, default=False, help="Scrape the latest year data for model is avaiable (cannot be used with --year flag)")
     year_group.add_argument('--year', type=int, help="The year to scrape model data (cannot be used with --latest flag)")
+
+    parser.add_argument('--test', type=bool, nargs='?', const=True, default=False, help="Test the scraper by printing output to see if it is operating correctly")
 
     start = time.time()
 
