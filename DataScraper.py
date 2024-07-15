@@ -25,15 +25,18 @@ def scrapeData(driver: webdriver, specs: dict = {}):
     # Note: price is under one of the following styles, if getting a bunch of no such element errors, switch which one is commented out
     # todo automatically try one and if it fails try the other, if both fail return with error message 
     # price = driver.find_element(By.CLASS_NAME, 'css-11vbyw7.e1l3raf11')
-    price = driver.find_element(By.CLASS_NAME, 'css-1xre4z6.e1l3raf11')
+    # price = driver.find_element(By.CLASS_NAME, 'css-1xre4z6.e1l3raf11')
+    price = driver.find_element(By.CLASS_NAME, 'css-f1ylyv e1c3m9of1')
 
 
     specs['Price'] = price.text.replace(',', '')
 
-    data = driver.find_elements(By.CLASS_NAME, 'css-1ajawdl.eqxeor30')
+    # data = driver.find_elements(By.CLASS_NAME, 'css-1ajawdl.eqxeor30')
+    data = driver.find_elements(By.CLASS_NAME, 'css-o190g0 e2odqo16')
+
     # rows = []
     for i in range(len(data)):
-        print('\tFind Data', i+1, end='\r')
+        print('\tFind Data %3d'%(i+1), end='\r')
         row = data[i].find_elements(By.TAG_NAME, 'div')
         if len(row) != 0:
             # rows.append((row[0].text.replace(',', ''), row[1].text.replace(',', '')))
@@ -53,7 +56,7 @@ def getSelectors(driver) -> tuple:
     yearSelect, styleSelect, trimSelect = select
     return (yearSelect, styleSelect, trimSelect)
 
-def scrapeBrand(brand_filename: str, modelname: str = None, year: int = None, latest: bool = False):
+def scrapeBrand(brand_filename: str, modelname: str = None, year: int = None, latest: bool = False, test: bool = False):
     """brand_filename is the path to the brands links in Links folder"""
     brand = brand_filename.split('/')[-1].replace('.txt', '')
 
@@ -172,7 +175,8 @@ def scrapeBrand(brand_filename: str, modelname: str = None, year: int = None, la
                         except requests.exceptions.ConnectTimeout:
                             return -2
 
-                        writeData(data)
+                        if not test:
+                            writeData(data)
 
                         try:
                             yearSelect, styleSelect, trimSelect = getSelectors(driver)
@@ -372,7 +376,7 @@ def driver(args: argparse.Namespace):
 
             result = 0
             while result <= 0:
-                result = scrapeBrand(path, modelname=model, year=year, latest=latest)
+                result = scrapeBrand(path, modelname=model, year=year, latest=latest, test=args.test)
                 
                 if result == -1:
                     print("Bad link encountered, skipping")

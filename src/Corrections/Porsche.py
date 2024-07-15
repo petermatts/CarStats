@@ -33,7 +33,7 @@ class Porsche_Corrections(Correction_Template):
 				case "Model":
 					match result[k]:
 						case "718-boxster"|"718-cayman":
-							m = re.search(r"718 ((Boxster|Spyder|Cayman|GT(4|S)|RS|4.0) ?)+", result['Trim'])
+							m = re.search(r"718 ((Boxster|Spyder|Cayman|S|GT(4|S)|RS|4.0) ?)+", result['Trim'])
 							if m is not None:
 								result[k] = result['Trim'][m.span()[0]:m.span()[1]].rstrip()
 							else:
@@ -83,7 +83,7 @@ class Porsche_Corrections(Correction_Template):
 							result[k] = "Taycan"
 							temp = result['Trim'].replace("4dr ", "")
 							detail = ""
-							m = re.search(r"Turbo( S^.)?|4S?|GTS| S |", temp)
+							m = re.search(r"Turbo( S)?|4S?|GTS| S ", temp)
 							if m is not None:
 								detail = temp[m.span()[0]:m.span()[1]].strip()
 								result[k] += (" " + detail)

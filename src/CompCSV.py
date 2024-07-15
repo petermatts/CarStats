@@ -71,7 +71,6 @@ if __name__ == '__main__':
     group.add_argument('--remove', '--delete', '--clean', type=bool, nargs='?', const=True, default=False, help="Remove the data compiled csv files")
 
     args = parser.parse_args()
-    print(args)
 
     if args.make:
         AllData()
