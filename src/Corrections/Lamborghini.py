@@ -46,7 +46,7 @@ class Lamborghini_Corrections(Correction_Template):
 					result[k] = re.sub("coupe", "Coupe", result[k])
 					result[k] = re.sub("roadster", "Roadster", result[k])
 
-					s = re.search(r"((Spyder|Coupe|Evo|Roadster) ?)+", result[k])
+					s = re.search(r"((Spyder|Coupe|Roadster) ?)+", result[k])
 					if s is not None:
 						result[k] = result[k][s.span()[0]:s.span()[1]]
 					else:
@@ -56,7 +56,7 @@ class Lamborghini_Corrections(Correction_Template):
 					result[k] = re.sub("Conv", "", result[k])
 					result[k] = re.sub("Spyder", "", result[k])
 
-					t = re.search(r"((Ultimae|STO|SVJ?|Super(veloce|leggera)|Avio|LP|\d{3}-\d| S |Pirelli Edition|Performante|Edizione|Tecnica|Valentino Balboni|(Graphite|Pearl) Capsule|50th Anniversario) ?)+", result[k])
+					t = re.search(r"((Ultimae|STO|EVO|Sterrato|SVJ?|Super(veloce|leggera)|Avio|LP|\d{3}-\d| S |Pirelli Edition|Performante|Edizione|Tecnica|Valentino Balboni|(Graphite|Pearl) Capsule|50th Anniversario) ?)+", result[k])
 					if t is not None:
 						result[k] = result[k][t.span()[0]:t.span()[1]].strip()
 					else:

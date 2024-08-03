@@ -124,23 +124,30 @@ class Audi_Corrections(Correction_Template):
 					result[k] = temp.replace("/", "").strip()
 				case "Trim":
 					num = ""
-					if "40" in result[k]:
+					ans = ""
+					temp = result[k]
+					if "40" in temp:
 						num = " 40"
-					elif "45" in result[k]:
+					elif "45" in temp:
 						num = " 45"
-					elif "50" in result[k]:
+					elif "50" in temp:
 						num = " 50"
-					elif "55" in result[k]:
+					elif "55" in temp:
 						num = " 55"
 
-					if "Prestige" in result[k]:
-						result[k] = "Prestige" + num
-					elif "Premium Plus" in result[k]:
-						result[k] = "Premium Plus" + num
-					elif "Premium" in result[k]:
-						result[k] = "Premium" + num
+					if "performance" in temp.lower():
+						ans = "Performance "
+
+					if "Prestige" in temp:
+						ans += "Prestige" + num
+					elif "Premium Plus" in temp:
+						ans += "Premium Plus" + num
+					elif "Premium" in temp:
+						ans += "Premium" + num
 					else:
-						result[k] = ""
+						ans += ""
+
+					result[k] = ans
 
 				case "Drivetrain":
 					if result[k] == "A":
