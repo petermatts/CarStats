@@ -44,13 +44,21 @@ class Genesis_Corrections(Correction_Template):
 							result[k] = "G90"
 						case "gv60":
 							result[k] = "GV60"
+						case "gv80":
+							result[k] = "GV80"
 				case "Style":
 					if "Electrified" in result[k]:
 						result[k] = "Electrified"
-					elif "sedan":
+					elif "sedan" in result[k]:
 						result[k] = "Sedan"
+					else:
+						result[k] = ""
 				case "Trim":
-					t = re.search(r"(Advanced|Sport|Design|Dynamic|(Launch) Edition|Ultimate|Premium|Performance|Prestige Signature)", result[k])
+					t = re.search(r"(Advanced|Sport|Design|Dynamic|(Launch) Edition|Ultimate|Premium|Performance|Prestige Signature|e-SC)", result[k])
+					if t is not None:
+						result[k] = result[k][t.span()[0]:t.span()[1]].strip()
+					else:
+						result[k] = ""
 				case "Drivetrain":
 					pass #Implement this if necessary
 				case "EPA Class":
