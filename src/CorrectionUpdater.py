@@ -54,6 +54,11 @@ def update(fixmap: dict):
 
 
 if __name__ == "__main__":
+    """
+    dictionary mapping old key to a new key list|str in the event that a list is supplied as a key
+    the first element in the list will recieve any existing key code. In the event that the key is a
+    string, the case will simply be replaced with the new  string.
+    """
     # DEFINE FIX HERE
     fix = {}
 

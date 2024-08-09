@@ -56,10 +56,13 @@ class Subaru_Corrections(Correction_Template):
 					result[k] = result[k].replace("sedan", "Sedan")
 					result[k] = result[k].replace("hybrid", "Hyrbid")
 					result[k] = result[k].replace("wagon", "Wagon")
+					result[k] = re.sub(r"WRX ?", "", result[k])
 
-					s = re.search(r"STI( S209)?|Sedan|Wagon|Hybrid|B9|XV", result[k])
+					s = re.search(r"((STI( S209)?|Sedan|Wagon|Hybrid|B9|XV|Impreza) ?)+", result[k])
 					if s is not None:
-						result[k] = result[k][s.span()[0]:s.span()[1]]
+						result[k] = result[k][s.span()[0]:s.span()[1]].rstrip()
+						if result["Model"] == "Impreza":
+							result[k] = re.sub(r"Impreza ?", "", result[k])
 					else:
 						result[k] = ""
 				case "Trim":

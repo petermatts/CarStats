@@ -21,28 +21,31 @@ def KeyMap(webspecs: dict[str, str]) -> dict[str, str]:
             return {'Engine': 'Electric', 'Fuel': 'Electric'}
         else:
             isHybrid = "Gas/Electric" in v
-            engine = re.search('\w-?\d+', v)
+            val = v.replace("Flat ", "H")
+            engine = re.search('\w-?\d+', val.replace("Flat ", "H"))
 
             result = {}
             if engine != None:
-                engine = v[engine.span()[0]:engine.span()[1]].replace('-', '')
+                engine = val[engine.span()[0]:engine.span()[1]].replace('-', '')
                 result.update({'Engine': engine.upper()})
                 
                 # check turbos
-                if "Twin Turbo" in v:
+                if "Twin Turbo" in val:
                     specs['Turbo'] = 'Twin Turbo'
-                elif "Intercooled Turbo" in v:
+                elif "Turbocharged" in val:
+                    specs['Turbo'] = 'Turbocharged'
+                elif "Intercooled Turbo" in val:
                     specs['Turbo'] = 'Intercooled Turbo'
-                elif "Intercooled Supercharger" in v:
+                elif "Intercooled Supercharger" in val:
                     specs['Turbo'] = 'Intercooled Supercharger'
-                elif "Turbo" in v:
+                elif "Turbo" in val:
                     specs['Turbo'] = 'Turbo'
 
                 # check hybrid
                 if not isHybrid:
-                    gas = re.search("Regular|Premium|Gas|Diesel", v)
+                    gas = re.search("Regular|Premium|Gas|Diesel", val)
                     try:
-                        result.update({'Fuel': v[gas.span()[0]:gas.span()[1]]})
+                        result.update({'Fuel': val[gas.span()[0]:gas.span()[1]]})
                     except:
                         pass
                 else:
