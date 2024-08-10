@@ -138,12 +138,7 @@ def makeHelpers():
             data = [
                 '# Automatically generated file template\n',
                 '\n',
-                'import os\n',
-                'import sys\n',
                 'import re\n',
-                '\n',
-                'if os.getcwd() + "/../" not in sys.path:\n',
-                '\tsys.path.append(os.getcwd() + "/../")\n',
                 '\n',
                 'from Correction_Template import Correction_Template\n'
                 '\n',

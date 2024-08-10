@@ -1,12 +1,6 @@
 # Automatically generated file template
 
-import os
-import sys
 import re
-
-
-if os.getcwd() + "/../" not in sys.path:
-	sys.path.append(os.getcwd() + "/../")
 
 from Correction_Template import Correction_Template
 

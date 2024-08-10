@@ -10,9 +10,6 @@ import yaml
 import sys
 import argparse
 
-if os.getcwd() + '/../' not in sys.path:
-    sys.path.append(os.getcwd() + '/../')
-
 from Correction import Correction
 from ConversionHelper import KeyMap
 
