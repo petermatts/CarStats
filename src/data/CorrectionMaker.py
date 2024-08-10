@@ -7,13 +7,13 @@ import json
 cwd = os.getcwd()
 
 def getBrands():
-    os.chdir('../Data/YAML')
+    os.chdir('../../Data/YAML')
     brands = list(map(lambda x: x.replace('-', ''), os.listdir(os.getcwd())))
     os.chdir(cwd)
     return brands
 
 def getAttributes():
-    with open('../Docs/KeyGroups.json', 'r') as f:
+    with open('../../Docs/KeyGroups.json', 'r') as f:
         data = json.load(f)
 
     attrs = list()
@@ -28,9 +28,10 @@ ATTRIBUTES = getAttributes()
 
 def makeCorrectionFiles():
     makeMain()
+
     if not os.path.exists('Corrections'):
         os.mkdir('Corrections')
-    
+
     makeHelpers()
 
 
@@ -93,6 +94,7 @@ def makeMain():
                 f.writelines(data)
     
     def makeTemplate():
+        """ todo: use abstract base class on this? """
         if not os.path.isfile('Correction_Template.py'):
             data = [
                 '# Automatically generated file - DO NOT EDIT\n',

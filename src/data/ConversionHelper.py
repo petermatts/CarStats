@@ -120,7 +120,7 @@ def KeyMap(webspecs: dict[str, str]) -> dict[str, str]:
         'Price': lambda k, v: {k: '' if v.startswith('$0') else v},
         'Model': lambda k, v: {k: modelYearRemover(v)},
         'EPA Classification': lambda k, v: {'EPA Class': v},
-        'Drivetrain': lambda k, v: {'Drivetrain': ''.join(list(filter(lambda c: c.isupper() or c.isdigit(), re.sub(r"(F|f)our", "4", v))))},
+        'Drivetrain': lambda k, v: {'Drivetrain': ''.join(list(filter(lambda c: c.isupper() or c.isdigit(), re.sub(r"(F|f)our", "4", re.sub(r"(W|w)heel (D|d)rive", "Wheel Drive", v)))))},
         'Engine Type and Required Fuel': EngineAndGas,
         'Displacement (liters/cubic inches)': lambda k, v: {'Displacement (Liters)': v.split('/')[0].replace('L', '').strip()},
         'Maximum Horsepower @ RPM': Horsepower,

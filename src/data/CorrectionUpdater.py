@@ -48,7 +48,7 @@ def update(fixmap: dict):
                         "\t\t\t\t\tpass #Implement this if necessary\n"
                     ]
 
-        with open('../../Temp/'+file, 'w') as f: #! move from temp once verified this actually works
+        with open('../../../Temp/'+file, 'w') as f: #! move from temp once verified this actually works
             f.writelines(newData)
 
 

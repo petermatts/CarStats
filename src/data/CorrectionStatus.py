@@ -8,19 +8,19 @@ def run():
     wb = Workbook()
     ws = wb.active
     BoldFont = Font(bold=True)
-    Void = PatternFill(start_color="444444", end_color="444444", bgColor="444444", fill_type="solid")
+    Void = PatternFill(start_color="888888", end_color="888888", bgColor="888888", fill_type="solid")
     Gray = PatternFill(start_color="D8D8D8", end_color="D8D8D8", bgColor="D8D8D8", fill_type="solid")
     Good = PatternFill(start_color="C6EFCE", end_color="C6EFCE", bgColor="C6EFCE", fill_type="solid")
 
     # Column and Row setup
     idxs = {}
-    Brands = list(map(lambda x: x[:-4].replace("-", " "), os.listdir("../Links")))
+    Brands = list(map(lambda x: x[:-4].replace("-", " "), os.listdir("../../Links")))
     Brands = [""] + Brands
 
     for b in range(len(Brands)):
         idxs[Brands[b].replace("-", "").replace(" ", "")] = xl_col_to_name(b)
 
-    with open("../Docs/Base.csv", "r") as f:
+    with open("../../Docs/Base.csv", "r") as f:
         Specs = list(map(lambda x: x.rstrip(), f.read().split(',')))
 
     Specs += ["_"] # the defualt case
@@ -85,7 +85,7 @@ def run():
         adjusted_width = (max_length+2)
         ws.column_dimensions[column_letter].width = adjusted_width
 
-    wb.save("../Docs/CorrectionStatus.xlsx")
+    wb.save("../../Docs/CorrectionStatus.xlsx")
 
 
 if __name__ == "__main__":

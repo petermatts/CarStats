@@ -10,21 +10,21 @@ import argparse
 
 def _getBrands() -> list[str]:
     cwd = os.getcwd()
-    os.chdir("../Data/YAML")
+    os.chdir("../../Data/YAML")
     brands = os.listdir()
     os.chdir(cwd)
     return brands
 
 def _getYears(brand: str) -> list[str]:
     cwd = os.getcwd()
-    os.chdir("../Data/YAML/"+brand)
+    os.chdir("../../Data/YAML/"+brand)
     years = os.listdir()
     os.chdir(cwd)
     return years
 
 def _getModels(brand: str) -> list[str]:
     cwd = os.getcwd()
-    os.chdir("../Data/YAML/"+brand)
+    os.chdir("../../Data/YAML/"+brand)
     years = os.listdir()
     models = set()
     for y in years:
@@ -37,10 +37,10 @@ def _getModels(brand: str) -> list[str]:
 
 def _getAttrs(yaml: bool = None) -> list[str]:
     if yaml:
-        with open("../Docs/BaseYAML.txt") as f:
+        with open("../../Docs/BaseYAML.txt") as f:
             attributes = f.readlines()
     else:
-        with open("../Docs/Base.txt") as f:
+        with open("../../Docs/Base.txt") as f:
             attributes = f.readlines()
         
     for a in range(len(attributes)):
@@ -50,7 +50,7 @@ def _getAttrs(yaml: bool = None) -> list[str]:
 
 def yearHasModel(brand: str, year: str, model: str) -> bool:
     cwd = os.getcwd()
-    os.chdir("../Data/YAML/"+brand+"/"+year)
+    os.chdir("../../Data/YAML/"+brand+"/"+year)
     models = os.listdir()
     for m in models:
         if model == m.split(".")[0]:
@@ -95,11 +95,11 @@ def gatherBrand(attr: str, yam: bool, csv: bool, year: int = None, model: str = 
 def getAttr(attr: str, brand: str = None, yam: bool = False, csv: bool = False, year: int = None, model: str = None) -> set:
     cwd = os.getcwd()
     if yam:
-        os.chdir("../Data/YAML")
+        os.chdir("../../Data/YAML")
     elif csv:
-        os.chdir("../Data/CSV")
+        os.chdir("../../Data/CSV")
     else:
-        os.chdir("../Data/JSON")
+        os.chdir("../../Data/JSON")
     values = set()
 
     if brand != None:

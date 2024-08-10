@@ -4,13 +4,14 @@ import os
 import argparse
 
 def AllData():
-    base = open('../Docs/Base.csv', 'r')
+    cwd = os.getcwd()
+    base = open('../../Docs/Base.csv', 'r')
     header = base.readline()
     base.close()
 
     L = [header]
 
-    os.chdir('../Data/CSV')
+    os.chdir('../../Data/CSV')
     for brand in os.listdir():
         if not os.path.isdir(brand):
             continue
@@ -47,10 +48,10 @@ def AllData():
     file.writelines(L)
     file.close()
 
-    os.chdir('../')
+    os.chdir(cwd)
 
 def removeCompCSVs():
-    os.chdir('../Data/CSV')
+    os.chdir('../../Data/CSV')
     for brand in os.listdir():
         try:
             filename = str(brand) + '/' + str(brand) + '.csv'
