@@ -1,5 +1,6 @@
 import argparse
 import os
+import re
 
 def _getAttrs() -> list[str]:
     with open("../../Docs/Base.csv") as f:
@@ -7,13 +8,35 @@ def _getAttrs() -> list[str]:
 
     return attributes.rstrip().split(",")
 
-def makeArgs():
-    # todo, automatically configure args based on all attributes
-    parser = argparse.ArgumentParser()
+
+def makeArgs() -> tuple[dict[str, str], dict[str, str]]:
+    description = """""" # todo write helpful description
+    parser = argparse.ArgumentParser(description=description)
     attributes = _getAttrs()
 
-    print(attributes)
+    keymap = dict() # maps the keys to the right attribute name in the CSV
+
+    seen = list()
+    for attr in attributes:
+        a = re.sub(r"@|ï¿½ |:|-|/|'|\(|\)", "", attr).lower()
+        #? remove mulitple occurences of the same word (first occurence of duplicates)
+        a = re.sub(r"\s+", "-", a)
+
+        if a in seen:
+            continue
+        else:
+            seen.append(a)
+
+        parser.add_argument(f"--{a}", type=str)
+        keymap[a.replace("-", "_")] = attr
+
+    return vars(parser.parse_args()), keymap
+
+
+def search(args: dict[str, str], keymap: dict[str,  str]) -> list:
+    pass
 
 
 if __name__ == "__main__":
-    makeArgs()
+    args, keymap = makeArgs()
+    search(args, keymap)
