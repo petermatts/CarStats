@@ -18,8 +18,10 @@ def makeArgs() -> tuple[dict[str, str], dict[str, str]]:
     # customization args
     parser.add_argument("-v", "--verbose", type=bool, nargs='?', const=True, default=False, help="Displays full dataframe of matches, beware generic searches will have a large result")
     parser.add_argument("-s", "--show", nargs='+', type=str, default=[], help="Additional specs to display but not filter over. Misspellings will be skipped. Syntax is the same as the arguement in --help but replace - with _ and -- with nothing")
-    parser.add_argument("--ge", type=bool, const=True, default=False, nargs='?', help="Run the search with comparisons >= (does not apply for standards for brand, model, style, trim)")
-    parser.add_argument("--le", type=bool, const=True, default=False, nargs='?', help="Run the search with comparisons <= (does not apply for standards for brand, model, style, trim)")
+    
+    comp = parser.add_mutually_exclusive_group()
+    comp.add_argument("--ge", type=bool, const=True, default=False, nargs='?', help="Run the search with comparisons >= (does not apply for standards for brand, model, style, trim)")
+    comp.add_argument("--le", type=bool, const=True, default=False, nargs='?', help="Run the search with comparisons <= (does not apply for standards for brand, model, style, trim)")
 
     keymap = dict() # maps the keys to the right attribute name in the CSV
 
