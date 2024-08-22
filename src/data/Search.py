@@ -42,11 +42,14 @@ def makeArgs() -> tuple[dict[str, str], dict[str, str]]:
     return vars(parser.parse_args()), keymap
 
 
-def search(args: dict[str, str], keymap: dict[str,  str]) -> list:
+def search(args: dict[str, str], keymap: dict[str,  str]) -> None:
     if all(v is None for v in args.values()):
         print("Error: must supply atleast 1 search key. Run --help for options.")
-        return []
-    
+        return
+    elif not os.path.isfile("../../Data/CSV/AllData.csv"):
+        print("Error: AllData.csv does not exist. Run CompCSV.py --build")
+        return
+
     data = pd.read_csv("../../Data/CSV/AllData.csv", encoding="cp1252", dtype=str)
 
     print_cols = list()

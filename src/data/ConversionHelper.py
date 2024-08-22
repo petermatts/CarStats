@@ -22,7 +22,7 @@ def KeyMap(webspecs: dict[str, str]) -> dict[str, str]:
         else:
             isHybrid = "Gas/Electric" in v
             val = v.replace("Flat ", "H")
-            engine = re.search('\w-?\d+', val.replace("Flat ", "H"))
+            engine = re.search(r'\w-?\d+', val.replace("Flat ", "H"))
 
             result = {}
             if engine != None:
@@ -40,16 +40,18 @@ def KeyMap(webspecs: dict[str, str]) -> dict[str, str]:
                     specs['Turbo'] = 'Intercooled Supercharger'
                 elif "Turbo" in val:
                     specs['Turbo'] = 'Turbo'
-
-                # check hybrid
-                if not isHybrid:
-                    gas = re.search("Regular|Premium|Gas|Diesel", val)
-                    try:
-                        result.update({'Fuel': val[gas.span()[0]:gas.span()[1]]})
-                    except:
-                        pass
-                else:
-                    result.update({'Fuel': 'Hybrid'})
+            elif "rotary" in val.lower():
+                result.update({'Engine': 'Rotary'})
+                
+            # check hybrid
+            if not isHybrid:
+                gas = re.search("Regular|Premium|Gas|Diesel", val)
+                try:
+                    result.update({'Fuel': val[gas.span()[0]:gas.span()[1]]})
+                except:
+                    pass
+            else:
+                result.update({'Fuel': 'Hybrid'})
             
             return result
 
