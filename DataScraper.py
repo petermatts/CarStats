@@ -53,6 +53,7 @@ def scrapeData(driver: webdriver, specs: dict = {}):
 
 def getSelectors(driver) -> tuple:
     select = driver.find_elements(By.CLASS_NAME, 'e1rdmryi0.cad-dropdown-filters__control.css-1l5x637-control')
+    print(select)
     yearSelect, styleSelect, trimSelect = select
     return (yearSelect, styleSelect, trimSelect)
 
@@ -63,7 +64,7 @@ def scrapeBrand(brand_filename: str, modelname: str = None, year: int = None, la
     # get links
     with open(brand_filename, 'r') as file:
         links = file.readlines()
-    
+
     # open debug file (open with defaults if it doesn't exist)
     debug_path = './Debug/' + brand + '.yaml'
     debug = openDebugFile(debug_path)
@@ -361,7 +362,6 @@ def driver(args: argparse.Namespace):
     year = args.year
     latest = args.latest
     # end option configuration
-
     if not args.list:
         path = './Links/' + brand + '.txt'
 

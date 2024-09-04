@@ -1,0 +1,5 @@
+Avoid bot detection using:
+https://github.com/ultrafunkamsterdam/undetected-chromedriver/blob/master/undetected_chromedriver/options.py
+
+Alternative methods:
+https://www.zenrows.com/blog/selenium-avoid-bot-detection

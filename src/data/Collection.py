@@ -29,7 +29,7 @@ def _getModels(brand: str) -> list[str]:
     models = set()
     for y in years:
         for m in os.listdir(y):
-            models.add(m[:-5]) # chop of the .yaml
+            models.add(m[:-5]) # chop off the .yaml
     os.chdir(cwd)
     models = list(models)
     models.sort()

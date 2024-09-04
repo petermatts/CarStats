@@ -1,5 +1,7 @@
 """
 This file aquires the names of all brands and models and writes it to a file AllBrandsAndModels.json
+
+# todo get this script passed bot detection
 """
 
 from selenium import webdriver
