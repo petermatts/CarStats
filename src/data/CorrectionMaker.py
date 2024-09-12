@@ -3,17 +3,18 @@
 import sys
 import os
 import json
+from pathlib import Path
 
 cwd = os.getcwd()
 
 def getBrands():
-    os.chdir('../../Data/YAML')
+    os.chdir(Path(__file__).parent / '..' / '..' / 'Data' / 'YAML')
     brands = list(map(lambda x: x.replace('-', ''), os.listdir(os.getcwd())))
     os.chdir(cwd)
     return brands
 
 def getAttributes():
-    with open('../../Docs/KeyGroups.json', 'r') as f:
+    with open(Path(__file__).parent / '..' / '..' / 'Docs' / 'KeyGroups.json', 'r') as f:
         data = json.load(f)
 
     attrs = list()
@@ -29,15 +30,15 @@ ATTRIBUTES = getAttributes()
 def makeCorrectionFiles():
     makeMain()
 
-    if not os.path.exists('Corrections'):
-        os.mkdir('Corrections')
+    if not os.path.exists(Path(__file__).parent / 'Corrections'):
+        os.mkdir(Path(__file__).parent / 'Corrections')
 
     makeHelpers()
 
 
 def makeMain():
     def makeCorrection():
-        if not os.path.isfile('Correction.py'):
+        if not os.path.isfile(Path(__file__).parent / 'Correction.py'):
             data = [
                 '# Automatically generated file - DO NOT EDIT\n',
                 '\n',
@@ -90,7 +91,7 @@ def makeMain():
             ]
 
             print("Making Correction.py")
-            with open('Correction.py', 'w') as f:
+            with open(Path(__file__).parent / 'Correction.py', 'w') as f:
                 f.writelines(data)
     
     def makeTemplate():
@@ -110,7 +111,7 @@ def makeMain():
             ]
 
             print("Making Correction_Template.py")
-            with open('Correction_Template.py', 'w') as f:
+            with open(Path(__file__).parent / 'Correction_Template.py', 'w') as f:
                 f.writelines(data)
 
     makeCorrection()
@@ -130,7 +131,7 @@ def makeHelpers():
             '# from Corrections import *\n'
         ]
         print("Making Corrections/__init__.py")
-        with open('Corrections/__init__.py', 'w') as f:
+        with open(Path(__file__).parent / 'Corrections' / '__init__.py', 'w') as f:
             f.writelines(data)
     
     def makeCorrectionHelperFiles():
@@ -171,7 +172,7 @@ def makeHelpers():
             ]
 
             print("Making Corrections/" + b + ".py")
-            with open("Corrections/" + b + ".py", 'w') as f:
+            with open(Path(__file__).parent / "Corrections" / (b + ".py"), 'w') as f:
                 f.writelines(data)
 
     makeInit()

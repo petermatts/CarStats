@@ -1,12 +1,13 @@
 import argparse
 import os
 import yaml
+from pathlib import Path
 from iteration_utilities import unique_everseen
 
 cwd = os.getcwd()
 
 def deduplicate(remove: bool = False, verbose: bool = False):
-    os.chdir('../../Data/YAML')
+    os.chdir(Path(__file__).parent / '..' / '..' / 'Data-Old' / 'YAML')
     brands = os.listdir()
     total = 0
     for b in brands:
@@ -30,7 +31,7 @@ def deduplicate(remove: bool = False, verbose: bool = False):
                 brand_duplicates += duplicates
 
                 if verbose:
-                    fname = 'Data/YAML/' + b + '/' + y + '/' + m + ' = ' + str(duplicates)
+                    fname = 'Data-Old/YAML/' + b + '/' + y + '/' + m + ' = ' + str(duplicates)
                     print(fname)
                 
                 if remove:

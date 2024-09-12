@@ -6,6 +6,9 @@ import csv as CSV
 import os
 import argparse
 
+# TODO: refactor with pathlib
+# TODO: move these top functions to the common folder
+
 # Collects data from JSON
 
 def _getBrands() -> list[str]:

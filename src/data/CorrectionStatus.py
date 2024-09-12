@@ -1,6 +1,7 @@
 from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, PatternFill
 from xlsxwriter.utility import xl_col_to_name
+from pathlib import Path
 import re
 import os
 
@@ -14,13 +15,13 @@ def run():
 
     # Column and Row setup
     idxs = {}
-    Brands = list(map(lambda x: x[:-4].replace("-", " "), os.listdir("../../Links")))
+    Brands = list(map(lambda x: x[:-4].replace("-", " "), os.listdir(Path(__file__).parent / '..' / '..' / 'Links')))
     Brands = [""] + Brands
 
     for b in range(len(Brands)):
         idxs[Brands[b].replace("-", "").replace(" ", "")] = xl_col_to_name(b)
 
-    with open("../../Docs/Base.csv", "r") as f:
+    with open(Path(__file__).parent / '..' / '..' / 'Docs' / 'Base.csv', "r") as f:
         Specs = list(map(lambda x: x.rstrip(), f.read().split(',')))
 
     Specs += ["_"] # the defualt case
@@ -38,7 +39,7 @@ def run():
 
 
     # Fill in the cells
-    files = os.listdir("Corrections")
+    files = os.listdir(Path(__file__).parent / "Corrections")
     files.remove("__init__.py")
     files.remove("__pycache__")
     files = list(map(lambda x: x.replace(".py", ""), files))
@@ -48,7 +49,7 @@ def run():
 
     for f in files:
         brand = f.replace(".py", "")
-        with open("Corrections/" + f + ".py", "r") as file:
+        with open(Path(__file__).parent / "Corrections/" / (f + ".py"), "r") as file:
             data = file.readlines()
         
         idx = list(map(lambda x: data.index(x), filter(filt, data)))
@@ -85,7 +86,7 @@ def run():
         adjusted_width = (max_length+2)
         ws.column_dimensions[column_letter].width = adjusted_width
 
-    wb.save("../../Docs/CorrectionStatus.xlsx")
+    wb.save(Path(__file__).parent / '..' / '..' / 'Docs' / 'CorrectionStatus.xlsx')
 
 
 if __name__ == "__main__":

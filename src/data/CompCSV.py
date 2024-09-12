@@ -3,7 +3,11 @@
 import os
 import argparse
 
-def AllData():
+# TODO: refactor with pathlib
+
+def AllData(old=False):
+    data_path = "Data-Old/CSV" if old else "Data"
+
     cwd = os.getcwd()
     base = open('../../Docs/Base.csv', 'r')
     header = base.readline()
@@ -70,6 +74,7 @@ if __name__ == '__main__':
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('--make', '--build', type=bool, nargs='?', const=True, default=False, help="Create the data compiled csv files")
     group.add_argument('--remove', '--delete', '--clean', type=bool, nargs='?', const=True, default=False, help="Remove the data compiled csv files")
+    group.add_argument('--old', type=bool, nargs='?', const=True, default=False, help="Compile CSVs for old data")
 
     args = parser.parse_args()
 

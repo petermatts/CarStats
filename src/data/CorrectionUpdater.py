@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 def update(fixmap: dict):
     """
@@ -10,7 +11,7 @@ def update(fixmap: dict):
     @return: None
     """
 
-    os.chdir('Corrections')
+    os.chdir(Path(__file__).parent / 'Corrections')
     files = list(filter(lambda x: x not in ['__pycache__', '__init__.py'], os.listdir()))
     
     for file in files:
@@ -48,7 +49,7 @@ def update(fixmap: dict):
                         "\t\t\t\t\tpass #Implement this if necessary\n"
                     ]
 
-        with open('../../../Temp/'+file, 'w') as f: #! move from temp once verified this actually works
+        with open(Path(__file__).parent / '..' / '..' / '..' / 'Temp' / file, 'w') as f: #! move from temp once verified this actually works
             f.writelines(newData)
 
 

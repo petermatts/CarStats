@@ -5,6 +5,7 @@ Make the txt first with txt args, sort it then make the csv with the csv arg
 import os
 import json
 import argparse
+from pathlib import Path
 from Conversion import Gather_Keys
 
 cwd = os.getcwd()
@@ -15,11 +16,11 @@ def write_txt():
     for k in range(len(keys)):
         keys[k] = keys[k] + '\n'
     
-    with open('../../Docs/Base.txt', 'w') as f:
+    with open(Path(__file__).parent / '..' / '..' / 'Docs' /  'Base.txt', 'w') as f:
         f.writelines(keys)
 
 def write_csv(unordered = False):
-    with open('../../Docs/KeyGroups.json', 'r') as f:
+    with open(Path(__file__).parent / '..' / '..' / 'Docs' / 'KeyGroups.json', 'r') as f:
         data = json.load(f)
 
     groups = data.keys()
@@ -39,7 +40,7 @@ def write_csv(unordered = False):
 
     specs = specs_t + specs_f
 
-    with open('../../Docs/Base.csv', 'w') as f:
+    with open(Path(__file__).parent / '..' / '..' / 'Docs' /  'Base.csv', 'w') as f:
         f.write(','.join(specs) + '\n')
 
 def getYamlBase():
@@ -48,7 +49,7 @@ def getYamlBase():
     for k in range(len(keys)):
         keys[k] = keys[k] + '\n'
     
-    with open('../../Docs/BaseYAML.txt', 'w') as f:
+    with open(Path(__file__).parent / '..' / '..' / 'Docs' /  'BaseYAML.txt', 'w') as f:
         f.writelines(keys)
 
 if __name__ == '__main__':

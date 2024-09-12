@@ -4,11 +4,13 @@ This file maps the raw YAML data to JSON. Then JSON to CSV.
 Reconfiguring it according to the design plans along the way.
 """
 
+# TODO: refactor with pathlib
+
 import os
 import json
 import yaml
-import sys
 import argparse
+from pathlib import Path
 
 from Correction import Correction
 from ConversionHelper import KeyMap
