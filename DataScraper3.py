@@ -37,25 +37,13 @@ def openDebugFile(path: str):
     def makeDebugFile(path: str):
         """Assumes valid path and only needs to make file"""
 
-        default = {
-            'link_idx': 0,
-            'year_idx': 0,
-            'year_text': '',
-            'style_idx': 0,
-            'style_text': '',
-            'trim_idx': 0,
-            'trim_text': ''
-        }
-
         with open(path, 'w') as f:
-            data = yaml.dump(default)
-            f.write(data)
+            f.write(yaml.dump(DEBUG_DEFAULT))
     
     try:
         with open(path, 'r') as file:
-            data = yaml.safe_load(file)
-            return data
-    except:
+            return yaml.safe_load(file)
+    except FileNotFoundError:
         makeDebugFile(path)
         return openDebugFile(path)
 
@@ -63,6 +51,11 @@ def openDebugFile(path: str):
 def updateDebugFile(path: str, debug_data: dict):
     with open(path, 'w') as f:
         f.write(yaml.dump(debug_data))
+
+
+def resetDebugFile(path: str):
+    with open(path, 'w') as f:
+        f.write(yaml.dump(DEBUG_DEFAULT))
 
 
 def makeArgs() -> argparse.Namespace:
@@ -83,6 +76,15 @@ def makeArgs() -> argparse.Namespace:
 
     return parser.parse_args()
 
+
+def getSelectors(driver: uc.Chrome) -> tuple[uc.WebElement,uc.WebElement,uc.WebElement]:
+    select = driver.find_elements(By.CLASS_NAME, "eb99zkn0.eqh7ajx0.css-1pdk0xo-container")
+    if len(select) != 3:
+        raise ValueError(f"{len(select)} dropdowns found, expected 3. Expected to see Year, Style, and Trim.")
+    
+    yearSelect, styleSelect, trimSelect = select
+    return yearSelect, styleSelect, trimSelect
+
 ####################################################################################################
 
 # the scraping algorithm is composed of the functions in this section
@@ -96,7 +98,7 @@ def scrape(brand_filename: str, modelname: str = None, year: int = None, latest 
         links = file.readlines()
 
     # open debug file (open with defaults if it doesn't exist)
-    debug_path = Path(__file__).parent / brand + '.yaml'
+    debug_path = Path(__file__).parent / "Debug" / (brand + '.yaml')
     debug = openDebugFile(debug_path)
     u = debug['link_idx']
 
@@ -113,12 +115,82 @@ def scrape(brand_filename: str, modelname: str = None, year: int = None, latest 
         # create the webdriver and options
         opts = uc.ChromeOptions()
         opts.add_argument('start-maximized')
-        opts.add_argument('--ignore-certificate-errors')
-        opts.add_experimental_option('excludeSwitches', ['enable-logging'])
-        driver = uc.Chrome(opts)
+        # opts.add_argument('--ignore-certificate-errors')
+        # opts.add_experimental_option('excludeSwitches', ['enable-logging'])
+        driver = uc.Chrome(opts, use_subprocess=False)
         driver.implicitly_wait(Timing.IMPLICIT_WAIT)
 
-        # todo keep going
+        try:
+            driver.get(url)
+            r = requests.get(url, timeout = 5)
+            if r.status_code == 404:
+                raise ValueError()
+        except ValueError:
+            print(f"Bad URL: {url}")
+            with open(Path(__file__).parent / "Log" / "Bad ScrapeLinks.log", 'a') as file:
+                file.write(url)
+            u += 1
+            debug['link_idx'] = u
+            updateDebugFile(debug_path, debug)
+            continue
+
+        #iteratively scrape over the dropdown, updating debug file as we go
+        try:
+            yearSelect, styleSelect, trimSelect = getSelectors(driver)
+            yearSelect.click()
+
+            years = driver.find_element(By.ID, 'react-select-2-listbox').find_elements(By.XPATH, './/*')[2:]
+            print(list(map(lambda e: e.text, years))) # todo remove this
+            years.reverse()
+
+            time.sleep(Timing.SLEEP)
+
+            y, s, t = debug['year_idx'], debug['style_idx'], debug['trim_idx']
+
+
+            if latest: # skip to the latest year if latest param is true
+                y = len(years) - 1 
+
+            while y < len(years):
+                time.sleep(Timing.SLEEP)
+                years = driver.find_element(By.ID, 'react-select-2-listbox').find_elements(By.XPATH, './/*')[2:]
+                years.reverse()
+
+                if year != None and int(years[y].text) != year:
+                    # only scrape the specified year if the year parameter is defined
+                    y += 1
+                    continue
+
+                debug['year_text'] = years[y].text
+                years[y].click()
+                time.sleep(Timing.SLEEP)
+
+                styleSelect.click()
+                styles = driver.find_element(By.ID, 'react-select-3-listbox').find_elements(By.XPATH, './/*')[2:]
+                print(list(map(lambda e: e.text, styles))) # todo remove this
+                while s < len(styles):
+                    time.sleep(Timing.SLEEP)
+                    styles = driver.find_element(By.ID, 'react-select-3-listbox').find_elements(By.XPATH, './/*')[2:]
+                    debug['style_text'] = styles[s].text
+                    styles[s].click()
+                    time.sleep(Timing.SLEEP)
+
+                    trimSelect.click()
+                    trims = driver.find_element(By.ID, 'react-select-4-listbox').find_elements(By.XPATH, './/*')[2:]
+                    print(list(map(lambda e: e.text, trims)))
+                    while t < len(trims):
+                        time.sleep(Timing.SLEEP)
+                        trims = driver.find_element(By.ID, 'react-select-4-listbox').find_elements(By.XPATH, './/*')[2:]
+                        debug['trim_text'] = trims[t].text
+                        trims[t].click()
+                        time.sleep(Timing.SLEEP)
+
+
+
+            time.sleep(3600) # todo remove this
+        except Exception:
+            pass #todo
+
 
 ####################################################################################################
 
@@ -137,11 +209,11 @@ def driver(args: argparse.Namespace) -> int:
     test = args.test
 
     if not args.list:
-        brand_links = Path(__file__) / "Links" / brand + ".txt"
+        brand_links = str(Path(__file__).parent / "Links" / (brand + ".txt"))
 
-        if os.path.isfile(brand_links):
+        if os.path.isfile(brand_links): 
             if args.show:
-                print(f"Here are all models of brand {brand}:\nf{getCLIString(getModelList(brand))}")
+                print(f"Here are all models of brand {brand}:\n{getCLIString(getModelList(brand))}")
                 return Results.BAD
             
             result = 0
