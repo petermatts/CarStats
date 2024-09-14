@@ -3,12 +3,20 @@ import os
 import re
 import pandas as pd
 
-from ..common import getAttrList
+from pathlib import Path
+
+
+def _getAttrs() -> list[str]:
+    with open((Path(__file__).parent/"../../Docs/Base-Old.csv").resolve()) as f:
+        attributes = f.readline()
+
+    return attributes.rstrip().split(",")
+
 
 def makeArgs() -> tuple[dict[str, str], dict[str, str]]:
     description = """""" # todo write helpful description
     parser = argparse.ArgumentParser(description=description)
-    attributes = getAttrList()
+    attributes = _getAttrs()
 
     # customization args
     parser.add_argument("-v", "--verbose", type=bool, nargs='?', const=True, default=False, help="Displays full dataframe of matches, beware generic searches will have a large result")
@@ -41,11 +49,11 @@ def search(args: dict[str, str], keymap: dict[str,  str]) -> None:
     if all(v is None for v in args.values()):
         print("Error: must supply atleast 1 search key. Run --help for options.")
         return
-    elif not os.path.isfile("../../Data/CSV/AllData.csv"):
-        print("Error: AllData.csv does not exist. Run CompCSV.py --build")
+    elif not os.path.isfile((Path(__file__).parent/"../../Data-Old/CSV/AllData.csv").resolve()):
+        print("Error: AllData.csv does not exist. Run CompCSV.py --build --old")
         return
 
-    data = pd.read_csv("../../Data/CSV/AllData.csv", encoding="cp1252", dtype=str)
+    data = pd.read_csv((Path(__file__).parent/"../../Data-Old/CSV/AllData.csv").resolve(), encoding="cp1252", dtype=str)
 
     print_cols = list()
     for k,v in args.items():
@@ -67,7 +75,7 @@ def search(args: dict[str, str], keymap: dict[str,  str]) -> None:
         pd.set_option('display.max_rows', len(data))
     print(data[print_cols])
     pd.reset_option('display.max_rows')
-    
+
 
 if __name__ == "__main__":
     args, keymap = makeArgs()

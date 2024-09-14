@@ -37,7 +37,7 @@ class Volkswagen_Corrections(Correction_Template):
 							result[k] = "CC"
 						case "eos":
 							result[k] = "Eos"
-						case "golf"|"golf-alltrack"|"golf-gta"|"golf-r"|"golf-sportwagen":
+						case "golf"|"golf-alltrack"|"golf-gti"|"golf-r"|"golf-sportwagen":
 							result[k] = "Golf"
 						case "id4":
 							result[k] = "ID.4"
@@ -64,7 +64,7 @@ class Volkswagen_Corrections(Correction_Template):
 
 					s = re.search(r"((Touareg2|Alltrack|New Beetle|Convertible|Hatchback|Hybrid|Sedan|GLI|GTI|TDI|Cross Sport|Dune|R-Line|SportWagen| R | R$|Wagon) ?)+", result[k])
 					if s is not None:
-						result[k] = result[k][s.span()[0]:s.span()[1]].rstrip()
+						result[k] = result[k][s.span()[0]:s.span()[1]].strip()
 					else:
 						result[k] = ""
 				case "Trim":

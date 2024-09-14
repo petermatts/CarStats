@@ -18,10 +18,10 @@ from ConversionHelper import KeyMap
 cwd = os.getcwd()
 
 def YAML_TO_JSON(brand: str = None):
-    if not os.path.exists('../../Data/JSON'):
-        os.mkdir('../../Data/JSON')
+    if not os.path.exists('../../Data-Old/JSON'):
+        os.mkdir('../../Data-Old/JSON')
 
-    os.chdir('../../Data/YAML')
+    os.chdir('../../Data-Old/YAML')
 
     brands = os.listdir()
     for b in brands:
@@ -63,13 +63,13 @@ def YAML_TO_JSON(brand: str = None):
 def JSON_TO_CSV(brand: str = None):
     C = Correction()
 
-    if not os.path.exists('../../Data/CSV'):
-        os.mkdir('../../Data/CSV')
+    if not os.path.exists('../../Data-Old/CSV'):
+        os.mkdir('../../Data-Old/CSV')
 
-    with open('../../Docs/Base.csv', 'r') as f:
+    with open('../../Docs/Base-Old.csv', 'r') as f:
         header = f.readlines()[0]
 
-    os.chdir('../../Data/JSON')
+    os.chdir('../../Data-Old/JSON')
 
     brands = os.listdir()
     for b in brands:
@@ -127,9 +127,9 @@ def Gather_Keys(yamlfile: bool = False) -> list[str]:
     print("Gathering keys from...")
     keys = set()
     if yamlfile:
-        os.chdir('../../Data/YAML')
+        os.chdir('../../Data-Old/YAML')
     else:
-        os.chdir('../../Data/JSON')
+        os.chdir('../../Data-Old/JSON')
 
     brands = os.listdir()
     for b in brands:
@@ -163,7 +163,7 @@ def Gather_Keys(yamlfile: bool = False) -> list[str]:
 
 def driver(args: argparse.Namespace):
     cwd = os.getcwd()
-    os.chdir('../../Data/YAML')
+    os.chdir('../../Data-Old/YAML')
     brands = os.listdir()
     os.chdir(cwd)
 

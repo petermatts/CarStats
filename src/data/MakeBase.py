@@ -40,7 +40,7 @@ def write_csv(unordered = False):
 
     specs = specs_t + specs_f
 
-    with open(Path(__file__).parent / '..' / '..' / 'Docs' /  'Base.csv', 'w') as f:
+    with open(Path(__file__).parent / '..' / '..' / 'Docs' /  'Base-Old.csv', 'w') as f:
         f.write(','.join(specs) + '\n')
 
 def getYamlBase():

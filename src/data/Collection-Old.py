@@ -9,8 +9,6 @@ import argparse
 from ..common import *
 from pathlib import Path
 
-# TODO make this file work for the migrated data folder
-
 def gatherBrand(attr: str, yam: bool, csv: bool, year: int = None, model: str = None):
     """Gathers all data amongst attribute. Function run within brand directory"""
     values = set()
