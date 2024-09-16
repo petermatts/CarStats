@@ -1,9 +1,14 @@
 import argparse
 import os
 import re
+import sys
 import pandas as pd
+from pathlib import Path
 
-from ..common import getAttrList
+if (Path(__file__).parent / "..").resolve().__str__() not in sys.path:
+    sys.path.append((Path(__file__).parent / "..").resolve().__str__())
+
+from common import getAttrList
 
 def makeArgs() -> tuple[dict[str, str], dict[str, str]]:
     description = """""" # todo write helpful description
@@ -41,11 +46,11 @@ def search(args: dict[str, str], keymap: dict[str,  str]) -> None:
     if all(v is None for v in args.values()):
         print("Error: must supply atleast 1 search key. Run --help for options.")
         return
-    elif not os.path.isfile("../../Data/CSV/AllData.csv"):
+    elif not os.path.isfile(Path(__file__).parent / "../../Data/AllData.csv"):
         print("Error: AllData.csv does not exist. Run CompCSV.py --build")
         return
 
-    data = pd.read_csv("../../Data/CSV/AllData.csv", encoding="cp1252", dtype=str)
+    data = pd.read_csv(Path(__file__).parent / "../../Data/AllData.csv", encoding="cp1252", dtype=str)
 
     print_cols = list()
     for k,v in args.items():

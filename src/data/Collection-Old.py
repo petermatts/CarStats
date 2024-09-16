@@ -1,13 +1,17 @@
 # Script to gather a set of all values in (parameter) specified columns of the data CSV files 
 
-import json
-import yaml
-import csv as CSV
-import os
 import argparse
-
-from ..common import *
+import csv as CSV
+import json
+import os
+import sys
+import yaml
 from pathlib import Path
+
+if (Path(__file__).parent / "..").resolve().__str__() not in sys.path:
+    sys.path.append((Path(__file__).parent / "..").resolve().__str__())
+
+from common import *
 
 def gatherBrand(attr: str, yam: bool, csv: bool, year: int = None, model: str = None):
     """Gathers all data amongst attribute. Function run within brand directory"""
@@ -45,11 +49,11 @@ def gatherBrand(attr: str, yam: bool, csv: bool, year: int = None, model: str = 
 def getAttr(attr: str, brand: str = None, yam: bool = False, csv: bool = False, year: int = None, model: str = None) -> set:
     cwd = os.getcwd()
     if yam:
-        os.chdir((Path(__file__) / "../../Data-Old/YAML").resolve())
+        os.chdir((Path(__file__).parent / "../../Data-Old/YAML").resolve())
     elif csv:
-        os.chdir((Path(__file__) / "../../Data-Old/CSV").resolve())
+        os.chdir((Path(__file__).parent / "../../Data-Old/CSV").resolve())
     else:
-        os.chdir((Path(__file__) / "../../Data-Old/JSON").resolve())
+        os.chdir((Path(__file__).parent / "../../Data-Old/JSON").resolve())
     values = set()
 
     if brand != None:

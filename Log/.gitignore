@@ -1,2 +1,6 @@
+# Sheets
 *.xlsx
 *.csv
+
+# Images/Plots
+*.png

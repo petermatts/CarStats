@@ -4,13 +4,14 @@ import os
 
 def getBrandList() -> list[str]:
     """"""
-    return os.listdir(Path(__file__).parent / ".." / ".." / "Data")
+    return list(filter(lambda x: ".csv" not in x, os.listdir(Path(__file__).parent / "../../Data")))
 
 
 def getYearList(brand: str) -> list[str]:
     """"""
     assert brand in getBrandList()
-    return os.listdir(Path(__file__).parent / ".." / ".." / "Data" / f"{brand}")
+    
+    return list(filter(lambda x: ".csv" not in x, os.listdir(Path(__file__).parent / f"../../Data/{brand}")))
 
 
 def getModelList(brand: str, year: int = None) -> list[str]:
@@ -19,12 +20,12 @@ def getModelList(brand: str, year: int = None) -> list[str]:
     #? print out list of options if not in list?
 
     models = set()
-    years = getYearList()
+    years = getYearList(brand)
     for y in years:
         if year is not None and y != year:
             continue
 
-        for m in os.listdir(Path(__file__).parent / ".." / ".." / "Data" / f"{brand}" / f"{y}"):
+        for m in os.listdir(Path(__file__).parent / f"../../Data/{brand}/{y}"):
             models.add(m[:-4]) # chop off the .csv
     
     models = list(models)
@@ -34,7 +35,7 @@ def getModelList(brand: str, year: int = None) -> list[str]:
 
 def getAttrList() -> list[str]:
     """"""
-    with open("../../Docs/Base.csv") as f:
+    with open(Path(__file__).parent / "../../Docs/Base.csv") as f:
         attributes = f.readline()
 
     return attributes.rstrip().split(",")
@@ -42,7 +43,12 @@ def getAttrList() -> list[str]:
 
 def yearHasModel(brand: str, year: str, model: str) -> bool:
     cwd = os.getcwd()
-    os.chdir(Path(__file__).parent / '..' / '..' / 'Data' / brand / year)
+    
+    try:
+        os.chdir(Path(__file__).parent / f"../../Data/{brand}/{year}")
+    except FileNotFoundError:
+        return False
+    
     models = os.listdir()
     for m in models:
         if model == m.split(".")[0]:
