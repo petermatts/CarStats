@@ -1,0 +1,14 @@
+# Folders
+.vscode
+**/__pycache__
+
+Data/CSV
+Data/JSON
+Data/YAML
+
+Temp
+
+# Files
+# AllLinks.txt
+/**/~*
+# Log/ErrorLinks-Fix.csv
